@@ -15,19 +15,22 @@
 <body class="classroom-body">
   <main class="classroom-app">
 
-    <header class="classroom-header">
-      <div class="school-info">
+    <header class="classroom-hero">
+      <div class="classroom-logos">
+        <img class="ministry-logo" src="icons/ministry-logo.png" alt="شعار وزارة التربية والتعليم" />
         <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
-        <div>
-          <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
-          <p id="scheduleName">جاري تحميل التوقيت...</p>
-        </div>
+      </div>
+
+      <div class="classroom-title">
+        <p class="ministry-text">وزارة التربية والتعليم</p>
+        <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
+        <p id="scheduleName">جاري تحميل التوقيت...</p>
       </div>
 
       <div class="classroom-time">
         <span id="dayName">--</span>
-        <span id="dateText">--</span>
         <strong id="currentTime">--:--:--</strong>
+        <span id="dateText">--</span>
       </div>
     </header>
 
@@ -66,6 +69,18 @@
 
       <div id="scheduleList" class="schedule-list"></div>
     </section>
+
+    <footer class="footer modern-footer">
+      <div>
+        <strong>وزارة التربية والتعليم</strong>
+        <span>مدرسة الشيخ سيف بن حمد الأغبري (5-12)</span>
+      </div>
+
+      <div>
+        <span>إعداد وتطوير</span>
+        <strong>ماجد بن سيف الأغبري</strong>
+      </div>
+    </footer>
 
   </main>
 
