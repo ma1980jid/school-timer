@@ -43,20 +43,18 @@ async function loadSchool() {
     if (logoEl) logoEl.src = logo;
     setPageIcons(logo);
 
-    // جلب التوقيت النشط من جدول school_schedules
-    const { data: activeSchoolSchedule, error: activeScheduleError } = await supabaseClient
+    const { data: activeSchedules, error: activeScheduleError } = await supabaseClient
       .from("school_schedules")
       .select("*")
       .eq("school_id", school.id)
-      .eq("is_active", true)
-      .single();
+      .eq("is_active", true);
 
-    if (activeScheduleError || !activeSchoolSchedule) {
+    if (activeScheduleError || !activeSchedules || activeSchedules.length === 0) {
       showError("لم يتم تحديد توقيت نشط لهذه المدرسة في جدول school_schedules.");
       return;
     }
 
-    const activeScheduleId = activeSchoolSchedule.schedule_id;
+    const activeScheduleId = activeSchedules[0].schedule_id;
 
     const { data: schedule } = await supabaseClient
       .from("schedules")
@@ -155,6 +153,7 @@ function setText(id, value) {
 function setPageIcons(iconUrl) {
   const icon = document.querySelector("link[rel='icon']");
   const apple = document.querySelector("link[rel='apple-touch-icon']");
+
   if (icon) icon.href = iconUrl;
   if (apple) apple.href = iconUrl;
 }
