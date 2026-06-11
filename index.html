@@ -4,60 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مؤقت الحصص المدرسية</title>
+
+  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0f766e" />
   <link rel="icon" href="icons/default-icon.svg" />
-  <link rel="apple-touch-icon" href="icons/default-icon.svg" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <main class="app teacher-mode">
-    <section class="top-card">
-      <div class="brand">
-        <div class="logo-wrap"><img id="schoolLogo" src="icons/default-icon.svg" alt="شعار المدرسة"></div>
+  <main class="app">
+
+    <header class="top-card">
+      <div class="school-info">
+        <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
         <div>
           <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
           <p id="scheduleName">جاري تحميل التوقيت...</p>
         </div>
       </div>
-      <div class="date-clock">
-        <div id="dayName">--</div>
-        <div id="dateText">--</div>
-        <div id="currentTime">--:--:--</div>
+
+      <div class="time-box">
+        <span id="dayName">--</span>
+        <span id="dateText">--</span>
+        <strong id="currentTime">--:--:--</strong>
       </div>
-    </section>
+    </header>
 
     <div id="alertBar" class="alert-bar hidden"></div>
 
-    <section class="cards-grid">
-      <article class="main-card current-card">
-        <div class="card-label">الحصة الحالية</div>
-        <h2 id="currentPeriod">--</h2>
-        <div id="remainingTime" class="remaining">--:--</div>
-        <p id="periodRange" class="range">--</p>
-        <div id="progressTrack" class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-      </article>
+    <section class="message-card">
+      <span>عبارة اليوم</span>
+      <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
+    </section>
 
-      <article class="next-card">
-        <div class="card-label">الحصة القادمة</div>
+    <section class="cards-grid">
+      <div class="main-card">
+        <span>الحصة الحالية</span>
+        <h2 id="currentPeriod">--</h2>
+        <strong id="remainingTime">--:--</strong>
+        <p id="periodRange">--</p>
+        <div class="progress">
+          <div id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="next-card">
+        <span>الحصة القادمة</span>
         <h2 id="nextPeriod">--</h2>
-        <p id="nextRange" class="range">--</p>
-        <p id="nextStartsIn" class="starts-in">--</p>
-      </article>
+        <p id="nextRange">--</p>
+        <small id="nextStartsIn"></small>
+      </div>
     </section>
 
     <section class="schedule-card">
-      <div class="section-head">
+      <div class="section-title">
         <h2>جدول اليوم</h2>
         <span id="scheduleCount">0 فترة</span>
       </div>
+
       <div id="scheduleList" class="schedule-list"></div>
     </section>
 
-    <footer>
+    <footer class="footer">
       <span>مؤقت الحصص المدرسية</span>
       <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
     </footer>
+
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
