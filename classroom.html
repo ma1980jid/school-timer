@@ -89,3 +89,163 @@
   <script src="script.js"></script>
 </body>
 </html>
+/* =========================
+   Classroom V2 Enhancement
+========================= */
+
+.classroom-body .classroom-app {
+  width: min(1500px, 96%);
+  padding-top: 18px;
+}
+
+.classroom-hero {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 30px;
+  padding: 22px 34px;
+  display: grid;
+  grid-template-columns: 180px 1fr 320px;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 20px 45px rgba(15, 118, 110, 0.12);
+}
+
+.classroom-logos {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.classroom-title {
+  text-align: center;
+}
+
+.classroom-title h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.classroom-title p {
+  margin: 6px 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.classroom-time {
+  background: linear-gradient(135deg, var(--primary), #075e57);
+  color: white;
+  border-radius: 26px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 16px 35px rgba(15, 118, 110, 0.28);
+}
+
+.classroom-time strong {
+  font-size: 58px;
+  line-height: 1.2;
+}
+
+.classroom-main {
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 24px;
+  margin-top: 22px;
+}
+
+.classroom-current,
+.classroom-next {
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.classroom-current span,
+.classroom-next span {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.classroom-current h2 {
+  font-size: 76px;
+  margin: 14px 0;
+}
+
+.classroom-current strong {
+  font-size: 120px;
+  line-height: 1;
+}
+
+.classroom-current p,
+.classroom-next p {
+  color: var(--muted);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.classroom-next h2 {
+  font-size: 58px;
+  margin: 18px 0;
+}
+
+.classroom-next small {
+  color: var(--secondary);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.classroom-progress {
+  height: 18px;
+  margin-top: 28px;
+}
+
+.classroom-message {
+  margin-top: 22px;
+  padding: 22px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.classroom-message span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.classroom-message strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 42px;
+  color: var(--primary);
+}
+
+.classroom-schedule {
+  margin-top: 22px;
+}
+
+.classroom-schedule .schedule-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.classroom-schedule .item {
+  min-height: 54px;
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .classroom-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .classroom-main {
+    grid-template-columns: 1fr;
+  }
+
+  .classroom-schedule .schedule-list {
+    grid-template-columns: 1fr;
+  }
+}
