@@ -13,51 +13,55 @@
 </head>
 
 <body>
-  <main class="app">
+  <main class="app modern-layout">
 
-    <header class="top-card">
-      <div class="school-info">
+    <header class="hero-card">
+      <div class="hero-logos">
+        <img class="ministry-logo" src="icons/ministry-logo.png" alt="شعار وزارة التربية والتعليم" />
         <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
-        <div>
-          <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
-          <p id="scheduleName">جاري تحميل التوقيت...</p>
-        </div>
       </div>
 
-      <div class="time-box">
+      <div class="hero-content">
+        <p class="ministry-text">وزارة التربية والتعليم</p>
+        <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
+        <p id="scheduleName" class="schedule-name">جاري تحميل التوقيت...</p>
+      </div>
+
+      <div class="hero-time">
         <span id="dayName">--</span>
-        <span id="dateText">--</span>
         <strong id="currentTime">--:--:--</strong>
+        <span id="dateText">--</span>
       </div>
     </header>
 
     <div id="alertBar" class="alert-bar hidden"></div>
 
-    <section class="message-card">
-      <span>عبارة اليوم</span>
+    <section class="message-card modern-message">
+      <span>رسالة تربوية</span>
       <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
     </section>
 
-    <section class="cards-grid">
-      <div class="main-card">
-        <span>الحصة الحالية</span>
+    <section class="cards-grid modern-cards">
+      <div class="main-card current-card">
+        <div class="card-label">الحصة الحالية</div>
         <h2 id="currentPeriod">--</h2>
         <strong id="remainingTime">--:--</strong>
         <p id="periodRange">--</p>
+
         <div class="progress">
           <div id="progressFill"></div>
         </div>
       </div>
 
-      <div class="next-card">
-        <span>الحصة القادمة</span>
+      <div class="next-card upcoming-card">
+        <div class="card-label">الحصة القادمة</div>
         <h2 id="nextPeriod">--</h2>
         <p id="nextRange">--</p>
         <small id="nextStartsIn"></small>
       </div>
     </section>
 
-    <section class="schedule-card">
+    <section class="schedule-card modern-schedule">
       <div class="section-title">
         <h2>جدول اليوم</h2>
         <span id="scheduleCount">0 فترة</span>
@@ -66,8 +70,17 @@
       <div id="scheduleList" class="schedule-list"></div>
     </section>
 
-    <footer class="footer">
-      <span>مؤقت الحصص المدرسية</span>
+    <footer class="footer modern-footer">
+      <div>
+        <strong>وزارة التربية والتعليم</strong>
+        <span>مدرسة الشيخ سيف بن حمد الأغبري (5-12)</span>
+      </div>
+
+      <div>
+        <span>إعداد وتطوير</span>
+        <strong>ماجد بن سيف الأغبري</strong>
+      </div>
+
       <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
     </footer>
 
