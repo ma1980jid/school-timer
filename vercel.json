@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/s/:school",
+      "destination": "/index.html?school=:school"
+    },
+    {
+      "source": "/classroom/:school",
+      "destination": "/classroom.html?school=:school"
+    }
+  ]
+}

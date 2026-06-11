@@ -1,0 +1,17 @@
+{
+  "name": "مؤقت الحصص المدرسية",
+  "short_name": "مؤقت الحصص",
+  "start_url": "index.html?school=alsheikh-saif",
+  "display": "standalone",
+  "direction": "rtl",
+  "lang": "ar",
+  "theme_color": "#0f766e",
+  "background_color": "#eef8f5",
+  "icons": [
+    {
+      "src": "icons/default-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

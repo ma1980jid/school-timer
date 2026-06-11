@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شاشة مؤقت الحصص</title>
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="icon" href="icons/default-icon.svg" />
+  <link rel="apple-touch-icon" href="icons/default-icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="classroom-mode">
+    <section class="classroom-header">
+      <div class="brand">
+        <div class="logo-wrap"><img id="schoolLogo" src="icons/default-icon.svg" alt="شعار المدرسة"></div>
+        <div>
+          <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
+          <p id="scheduleName">جاري تحميل التوقيت...</p>
+        </div>
+      </div>
+      <div class="date-clock">
+        <div id="dayName">--</div>
+        <div id="dateText">--</div>
+        <div id="currentTime">--:--:--</div>
+      </div>
+    </section>
+
+    <div id="alertBar" class="alert-bar hidden"></div>
+
+    <section class="classroom-main">
+      <div class="now-block">
+        <span>الحصة الحالية</span>
+        <h2 id="currentPeriod">--</h2>
+        <p id="periodRange" class="range">--</p>
+      </div>
+      <div class="countdown-block">
+        <span>المتبقي</span>
+        <div id="remainingTime">--:--</div>
+        <div id="progressTrack" class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      </div>
+      <div class="next-block">
+        <span>الحصة القادمة</span>
+        <h2 id="nextPeriod">--</h2>
+        <p id="nextRange" class="range">--</p>
+        <p id="nextStartsIn" class="starts-in">--</p>
+      </div>
+    </section>
+
+    <section class="classroom-strip">
+      <div id="scheduleCount">0 فترة</div>
+      <div id="scheduleList" class="strip-list"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
