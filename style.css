@@ -5,11 +5,9 @@
   --card: #ffffff;
   --text: #0f172a;
   --muted: #64748b;
-  --border: #dbeafe;
   --success: #16a34a;
   --warning: #f59e0b;
   --danger: #dc2626;
-  --soft: rgba(255, 255, 255, 0.78);
 }
 
 * {
@@ -39,6 +37,10 @@ body::before {
   z-index: -1;
 }
 
+/* =========================
+   Main App
+========================= */
+
 .app {
   width: min(980px, 94%);
   margin: 0 auto;
@@ -63,17 +65,6 @@ body::before {
   position: relative;
 }
 
-.hero-card::after {
-  content: "";
-  position: absolute;
-  inset-inline-start: -70px;
-  top: -70px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: rgba(245, 158, 11, 0.16);
-}
-
 .hero-logos {
   display: flex;
   flex-direction: column;
@@ -83,21 +74,21 @@ body::before {
 }
 
 .ministry-logo {
-  width: 64px;
-  height: 64px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   background: white;
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 5px;
   border: 1px solid rgba(15, 118, 110, 0.12);
 }
 
 .school-logo {
-  width: 72px;
-  height: 72px;
+  width: 66px;
+  height: 66px;
   object-fit: contain;
   background: white;
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 6px;
   border: 1px solid rgba(15, 118, 110, 0.15);
   box-shadow: 0 8px 20px rgba(15, 118, 110, 0.14);
@@ -181,7 +172,7 @@ body::before {
 
 .message-card {
   margin-top: 14px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(236,253,245,0.96));
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(15, 118, 110, 0.16);
   border-radius: 22px;
   padding: 16px 20px;
@@ -265,8 +256,7 @@ body::before {
 }
 
 .next-card {
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,247,237,0.96));
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,247,237,0.96));
 }
 
 .next-card h2 {
@@ -439,7 +429,7 @@ body::before {
 }
 
 /* =========================
-   Classroom mode
+   Classroom Mode
 ========================= */
 
 .classroom-body {
@@ -449,45 +439,81 @@ body::before {
 }
 
 .classroom-app {
-  width: min(1400px, 96%);
+  width: min(1500px, 96%);
   margin: 0 auto;
-  padding: 24px 0;
+  padding: 18px 0 24px;
 }
 
-.classroom-header {
-  background: rgba(255,255,255,0.94);
+.classroom-hero {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 118, 110, 0.14);
   border-radius: 30px;
-  padding: 22px;
-  display: flex;
-  justify-content: space-between;
+  padding: 22px 34px;
+  display: grid;
+  grid-template-columns: 180px 1fr 320px;
   align-items: center;
-  box-shadow: 0 18px 40px rgba(15,118,110,0.12);
-  border: 1px solid rgba(15,118,110,0.16);
+  gap: 24px;
+  box-shadow: 0 20px 45px rgba(15, 118, 110, 0.12);
+}
+
+.classroom-logos {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.classroom-title {
+  text-align: center;
+}
+
+.classroom-title h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.classroom-title p {
+  margin: 6px 0;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .classroom-time {
+  background: linear-gradient(135deg, var(--primary), #075e57);
+  color: white;
+  border-radius: 26px;
+  padding: 20px;
   text-align: center;
-  color: var(--primary);
+  box-shadow: 0 16px 35px rgba(15, 118, 110, 0.28);
+}
+
+.classroom-time span {
+  display: block;
+  font-weight: 700;
+  opacity: 0.95;
 }
 
 .classroom-time strong {
   display: block;
-  font-size: 54px;
+  font-size: 58px;
+  line-height: 1.2;
+  margin: 8px 0;
   font-weight: 900;
 }
 
 .classroom-main {
-  margin-top: 18px;
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 18px;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 24px;
+  margin-top: 22px;
 }
 
 .classroom-current,
 .classroom-next,
 .classroom-message,
 .classroom-schedule {
-  background: white;
+  background: rgba(255, 255, 255, 0.94);
   border-radius: 30px;
   padding: 28px;
   box-shadow: 0 18px 40px rgba(15,118,110,0.12);
@@ -495,43 +521,96 @@ body::before {
   text-align: center;
 }
 
+.classroom-current,
+.classroom-next {
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.classroom-current span,
+.classroom-next span {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 800;
+}
+
 .classroom-current h2 {
   color: var(--primary);
-  font-size: 64px;
-  margin: 10px 0;
+  font-size: 76px;
+  margin: 14px 0;
 }
 
 .classroom-current strong {
   display: block;
   color: var(--primary);
-  font-size: 90px;
+  font-size: 120px;
+  line-height: 1;
   font-weight: 900;
+}
+
+.classroom-current p,
+.classroom-next p {
+  color: var(--muted);
+  font-size: 24px;
+  font-weight: 800;
 }
 
 .classroom-next h2 {
   color: var(--secondary);
-  font-size: 48px;
+  font-size: 58px;
+  margin: 18px 0;
+}
+
+.classroom-next small {
+  color: var(--secondary);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.classroom-progress {
+  height: 18px;
+  margin-top: 28px;
 }
 
 .classroom-message {
-  margin-top: 18px;
+  margin-top: 22px;
+}
+
+.classroom-message span {
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .classroom-message strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 42px;
   color: var(--primary);
-  font-size: 32px;
 }
 
 .classroom-schedule {
-  margin-top: 18px;
+  margin-top: 22px;
   text-align: right;
+}
+
+.classroom-schedule .schedule-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.classroom-schedule .item {
+  min-height: 54px;
+  font-size: 16px;
 }
 
 /* =========================
    Responsive
 ========================= */
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .app {
     width: min(94%, 520px);
     padding-top: 12px;
@@ -548,16 +627,6 @@ body::before {
   .hero-logos {
     flex-direction: row;
     justify-content: center;
-  }
-
-  .ministry-logo {
-    width: 62px;
-    height: 62px;
-  }
-
-  .school-logo {
-    width: 68px;
-    height: 68px;
   }
 
   .hero-content {
@@ -619,5 +688,30 @@ body::before {
 
   .footer a {
     display: block;
+  }
+
+  .classroom-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .classroom-main {
+    grid-template-columns: 1fr;
+  }
+
+  .classroom-schedule .schedule-list {
+    grid-template-columns: 1fr;
+  }
+
+  .classroom-current h2 {
+    font-size: 46px;
+  }
+
+  .classroom-current strong {
+    font-size: 64px;
+  }
+
+  .classroom-time strong {
+    font-size: 42px;
   }
 }
