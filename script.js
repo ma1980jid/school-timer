@@ -38,10 +38,18 @@ async function loadSchool() {
 
     applySchoolTheme(school);
 
-    const logo = school.logo_url || school.app_icon_url || "icons/default-icon.svg";
+    const schoolLogo = school.logo_url || "icons/default-icon.svg";
+    const appIcon = school.app_icon_url || school.logo_url || "icons/default-icon.svg";
+
     const logoEl = document.getElementById("schoolLogo");
-    if (logoEl) logoEl.src = logo;
-    setPageIcons(logo);
+    if (logoEl) {
+      logoEl.src = schoolLogo;
+      logoEl.onerror = () => {
+        logoEl.src = "icons/default-icon.svg";
+      };
+    }
+
+    setPageIcons(appIcon);
 
     const { data: activeSchedules, error: activeScheduleError } = await supabaseClient
       .from("school_schedules")
@@ -56,14 +64,19 @@ async function loadSchool() {
 
     const activeScheduleId = activeSchedules[0].schedule_id;
 
-    const { data: schedule } = await supabaseClient
+    const { data: schedule, error: scheduleError } = await supabaseClient
       .from("schedules")
       .select("*")
       .eq("id", activeScheduleId)
       .single();
 
+    if (scheduleError || !schedule) {
+      showError("تعذر تحميل اسم التوقيت من جدول schedules.");
+      return;
+    }
+
     currentSchedule = schedule;
-    setText("scheduleName", schedule?.schedule_name || "التوقيت المدرسي");
+    setText("scheduleName", schedule.schedule_name || "التوقيت المدرسي");
 
     const { data: items, error: itemsError } = await supabaseClient
       .from("schedule_items")
