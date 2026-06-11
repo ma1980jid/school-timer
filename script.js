@@ -7,9 +7,13 @@ const isClassroomMode = location.pathname.includes("classroom");
 let scheduleItems = [];
 let currentSchool = null;
 let currentSchedule = null;
+let messages = [];
+let messageIndex = 0;
+
 let lastAlertKey = "";
 let lastStartedKey = "";
 let timerStarted = false;
+let messageTimerStarted = false;
 
 async function loadSchool() {
   try {
@@ -28,23 +32,36 @@ async function loadSchool() {
     }
 
     currentSchool = school;
+
     document.title = school.school_name || "مؤقت الحصص المدرسية";
     setText("schoolName", school.school_name || "مدرسة بدون اسم");
+
+    applySchoolTheme(school);
 
     const logo = school.logo_url || school.app_icon_url || "icons/default-icon.svg";
     const logoEl = document.getElementById("schoolLogo");
     if (logoEl) logoEl.src = logo;
     setPageIcons(logo);
 
-    if (!school.active_schedule_id) {
-      showError("لم يتم تحديد active_schedule_id لهذه المدرسة.");
+    // جلب التوقيت النشط من جدول school_schedules
+    const { data: activeSchoolSchedule, error: activeScheduleError } = await supabaseClient
+      .from("school_schedules")
+      .select("*")
+      .eq("school_id", school.id)
+      .eq("is_active", true)
+      .single();
+
+    if (activeScheduleError || !activeSchoolSchedule) {
+      showError("لم يتم تحديد توقيت نشط لهذه المدرسة في جدول school_schedules.");
       return;
     }
+
+    const activeScheduleId = activeSchoolSchedule.schedule_id;
 
     const { data: schedule } = await supabaseClient
       .from("schedules")
       .select("*")
-      .eq("id", school.active_schedule_id)
+      .eq("id", activeScheduleId)
       .single();
 
     currentSchedule = schedule;
@@ -53,7 +70,7 @@ async function loadSchool() {
     const { data: items, error: itemsError } = await supabaseClient
       .from("schedule_items")
       .select("*")
-      .eq("schedule_id", school.active_schedule_id)
+      .eq("schedule_id", activeScheduleId)
       .order("period_order", { ascending: true });
 
     if (itemsError) {
@@ -64,14 +81,64 @@ async function loadSchool() {
     scheduleItems = (items || []).filter(Boolean);
     setText("scheduleCount", `${scheduleItems.length} فترة`);
 
+    await loadMessages();
+
     updateTimer();
+
     if (!timerStarted) {
       setInterval(updateTimer, 1000);
       timerStarted = true;
     }
+
+    if (!messageTimerStarted) {
+      rotateMessage();
+      setInterval(rotateMessage, 15000);
+      messageTimerStarted = true;
+    }
+
   } catch (err) {
     showError("حدث خطأ أثناء تحميل البيانات.");
     console.error(err);
+  }
+}
+
+async function loadMessages() {
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .eq("is_active", true)
+    .order("id", { ascending: true });
+
+  if (!error && data && data.length > 0) {
+    messages = data;
+  }
+}
+
+function rotateMessage() {
+  if (!messages.length) return;
+
+  const message = messages[messageIndex];
+  setText("educationMessage", message.message_text);
+
+  messageIndex++;
+  if (messageIndex >= messages.length) messageIndex = 0;
+}
+
+function applySchoolTheme(school) {
+  const primary = school.primary_color || "#0f766e";
+  const secondary = school.secondary_color || "#b7791f";
+  const background = school.background_color || "#ecfdf5";
+
+  document.documentElement.style.setProperty("--primary", primary);
+  document.documentElement.style.setProperty("--secondary", secondary);
+  document.documentElement.style.setProperty("--background", background);
+
+  document.body.style.background = background;
+
+  if (school.pattern_url) {
+    document.body.style.backgroundImage = `url('${school.pattern_url}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundAttachment = "fixed";
   }
 }
 
@@ -113,11 +180,15 @@ function fmtClock(date) {
 }
 
 function fmtDate(date) {
-  return date.toLocaleDateString("ar-OM", { year: "numeric", month: "long", day: "numeric" });
+  return date.toLocaleDateString("ar-OM", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
 }
 
 function fmtRange(item) {
-  return `${String(item.start_time).slice(0,5)} - ${String(item.end_time).slice(0,5)}`;
+  return `${String(item.start_time).slice(0, 5)} - ${String(item.end_time).slice(0, 5)}`;
 }
 
 function formatDuration(ms) {
@@ -129,12 +200,14 @@ function formatDuration(ms) {
   if (hours > 0) {
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   }
+
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 function getItemState(item, now) {
   const start = timeToDate(item.start_time);
   const end = timeToDate(item.end_time);
+
   if (now > end) return "finished";
   if (now >= start && now <= end) return "active";
   return "upcoming";
@@ -157,6 +230,7 @@ function findCurrentAndNext(now) {
 
 function updateTimer() {
   const now = new Date();
+
   setText("currentTime", fmtClock(now));
   setText("dayName", now.toLocaleDateString("ar-OM", { weekday: "long" }));
   setText("dateText", fmtDate(now));
@@ -166,6 +240,7 @@ function updateTimer() {
   if (current) {
     const start = timeToDate(current.start_time);
     const end = timeToDate(current.end_time);
+
     const remainingMs = end - now;
     const totalMs = end - start;
     const elapsedMs = now - start;
@@ -174,8 +249,8 @@ function updateTimer() {
     setText("currentPeriod", current.period_name);
     setText("remainingTime", formatDuration(remainingMs));
     setText("periodRange", fmtRange(current));
-    setProgress(progress);
 
+    setProgress(progress);
     updateAlert(current, remainingMs);
     announceStart(current);
   } else {
@@ -208,6 +283,7 @@ function setProgress(percent) {
 function updateAlert(current, remainingMs) {
   const alertBar = document.getElementById("alertBar");
   if (!alertBar) return;
+
   const remainingMinutes = Math.ceil(remainingMs / 60000);
   const alertMs = ALERT_BEFORE_MINUTES * 60000;
 
@@ -216,6 +292,7 @@ function updateAlert(current, remainingMs) {
     alertBar.textContent = `🔔 بقي ${remainingMinutes} دقائق على نهاية ${current.period_name}`;
 
     const key = `${current.id || current.period_order}-${remainingMinutes}`;
+
     if (ENABLE_SOUND_ALERT && key !== lastAlertKey && remainingMinutes === ALERT_BEFORE_MINUTES) {
       playBeep();
       lastAlertKey = key;
@@ -241,9 +318,11 @@ function announceStart(current) {
 function showTemporaryAlert(text, danger = false) {
   const alertBar = document.getElementById("alertBar");
   if (!alertBar) return;
+
   alertBar.classList.remove("hidden");
   alertBar.classList.toggle("danger", danger);
   alertBar.textContent = text;
+
   setTimeout(() => hideAlert(), 6000);
 }
 
@@ -255,6 +334,7 @@ function hideAlert() {
 function renderSchedule(now) {
   const list = document.getElementById("scheduleList");
   if (!list) return;
+
   list.innerHTML = "";
 
   scheduleItems.forEach(item => {
@@ -263,21 +343,34 @@ function renderSchedule(now) {
 
     let icon = "🔵";
     let status = "قادمة";
-    if (state === "finished") { icon = "✔"; status = "انتهت"; }
-    if (state === "active") { icon = isBreak ? "☕" : "🟢"; status = "جارية الآن"; }
-    if (isBreak && state !== "active") { icon = "☕"; }
+
+    if (state === "finished") {
+      icon = "✔";
+      status = "انتهت";
+    }
+
+    if (state === "active") {
+      icon = isBreak ? "☕" : "🟢";
+      status = "جارية الآن";
+    }
+
+    if (isBreak && state !== "active") {
+      icon = "☕";
+    }
 
     const classes = ["item", state];
     if (isBreak) classes.push("break");
 
     const div = document.createElement("div");
     div.className = classes.join(" ");
+
     div.innerHTML = `
       <span class="icon">${icon}</span>
       <span class="name">${item.period_name}</span>
       <span class="time">${fmtRange(item)}</span>
       <span class="status">${status}</span>
     `;
+
     list.appendChild(div);
   });
 }
@@ -295,7 +388,9 @@ function playBeep() {
 
     oscillator.connect(gain);
     gain.connect(ctx.destination);
+
     oscillator.start();
+
     setTimeout(() => {
       oscillator.stop();
       ctx.close();
