@@ -39,6 +39,34 @@
 
     <section class="schedule-card">
       <div class="section-title">
+        <h2>إدارة بيانات المدرسة</h2>
+        <span>الشعار والألوان والبيانات الأساسية</span>
+      </div>
+
+      <div style="display:grid; gap:10px;">
+        <input id="schoolNameInput" type="text" placeholder="اسم المدرسة" />
+        <input id="governorateInput" type="text" placeholder="المحافظة" />
+        <input id="wilayatInput" type="text" placeholder="الولاية" />
+        <input id="logoUrlInput" type="text" placeholder="رابط شعار المدرسة logo_url" />
+        <input id="appIconUrlInput" type="text" placeholder="رابط أيقونة التطبيق app_icon_url" />
+
+        <label>اللون الرئيسي</label>
+        <input id="primaryColorInput" type="color" />
+
+        <label>اللون الثانوي</label>
+        <input id="secondaryColorInput" type="color" />
+
+        <label>لون الخلفية</label>
+        <input id="backgroundColorInput" type="color" />
+
+        <input id="themeStyleInput" type="text" placeholder="نمط التصميم: omani / modern / classic" />
+
+        <button class="admin-btn" onclick="saveSchoolData()">حفظ بيانات المدرسة</button>
+      </div>
+    </section>
+
+    <section class="schedule-card">
+      <div class="section-title">
         <h2>اختيار التوقيت النشط</h2>
         <span>اختر توقيتًا واحدًا فقط</span>
       </div>
