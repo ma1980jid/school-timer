@@ -24,6 +24,8 @@ async function loadDashboard() {
   currentSchool = school;
   document.getElementById("dashboardSchoolName").textContent = school.school_name;
 
+  fillSchoolForm(school);
+
   const baseUrl = window.location.origin;
 
   teacherUrl = `${baseUrl}/?school=${school.school_slug}`;
@@ -34,6 +36,47 @@ async function loadDashboard() {
 
   await loadSchedules();
   await loadMessages();
+}
+
+function fillSchoolForm(school) {
+  document.getElementById("schoolNameInput").value = school.school_name || "";
+  document.getElementById("governorateInput").value = school.governorate || "";
+  document.getElementById("wilayatInput").value = school.wilayat || "";
+  document.getElementById("logoUrlInput").value = school.logo_url || "";
+  document.getElementById("appIconUrlInput").value = school.app_icon_url || "";
+  document.getElementById("primaryColorInput").value = school.primary_color || "#0f766e";
+  document.getElementById("secondaryColorInput").value = school.secondary_color || "#b7791f";
+  document.getElementById("backgroundColorInput").value = school.background_color || "#ecfdf5";
+  document.getElementById("themeStyleInput").value = school.theme_style || "omani";
+}
+
+async function saveSchoolData() {
+  if (!currentSchool) return;
+
+  const updates = {
+    school_name: document.getElementById("schoolNameInput").value.trim(),
+    governorate: document.getElementById("governorateInput").value.trim(),
+    wilayat: document.getElementById("wilayatInput").value.trim(),
+    logo_url: document.getElementById("logoUrlInput").value.trim(),
+    app_icon_url: document.getElementById("appIconUrlInput").value.trim(),
+    primary_color: document.getElementById("primaryColorInput").value,
+    secondary_color: document.getElementById("secondaryColorInput").value,
+    background_color: document.getElementById("backgroundColorInput").value,
+    theme_style: document.getElementById("themeStyleInput").value.trim() || "omani"
+  };
+
+  const { error } = await supabaseClient
+    .from("schools")
+    .update(updates)
+    .eq("id", currentSchool.id);
+
+  if (error) {
+    showStatus("تعذر حفظ بيانات المدرسة.", true);
+    return;
+  }
+
+  showStatus("تم حفظ بيانات المدرسة بنجاح.", false);
+  loadDashboard();
 }
 
 async function loadSchedules() {
