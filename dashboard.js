@@ -5,6 +5,8 @@ const schoolSlug = params.get("school") || DEFAULT_SCHOOL_SLUG;
 
 let currentSchool = null;
 let allSchedules = [];
+let teacherUrl = "";
+let classroomUrl = "";
 
 async function loadDashboard() {
   const { data: school, error: schoolError } = await supabaseClient
@@ -24,11 +26,11 @@ async function loadDashboard() {
 
   const baseUrl = window.location.origin;
 
-  document.getElementById("teacherLink").textContent =
-    `${baseUrl}/?school=${school.school_slug}`;
+  teacherUrl = `${baseUrl}/?school=${school.school_slug}`;
+  classroomUrl = `${baseUrl}/classroom.html?school=${school.school_slug}`;
 
-  document.getElementById("classroomDisplayLink").textContent =
-    `${baseUrl}/classroom.html?school=${school.school_slug}`;
+  document.getElementById("teacherLink").textContent = teacherUrl;
+  document.getElementById("classroomDisplayLink").textContent = classroomUrl;
 
   await loadSchedules();
   await loadMessages();
@@ -136,10 +138,10 @@ function renderMessages(messages) {
       <span class="name">${msg.message_text}</span>
       <span class="time">${msg.message_type || "عام"}</span>
       <span class="status">
-        <button onclick="toggleMessage(${msg.id}, ${msg.is_active})">
+        <button class="admin-btn" onclick="toggleMessage(${msg.id}, ${msg.is_active})">
           ${msg.is_active ? "تعطيل" : "تفعيل"}
         </button>
-        <button onclick="deleteMessage(${msg.id})">حذف</button>
+        <button class="admin-btn" onclick="deleteMessage(${msg.id})">حذف</button>
       </span>
     `;
 
@@ -207,6 +209,31 @@ async function deleteMessage(id) {
 
   showStatus("تم حذف الرسالة.", false);
   loadMessages();
+}
+
+function copyTeacherLink() {
+  copyText(teacherUrl, "تم نسخ رابط المعلمين.");
+}
+
+function copyClassroomLink() {
+  copyText(classroomUrl, "تم نسخ رابط الشاشة التفاعلية.");
+}
+
+function openTeacherLink() {
+  window.open(teacherUrl, "_blank");
+}
+
+function openClassroomLink() {
+  window.open(classroomUrl, "_blank");
+}
+
+async function copyText(text, successMessage) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus(successMessage, false);
+  } catch (error) {
+    showStatus("تعذر النسخ. انسخ الرابط يدويًا.", true);
+  }
 }
 
 function showStatus(message, isError = false) {
