@@ -39,17 +39,11 @@
 
     <section class="schedule-card">
       <div class="section-title">
-        <h2>إدارة بيانات المدرسة</h2>
-        <span>الشعار والألوان والبيانات الأساسية</span>
+        <h2>إعدادات التصميم</h2>
+        <span>الألوان والخلفية فقط</span>
       </div>
 
-      <div style="display:grid; gap:10px;">
-        <input id="schoolNameInput" type="text" placeholder="اسم المدرسة" />
-        <input id="governorateInput" type="text" placeholder="المحافظة" />
-        <input id="wilayatInput" type="text" placeholder="الولاية" />
-        <input id="logoUrlInput" type="text" placeholder="رابط شعار المدرسة logo_url" />
-        <input id="appIconUrlInput" type="text" placeholder="رابط أيقونة التطبيق app_icon_url" />
-
+      <div style="display:grid; gap:12px;">
         <label>اللون الرئيسي</label>
         <input id="primaryColorInput" type="color" />
 
@@ -61,7 +55,7 @@
 
         <input id="themeStyleInput" type="text" placeholder="نمط التصميم: omani / modern / classic" />
 
-        <button class="admin-btn" onclick="saveSchoolData()">حفظ بيانات المدرسة</button>
+        <button class="admin-btn" onclick="saveDesignSettings()">حفظ إعدادات التصميم</button>
       </div>
     </section>
 
