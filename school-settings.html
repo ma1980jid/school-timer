@@ -1,57 +1,181 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تعديل بيانات المدرسة</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <main class="app">
 
-    <section class="schedule-card">
-      <div class="section-title">
-        <h2>تعديل بيانات المدرسة</h2>
-        <span id="settingsSchoolName">جاري التحميل...</span>
-      </div>
+<main class="app">
 
-      <div id="settingsStatus" class="alert-bar hidden"></div>
+  <section class="schedule-card">
 
-      <div style="display:grid; gap:12px;">
-        <input id="schoolNameInput" type="text" placeholder="اسم المدرسة" />
-        <input id="schoolSlugInput" type="text" placeholder="الرابط المختصر school_slug" />
-        <input id="governorateInput" type="text" placeholder="المحافظة" />
-        <input id="wilayatInput" type="text" placeholder="الولاية" />
+    <div class="section-title">
+      <h2>تعديل بيانات المدرسة</h2>
+      <span id="settingsSchoolName">
+        جاري التحميل...
+      </span>
+    </div>
 
-        <input id="logoUrlInput" type="text" placeholder="رابط شعار المدرسة logo_url" />
-        <input id="appIconUrlInput" type="text" placeholder="رابط أيقونة التطبيق app_icon_url" />
+    <div id="settingsStatus" class="alert-bar hidden"></div>
 
-        <label>اللون الرئيسي</label>
-        <input id="primaryColorInput" type="color" />
+    <div style="display:grid;gap:14px">
 
-        <label>اللون الثانوي</label>
-        <input id="secondaryColorInput" type="color" />
+      <!-- اسم المدرسة -->
+      <input
+        id="schoolNameInput"
+        type="text"
+        placeholder="اسم المدرسة">
 
-        <label>لون الخلفية</label>
-        <input id="backgroundColorInput" type="color" />
+      <!-- الرابط المختصر -->
+      <input
+        id="schoolSlugInput"
+        type="text"
+        placeholder="الرابط المختصر">
 
-        <input id="themeStyleInput" type="text" placeholder="نمط التصميم: omani / modern / classic" />
+      <!-- المحافظة -->
+      <input
+        id="governorateInput"
+        type="text"
+        placeholder="المحافظة">
 
-        <label>
-          <input id="isActiveInput" type="checkbox" />
-          المدرسة نشطة
-        </label>
+      <!-- الولاية -->
+      <input
+        id="wilayatInput"
+        type="text"
+        placeholder="الولاية">
 
-        <button class="admin-btn" onclick="saveSchoolSettings()">حفظ التعديلات</button>
-        <button class="admin-btn" onclick="goBack()">العودة للوحة مدير النظام</button>
-      </div>
-    </section>
 
-  </main>
+      <hr>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="school-settings.js"></script>
+
+      <!-- شعار المدرسة -->
+      <h3>شعار المدرسة</h3>
+
+      <img
+        id="logoPreview"
+        src=""
+        style="
+          width:130px;
+          height:130px;
+          object-fit:contain;
+          border:1px solid #ddd;
+          border-radius:16px;
+          background:white;
+          padding:10px">
+
+      <input
+        id="logoFile"
+        type="file"
+        accept="image/*">
+
+
+      <hr>
+
+
+      <!-- أيقونة التطبيق -->
+      <h3>أيقونة التطبيق</h3>
+
+      <img
+        id="iconPreview"
+        src=""
+        style="
+          width:90px;
+          height:90px;
+          object-fit:contain;
+          border:1px solid #ddd;
+          border-radius:16px;
+          background:white;
+          padding:10px">
+
+      <input
+        id="iconFile"
+        type="file"
+        accept="image/*">
+
+
+      <hr>
+
+
+      <!-- اللون الرئيسي -->
+      <label>اللون الرئيسي</label>
+
+      <input
+        id="primaryColorInput"
+        type="color">
+
+
+      <!-- اللون الثانوي -->
+      <label>اللون الثانوي</label>
+
+      <input
+        id="secondaryColorInput"
+        type="color">
+
+
+      <!-- لون الخلفية -->
+      <label>لون الخلفية</label>
+
+      <input
+        id="backgroundColorInput"
+        type="color">
+
+
+      <!-- نمط الخلفية -->
+      <input
+        id="themeStyleInput"
+        type="text"
+        placeholder="نمط التصميم: omani">
+
+
+      <hr>
+
+
+      <!-- حالة المدرسة -->
+      <label style="font-size:20px">
+
+        <input
+          id="isActiveInput"
+          type="checkbox">
+
+        المدرسة نشطة
+
+      </label>
+
+
+      <button
+        class="admin-btn"
+        onclick="saveSchoolSettings()">
+
+        حفظ التعديلات
+
+      </button>
+
+
+      <button
+        class="admin-btn"
+        onclick="goBack()">
+
+        العودة للوحة مدير النظام
+
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="config.js"></script>
+
+<script src="school-settings.js"></script>
+
 </body>
 </html>
