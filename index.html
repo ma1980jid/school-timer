@@ -14,24 +14,13 @@
 </head>
 
 <body>
-
   <main class="app app-shell">
 
-    <!-- القائمة الجانبية للكمبيوتر -->
-    <aside class="side-nav">
-      <button class="nav-item active">الرئيسية</button>
-      <button class="nav-item">الجدول</button>
-      <button class="nav-item">الإعلانات</button>
-      <button class="nav-item">الإعدادات</button>
-    </aside>
-
-    <!-- رأس الصفحة -->
     <header class="app-header">
       <button class="menu-btn">☰</button>
 
       <div class="brand-block">
         <img id="schoolLogo" class="brand-school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
-
         <div class="brand-text">
           <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
           <p id="scheduleName">جاري تحميل التوقيت...</p>
@@ -46,67 +35,102 @@
       <div class="date-card">
         <span id="dayName">--</span>
         <strong id="dateText">--</strong>
+        <small id="hijriDate">--</small>
       </div>
     </header>
 
     <div id="alertBar" class="alert-bar hidden"></div>
 
-    <!-- بطاقات مختصرة -->
-    <section class="summary-strip">
-      <div class="summary-card">
-        <span>الحصة المنتهية</span>
-        <strong id="prevPeriod">--</strong>
-        <small id="prevRange">--</small>
+    <section class="top-row">
+      <div class="summary-strip">
+        <div class="summary-card">
+          <span>الحصة المنتهية</span>
+          <strong id="prevPeriod">--</strong>
+          <small id="prevRange">--</small>
+        </div>
+
+        <div class="summary-card current">
+          <span>الحصة الحالية</span>
+          <strong id="currentPeriodMini">--</strong>
+          <small id="currentRangeMini">--</small>
+        </div>
+
+        <div class="summary-card">
+          <span>الحصة القادمة</span>
+          <strong id="nextPeriodMini">--</strong>
+          <small id="nextRangeMini">--</small>
+        </div>
+
+        <div class="summary-card break-card">
+          <span>الفسحة القادمة</span>
+          <strong id="nextBreakPeriod">--</strong>
+          <small id="nextBreakRange">--</small>
+        </div>
       </div>
 
-      <div class="summary-card current">
-        <span>الحصة الحالية</span>
-        <strong id="currentPeriodMini">--</strong>
-        <small id="currentRangeMini">--</small>
-      </div>
-
-      <div class="summary-card">
-        <span>الحصة القادمة</span>
-        <strong id="nextPeriodMini">--</strong>
-        <small id="nextRangeMini">--</small>
-      </div>
-
-      <div class="summary-card break-card">
-        <span>الفسحة القادمة</span>
-        <strong id="nextBreakPeriod">--</strong>
-        <small id="nextBreakRange">--</small>
+      <div class="weather-card">
+        <div class="sun-icon">☀</div>
+        <strong>38°</strong>
+        <span>مشمس</span>
+        <small>مسقط</small>
       </div>
     </section>
 
-    <!-- المحتوى الرئيسي -->
-    <section class="main-grid">
+    <section class="desktop-grid">
 
-      <!-- بطاقة الساعة -->
-      <section class="clock-card">
-        <div class="analog-clock">
-          <div class="clock-hand"></div>
-        </div>
-
-        <div class="clock-content">
-          <strong id="currentTime">--:--:--</strong>
-          <span>متبقي من الحصة الحالية</span>
-          <h2 id="remainingTime">--:--</h2>
-
-          <div class="progress">
-            <div id="progressFill"></div>
+      <section class="left-column">
+        <section class="clock-card">
+          <div class="analog-clock">
+            <div class="clock-hand"></div>
           </div>
 
-          <p id="periodRange">--</p>
+          <div class="clock-content">
+            <strong id="currentTime">--:--:--</strong>
+            <span>متبقي من الحصة الحالية</span>
+            <h2 id="remainingTime">--:--</h2>
+
+            <div class="progress">
+              <div id="progressFill"></div>
+            </div>
+
+            <p id="periodRange">--</p>
+          </div>
+
+          <div class="clock-date">
+            <span id="dayNameClock">--</span>
+            <strong id="dateTextClock">--</strong>
+          </div>
+        </section>
+
+        <div class="small-cards">
+          <section class="mini-panel">
+            <span>الحصة القادمة</span>
+            <strong id="nextPeriod">--</strong>
+            <p id="nextRange">--</p>
+            <small id="nextStartsIn"></small>
+          </section>
+
+          <section class="mini-panel weather-mini">
+            <div class="sun-icon">☀</div>
+            <strong>38°</strong>
+            <span>مشمس - مسقط</span>
+          </section>
         </div>
 
-        <div class="clock-date">
-          <span id="dayNameClock">--</span>
-          <strong id="dateTextClock">--</strong>
-          <small id="hijriDate">--</small>
+        <div class="small-cards">
+          <section class="mini-panel message-panel">
+            <span>رسالة المدرسة</span>
+            <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
+          </section>
+
+          <section class="mini-panel">
+            <span>الفعاليات القادمة</span>
+            <strong>اختبار الرياضيات</strong>
+            <p>الثلاثاء 27 مايو 2025</p>
+          </section>
         </div>
       </section>
 
-      <!-- جدول الحصص -->
       <section class="schedule-card modern-table-card">
         <div class="section-title">
           <h2>جدول الحصص اليومي</h2>
@@ -116,49 +140,26 @@
         <div id="scheduleList" class="schedule-list"></div>
       </section>
 
-      <!-- الحصة القادمة -->
-      <section class="mini-panel">
-        <span>الحصة القادمة</span>
-        <strong id="nextPeriod">--</strong>
-        <p id="nextRange">--</p>
-        <small id="nextStartsIn"></small>
-      </section>
-
-      <!-- بطاقة الرسائل -->
-      <section class="mini-panel message-panel">
-        <span>رسالة المدرسة</span>
-        <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
-      </section>
-
-      <!-- إحصائيات -->
-      <section class="stats-panel">
-        <div>
-          <span>الحصص المنتهية</span>
-          <strong id="finishedCount">0</strong>
-        </div>
-
-        <div>
-          <span>الحصة الحالية</span>
-          <strong id="activeCount">0</strong>
-        </div>
-
-        <div>
-          <span>الحصص القادمة</span>
-          <strong id="upcomingCount">0</strong>
-        </div>
-      </section>
-
     </section>
 
-    <!-- شريط سفلي للهاتف -->
-    <nav class="bottom-nav">
-      <button class="active">الرئيسية</button>
-      <button>الجدول</button>
-      <button>الإعلانات</button>
-      <button>الإعدادات</button>
-    </nav>
+    <section class="bottom-strip">
+      <div>
+        <span>الحصص المنتهية</span>
+        <strong id="finishedCount">0</strong>
+      </div>
 
-    <footer class="footer modern-footer">
+      <div>
+        <span>الحصة الحالية</span>
+        <strong id="activeCount">0</strong>
+      </div>
+
+      <div>
+        <span>الحصص القادمة</span>
+        <strong id="upcomingCount">0</strong>
+      </div>
+    </section>
+
+    <footer class="footer">
       <span>وزارة التعليم</span>
       <span>مدرسة الشيخ سيف بن حمد الأغبري</span>
       <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
@@ -169,6 +170,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="script.js"></script>
-
 </body>
 </html>
