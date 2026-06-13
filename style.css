@@ -30,11 +30,12 @@ body {
 
 .dashboard {
   width: min(100vw, 1620px);
-  height: min(100vh, 970px);
-  padding: 22px;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 16px;
   display: grid;
-  grid-template-rows: 110px 145px 1fr 52px;
-  gap: 16px;
+  grid-template-rows: 105px 135px 1fr 46px;
+  gap: 12px;
   background:
     radial-gradient(circle at top left, rgba(214,169,60,.22), transparent 28%),
     radial-gradient(circle at top right, rgba(6,75,53,.10), transparent 30%),
@@ -49,21 +50,21 @@ body {
 .ticker-shell {
   background: var(--soft);
   border: 1px solid rgba(204,181,144,.75);
-  border-radius: 28px;
+  border-radius: 24px;
   box-shadow: var(--shadow);
 }
 
 .header {
   display: grid;
-  grid-template-columns: 130px 1fr 170px 220px;
+  grid-template-columns: 120px 1fr 160px 215px;
   align-items: center;
-  gap: 18px;
-  padding: 14px 24px;
+  gap: 14px;
+  padding: 10px 20px;
 }
 
 .school-logo {
-  width: 120px;
-  height: 85px;
+  width: 110px;
+  height: 78px;
   object-fit: contain;
 }
 
@@ -74,14 +75,14 @@ body {
 .title h1 {
   margin: 0;
   color: var(--green);
-  font-size: 30px;
+  font-size: 29px;
   font-weight: 900;
 }
 
 .title p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: var(--gold);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
 }
 
@@ -94,8 +95,8 @@ body {
 .date-card {
   background: #fff;
   border: 1px solid rgba(204,181,144,.75);
-  border-radius: 20px;
-  padding: 12px;
+  border-radius: 18px;
+  padding: 10px;
   text-align: center;
   font-weight: 900;
 }
@@ -107,11 +108,11 @@ body {
 }
 
 .date-card span {
-  margin: 5px 0;
+  margin: 4px 0;
 }
 
 .date-card small {
-  color: var(--gold);
+  color: #74c9c0;
 }
 
 .cards-row {
@@ -124,14 +125,14 @@ body {
   text-align: center;
   display: grid;
   place-items: center;
-  padding: 16px;
+  padding: 12px;
 }
 
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 20px;
+  padding: 5px 18px;
   border-radius: 999px;
   background: #fff;
   border: 1px solid #ddd;
@@ -147,10 +148,10 @@ body {
 }
 
 .period-card h2 {
-  margin: 10px 0 4px;
-  font-size: 36px;
+  margin: 8px 0 3px;
+  font-size: 34px;
   font-weight: 900;
-  color: var(--green);
+  color: var(--gold);
 }
 
 .period-card p {
@@ -177,27 +178,28 @@ body {
 .main-grid {
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1.05fr;
+  grid-template-columns: 1.08fr 1fr;
   gap: 16px;
 }
 
 .clock-panel {
-  background: linear-gradient(135deg, var(--green), #052f25);
+  background: linear-gradient(135deg, #d6bd68, var(--green));
   color: #fff;
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 1fr 210px;
   align-items: center;
-  gap: 28px;
-  padding: 30px;
+  gap: 22px;
+  padding: 22px;
   overflow: hidden;
+  direction: ltr;
 }
 
 .analog-clock {
-  width: 210px;
+  width: 190px;
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, #fffaf0 0 58%, #f7ead2 72%, #d6a93c 77%, #6f4708 84%);
-  border: 6px solid var(--gold);
+  border: 6px solid #7ccdc6;
   position: relative;
   box-shadow: inset 0 0 18px rgba(108,67,5,.22), 0 8px 20px rgba(0,0,0,.28);
 }
@@ -207,12 +209,12 @@ body {
   left: 50%;
   top: 50%;
   width: 3px;
-  height: 16px;
+  height: 14px;
   margin-left: -1.5px;
-  margin-top: -92px;
+  margin-top: -83px;
   background: #173c30;
   border-radius: 999px;
-  transform-origin: 50% 92px;
+  transform-origin: 50% 83px;
 }
 
 .hand {
@@ -226,19 +228,19 @@ body {
 
 .hour-hand {
   width: 8px;
-  height: 58px;
+  height: 52px;
   background: #202020;
 }
 
 .minute-hand {
   width: 6px;
-  height: 78px;
+  height: 72px;
   background: #202020;
 }
 
 .second-hand {
   width: 2px;
-  height: 85px;
+  height: 80px;
   background: var(--red);
 }
 
@@ -249,47 +251,48 @@ body {
   width: 17px;
   height: 17px;
   border-radius: 50%;
-  background: var(--gold);
+  background: #7ccdc6;
   transform: translate(-50%, -50%);
   z-index: 4;
 }
 
 .time-info {
   text-align: center;
+  direction: rtl;
 }
 
 .digital-time {
   font-family: "Courier New", monospace;
-  font-size: 70px;
+  font-size: 62px;
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 4px 8px rgba(0,0,0,.35);
 }
 
 .countdown-label {
-  margin-top: 22px;
+  margin-top: 18px;
   font-size: 22px;
   font-weight: 900;
 }
 
 .countdown-value {
-  margin: 10px 0 20px;
-  color: var(--gold);
+  margin: 8px 0 18px;
+  color: #7ccdc6;
   font-family: "Courier New", monospace;
-  font-size: 64px;
+  font-size: 56px;
   font-weight: 900;
 }
 
 .progress-head {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   font-weight: 900;
 }
 
 .progress-track {
-  height: 13px;
-  background: rgba(255,255,255,.28);
+  height: 12px;
+  background: rgba(255,255,255,.35);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -303,20 +306,20 @@ body {
 }
 
 .schedule-panel {
-  padding: 18px;
+  padding: 14px 18px;
   overflow: hidden;
 }
 
 .schedule-panel h2 {
-  margin: 0 0 12px;
-  color: var(--green);
+  margin: 0 0 8px;
+  color: var(--gold);
   text-align: center;
   font-size: 28px;
   font-weight: 900;
 }
 
 .schedule-cover {
-  height: calc(100% - 48px);
+  height: calc(100% - 42px);
   overflow: hidden;
   border-radius: 18px;
 }
@@ -326,13 +329,13 @@ body {
   height: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
 }
 
 .schedule-table td {
   border-bottom: 1px solid #e3e5e8;
-  padding: 10px;
+  padding: 7px 10px;
   text-align: center;
   background: rgba(255,255,255,.96);
   white-space: nowrap;
@@ -344,8 +347,8 @@ body {
 
 .schedule-table .lesson {
   width: 31%;
-  color: var(--green);
-  font-size: 20px;
+  color: var(--gold);
+  font-size: 18px;
   font-weight: 900;
 }
 
@@ -360,9 +363,9 @@ body {
 .num-badge {
   display: inline-grid;
   place-items: center;
-  min-width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  min-width: 31px;
+  height: 31px;
+  border-radius: 8px;
   background: #0d8863;
   color: white;
   font-weight: 900;
@@ -372,12 +375,12 @@ body {
   display: inline-flex;
   min-width: 92px;
   justify-content: center;
-  padding: 7px 12px;
+  padding: 5px 10px;
   border-radius: 9px;
   background: #e9f8ef;
   color: #0f6746;
   border: 1px solid #bde8ce;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .schedule-table tr.current td {
@@ -419,7 +422,7 @@ body {
 .ticker-item::before,
 .ticker-item::after {
   content: "✦";
-  color: var(--gold);
+  color: #74c9c0;
   margin: 0 18px;
 }
 
@@ -500,6 +503,7 @@ body {
     grid-template-columns: 95px 1fr;
     gap: 12px;
     padding: 14px;
+    direction: rtl;
   }
 
   .analog-clock {
