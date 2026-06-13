@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>مؤقت الحصص المدرسية</title>
 
   <link rel="manifest" href="manifest.json" />
@@ -13,74 +14,153 @@
 </head>
 
 <body>
-  <main class="app modern-layout">
 
-    <header class="hero-card">
-      <div class="hero-logos">
-        <img class="ministry-logo" src="icons/ministry-logo.png" alt="شعار وزارة التربية والتعليم" />
-        <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
+  <main class="app app-shell">
+
+    <!-- القائمة الجانبية للكمبيوتر -->
+    <aside class="side-nav">
+      <button class="nav-item active">الرئيسية</button>
+      <button class="nav-item">الجدول</button>
+      <button class="nav-item">الإعلانات</button>
+      <button class="nav-item">الإعدادات</button>
+    </aside>
+
+    <!-- رأس الصفحة -->
+    <header class="app-header">
+      <button class="menu-btn">☰</button>
+
+      <div class="brand-block">
+        <img id="schoolLogo" class="brand-school-logo" src="icons/default-icon.svg" alt="شعار المدرسة" />
+
+        <div class="brand-text">
+          <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
+          <p id="scheduleName">جاري تحميل التوقيت...</p>
+        </div>
       </div>
 
-      <div class="hero-content">
-        <p class="ministry-text">وزارة التربية والتعليم</p>
-        <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
-        <p id="scheduleName" class="schedule-name">جاري تحميل التوقيت...</p>
+      <div class="ministry-block">
+        <img class="ministry-logo" src="icons/ministry-logo.png" alt="شعار وزارة التعليم" />
+        <span>وزارة التعليم</span>
       </div>
 
-      <div class="hero-time">
+      <div class="date-card">
         <span id="dayName">--</span>
-        <strong id="currentTime">--:--:--</strong>
-        <span id="dateText">--</span>
+        <strong id="dateText">--</strong>
       </div>
     </header>
 
     <div id="alertBar" class="alert-bar hidden"></div>
 
-    <section class="message-card modern-message">
-      <span>رسالة تربوية</span>
-      <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
-    </section>
-
-    <section class="cards-grid modern-cards">
-      <div class="main-card current-card">
-        <div class="card-label">الحصة الحالية</div>
-        <h2 id="currentPeriod">--</h2>
-        <strong id="remainingTime">--:--</strong>
-        <p id="periodRange">--</p>
-
-        <div class="progress">
-          <div id="progressFill"></div>
-        </div>
+    <!-- بطاقات مختصرة -->
+    <section class="summary-strip">
+      <div class="summary-card">
+        <span>الحصة المنتهية</span>
+        <strong id="prevPeriod">--</strong>
+        <small id="prevRange">--</small>
       </div>
 
-      <div class="next-card upcoming-card">
-        <div class="card-label">الحصة القادمة</div>
-        <h2 id="nextPeriod">--</h2>
+      <div class="summary-card current">
+        <span>الحصة الحالية</span>
+        <strong id="currentPeriodMini">--</strong>
+        <small id="currentRangeMini">--</small>
+      </div>
+
+      <div class="summary-card">
+        <span>الحصة القادمة</span>
+        <strong id="nextPeriodMini">--</strong>
+        <small id="nextRangeMini">--</small>
+      </div>
+
+      <div class="summary-card break-card">
+        <span>الفسحة القادمة</span>
+        <strong id="nextBreakPeriod">--</strong>
+        <small id="nextBreakRange">--</small>
+      </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <section class="main-grid">
+
+      <!-- بطاقة الساعة -->
+      <section class="clock-card">
+        <div class="analog-clock">
+          <div class="clock-hand"></div>
+        </div>
+
+        <div class="clock-content">
+          <strong id="currentTime">--:--:--</strong>
+          <span>متبقي من الحصة الحالية</span>
+          <h2 id="remainingTime">--:--</h2>
+
+          <div class="progress">
+            <div id="progressFill"></div>
+          </div>
+
+          <p id="periodRange">--</p>
+        </div>
+
+        <div class="clock-date">
+          <span id="dayNameClock">--</span>
+          <strong id="dateTextClock">--</strong>
+          <small id="hijriDate">--</small>
+        </div>
+      </section>
+
+      <!-- جدول الحصص -->
+      <section class="schedule-card modern-table-card">
+        <div class="section-title">
+          <h2>جدول الحصص اليومي</h2>
+          <span id="scheduleCount">0 فترة</span>
+        </div>
+
+        <div id="scheduleList" class="schedule-list"></div>
+      </section>
+
+      <!-- الحصة القادمة -->
+      <section class="mini-panel">
+        <span>الحصة القادمة</span>
+        <strong id="nextPeriod">--</strong>
         <p id="nextRange">--</p>
         <small id="nextStartsIn"></small>
-      </div>
+      </section>
+
+      <!-- بطاقة الرسائل -->
+      <section class="mini-panel message-panel">
+        <span>رسالة المدرسة</span>
+        <strong id="educationMessage">الوقت قيمة لا تعوض</strong>
+      </section>
+
+      <!-- إحصائيات -->
+      <section class="stats-panel">
+        <div>
+          <span>الحصص المنتهية</span>
+          <strong id="finishedCount">0</strong>
+        </div>
+
+        <div>
+          <span>الحصة الحالية</span>
+          <strong id="activeCount">0</strong>
+        </div>
+
+        <div>
+          <span>الحصص القادمة</span>
+          <strong id="upcomingCount">0</strong>
+        </div>
+      </section>
+
     </section>
 
-    <section class="schedule-card modern-schedule">
-      <div class="section-title">
-        <h2>جدول اليوم</h2>
-        <span id="scheduleCount">0 فترة</span>
-      </div>
-
-      <div id="scheduleList" class="schedule-list"></div>
-    </section>
+    <!-- شريط سفلي للهاتف -->
+    <nav class="bottom-nav">
+      <button class="active">الرئيسية</button>
+      <button>الجدول</button>
+      <button>الإعلانات</button>
+      <button>الإعدادات</button>
+    </nav>
 
     <footer class="footer modern-footer">
-      <div>
-        <strong>وزارة التربية والتعليم</strong>
-        <span>مدرسة الشيخ سيف بن حمد الأغبري (5-12)</span>
-      </div>
-
-      <div>
-        <span>إعداد وتطوير</span>
-        <strong>ماجد بن سيف الأغبري</strong>
-      </div>
-
+      <span>وزارة التعليم</span>
+      <span>مدرسة الشيخ سيف بن حمد الأغبري</span>
       <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
     </footer>
 
@@ -89,5 +169,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="script.js"></script>
+
 </body>
 </html>
