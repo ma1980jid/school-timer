@@ -1,571 +1,388 @@
 :root {
-  --page-bg: #f4ead8;
-  --ink: #13213d;
-  --green: #064b35;
-  --gold: #d6a93c;
-  --red: #cf1414;
-  --soft: rgba(255,255,255,.94);
-  --shadow: 0 18px 45px rgba(40,25,5,.16);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font-family: Tahoma, Arial, sans-serif;
-  background: var(--page-bg);
-  color: var(--ink);
-}
-
-body {
-  display: grid;
-  place-items: center;
-}
-
-.dashboard {
-  width: min(100vw, 1620px);
-  height: 100vh;
-  max-height: 100vh;
-  padding: 16px;
-  display: grid;
-  grid-template-rows: 105px 135px 1fr 46px;
-  gap: 12px;
-  background:
-    radial-gradient(circle at top left, rgba(214,169,60,.22), transparent 28%),
-    radial-gradient(circle at top right, rgba(6,75,53,.10), transparent 30%),
-    linear-gradient(135deg, #fff8ec, #f4ead8);
-  overflow: hidden;
-}
-
-.header,
-.period-card,
-.clock-panel,
-.schedule-panel,
-.ticker-shell {
-  background: var(--soft);
-  border: 1px solid rgba(204,181,144,.75);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-}
-
-.header {
-  display: grid;
-  grid-template-columns: 120px 1fr 160px 215px;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 20px;
-}
-
-.school-logo {
-  width: 110px;
-  height: 78px;
-  object-fit: contain;
-}
-
-.title {
-  text-align: center;
-}
-
-.title h1 {
-  margin: 0;
-  color: var(--green);
-  font-size: 29px;
-  font-weight: 900;
-}
-
-.title p {
-  margin: 5px 0 0;
-  color: var(--gold);
-  font-size: 17px;
-  font-weight: 900;
-}
-
-.ministry {
-  font-size: 22px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.date-card {
-  background: #fff;
-  border: 1px solid rgba(204,181,144,.75);
-  border-radius: 18px;
-  padding: 10px;
-  text-align: center;
-  font-weight: 900;
-}
-
-.date-card strong,
-.date-card span,
-.date-card small {
-  display: block;
-}
-
-.date-card span {
-  margin: 4px 0;
-}
-
-.date-card small {
-  color: #74c9c0;
-}
-
-.cards-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.period-card {
-  text-align: center;
-  display: grid;
-  place-items: center;
-  padding: 12px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 18px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid #ddd;
-  color: #657083;
-  font-weight: 900;
-}
-
-.dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.period-card h2 {
-  margin: 8px 0 3px;
-  font-size: 34px;
-  font-weight: 900;
-  color: var(--gold);
-}
-
-.period-card p {
-  margin: 0;
-  direction: rtl;
-  font-size: 18px;
-  font-weight: 900;
-}
-
-.current-card {
-  border-color: rgba(207,20,20,.75);
-}
-
-.current-card .pill,
-.current-card h2 {
-  color: var(--red);
-}
-
-.next-card .pill,
-.next-card h2 {
-  color: var(--green);
-}
-
-.main-grid {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 1.08fr 1fr;
-  gap: 16px;
-}
-
-.clock-panel {
-  background: linear-gradient(135deg, #d6bd68, var(--green));
-  color: #fff;
-  display: grid;
-  grid-template-columns: 1fr 210px;
-  align-items: center;
-  gap: 22px;
-  padding: 22px;
-  overflow: hidden;
-  direction: ltr;
-}
-
-.analog-clock {
-  width: 190px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fffaf0 0 58%, #f7ead2 72%, #d6a93c 77%, #6f4708 84%);
-  border: 6px solid #7ccdc6;
-  position: relative;
-  box-shadow: inset 0 0 18px rgba(108,67,5,.22), 0 8px 20px rgba(0,0,0,.28);
-}
-
-.tick {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 3px;
-  height: 14px;
-  margin-left: -1.5px;
-  margin-top: -83px;
-  background: #173c30;
-  border-radius: 999px;
-  transform-origin: 50% 83px;
-}
-
-.hand {
-  position: absolute;
-  left: 50%;
-  bottom: 50%;
-  transform-origin: 50% 100%;
-  border-radius: 999px;
-  transform: translateX(-50%) rotate(0deg);
-}
-
-.hour-hand {
-  width: 8px;
-  height: 52px;
-  background: #202020;
-}
-
-.minute-hand {
-  width: 6px;
-  height: 72px;
-  background: #202020;
-}
-
-.second-hand {
-  width: 2px;
-  height: 80px;
-  background: var(--red);
-}
-
-.clock-pin {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  background: #7ccdc6;
-  transform: translate(-50%, -50%);
-  z-index: 4;
-}
-
-.time-info {
-  text-align: center;
-  direction: rtl;
-}
-
-.digital-time {
-  font-family: "Courier New", monospace;
-  font-size: 62px;
-  font-weight: 900;
-  line-height: 1;
-  text-shadow: 0 4px 8px rgba(0,0,0,.35);
-}
-
-.countdown-label {
-  margin-top: 18px;
-  font-size: 22px;
-  font-weight: 900;
-}
-
-.countdown-value {
-  margin: 8px 0 18px;
-  color: #7ccdc6;
-  font-family: "Courier New", monospace;
-  font-size: 56px;
-  font-weight: 900;
-}
-
-.progress-head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 7px;
-  font-weight: 900;
-}
-
-.progress-track {
-  height: 12px;
-  background: rgba(255,255,255,.35);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #fff2a1, var(--gold));
-  border-radius: inherit;
-  transition: width .5s ease;
-}
-
-.schedule-panel {
-  padding: 14px 18px;
-  overflow: hidden;
-}
-
-.schedule-panel h2 {
-  margin: 0 0 8px;
-  color: var(--gold);
-  text-align: center;
-  font-size: 28px;
-  font-weight: 900;
-}
-
-.schedule-cover {
-  height: calc(100% - 42px);
-  overflow: hidden;
-  border-radius: 18px;
-}
-
-.schedule-table {
-  width: 100%;
-  height: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.schedule-table td {
-  border-bottom: 1px solid #e3e5e8;
-  padding: 7px 10px;
-  text-align: center;
-  background: rgba(255,255,255,.96);
-  white-space: nowrap;
-}
-
-.schedule-table .num {
-  width: 9%;
-}
-
-.schedule-table .lesson {
-  width: 31%;
-  color: var(--gold);
-  font-size: 18px;
-  font-weight: 900;
-}
-
-.schedule-table .time {
-  width: 36%;
-}
-
-.schedule-table .state {
-  width: 24%;
-}
-
-.num-badge {
-  display: inline-grid;
-  place-items: center;
-  min-width: 31px;
-  height: 31px;
-  border-radius: 8px;
-  background: #0d8863;
-  color: white;
-  font-weight: 900;
-}
-
-.status-badge {
-  display: inline-flex;
-  min-width: 92px;
-  justify-content: center;
-  padding: 5px 10px;
-  border-radius: 9px;
-  background: #e9f8ef;
-  color: #0f6746;
-  border: 1px solid #bde8ce;
-  font-size: 14px;
-}
-
-.schedule-table tr.current td {
-  background: #fff1f1;
-  color: var(--red);
-}
-
-.schedule-table tr.current .lesson,
-.schedule-table tr.current .status-badge {
-  color: var(--red);
-}
-
-.schedule-table tr.current .num-badge {
-  background: var(--red);
-}
-
-.ticker-shell {
-  display: grid;
-  grid-template-columns: 230px 1fr;
-  align-items: center;
-  overflow: hidden;
-  padding: 0 20px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.ticker-shell a {
-  color: var(--green);
-  text-decoration: none;
-}
-
-.ticker-track {
-  display: inline-flex;
-  gap: 60px;
-  min-width: max-content;
-  animation: ticker 28s linear infinite;
-}
-
-.ticker-item::before,
-.ticker-item::after {
-  content: "✦";
-  color: #74c9c0;
-  margin: 0 18px;
-}
-
-@keyframes ticker {
-  from { transform: translateX(-10%); }
-  to { transform: translateX(55%); }
-}
-
-@media (max-width: 800px) {
-  body {
-    overflow: auto;
-  }
-
-  .dashboard {
-    width: 100%;
-    height: auto;
-    min-height: 100vh;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .header {
-    grid-template-columns: 60px 1fr 70px;
-    gap: 8px;
-    padding: 10px;
-  }
-
-  .school-logo {
-    width: 58px;
-    height: 50px;
-  }
-
-  .title h1 {
-    font-size: 15px;
-  }
-
-  .title p {
-    font-size: 12px;
-  }
-
-  .ministry {
-    font-size: 12px;
-  }
-
-  .date-card {
-    display: none;
-  }
-
-  .cards-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .period-card {
-    padding: 10px 6px;
-  }
-
-  .pill {
-    font-size: 11px;
-    padding: 4px 8px;
-  }
-
-  .period-card h2 {
-    font-size: 18px;
-  }
-
-  .period-card p {
-    font-size: 11px;
-  }
-
-  .main-grid {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .clock-panel {
-    grid-template-columns: 95px 1fr;
-    gap: 12px;
-    padding: 14px;
-    direction: rtl;
-  }
-
-  .analog-clock {
-    width: 90px;
-  }
-
-  .tick {
-    height: 8px;
-    margin-top: -39px;
-    transform-origin: 50% 39px;
-  }
-
-  .hour-hand {
-    width: 5px;
-    height: 25px;
-  }
-
-  .minute-hand {
-    width: 4px;
-    height: 34px;
-  }
-
-  .second-hand {
-    height: 38px;
-  }
-
-  .digital-time {
-    font-size: 34px;
-  }
-
-  .countdown-label {
-    font-size: 13px;
-  }
-
-  .countdown-value {
-    font-size: 34px;
-  }
-
-  .schedule-table {
-    font-size: 12px;
-  }
-
-  .schedule-table .lesson {
-    font-size: 13px;
-  }
-
-  .status-badge {
-    min-width: 58px;
-    font-size: 11px;
-  }
-
-  .num-badge {
-    min-width: 24px;
-    height: 24px;
-  }
-
-  .ticker-shell {
-    grid-template-columns: 1fr;
-    height: 44px;
-  }
-
-  .ticker-shell a {
-    display: none;
-  }
-}
+      --page-bg: #f4ead8;
+      --ink: #13213d;
+      --green: #064b35;
+      --gold: #f4b437;
+      --red: #cf1414;
+      --soft: rgba(255, 255, 255, 0.92);
+      --shadow: 0 18px 45px rgba(40, 25, 5, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--page-bg);
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      overflow: auto;
+    }
+
+    .dashboard {
+      position: relative;
+      width: min(100vw, 1621px);
+      aspect-ratio: 1621 / 970;
+      line-height: 1.35;
+      background: #fff8ec;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .base-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .live-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .top-card {
+      position: absolute;
+      top: 17.95%;
+      width: 23.4%;
+      height: 13.9%;
+      display: grid;
+      place-items: center;
+      padding: 0.75% 1%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(250,250,250,0.94));
+      border: 1px solid rgba(204, 181, 144, 0.75);
+      border-radius: 1.25vw;
+      box-shadow: 0 8px 22px rgba(60, 42, 14, 0.08);
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .ended-card { left: 3.3%; }
+    .current-card { left: 27.45%; border-color: rgba(207, 20, 20, 0.75); }
+    .next-card { left: 50.9%; border-color: rgba(5, 126, 78, 0.75); }
+
+    .pill {
+      display: inline-flex;
+      gap: 0.35em;
+      align-items: center;
+      padding: 0.25em 1.05em;
+      border: 1px solid rgba(20, 30, 60, 0.14);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      font-size: clamp(10px, 0.82vw, 14px);
+      font-weight: 700;
+      color: #6a6f7c;
+    }
+
+    .dot {
+      width: 0.72em;
+      height: 0.72em;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .current-card .pill { color: var(--red); border-color: rgba(207,20,20,0.22); }
+    .next-card .pill { color: #087248; border-color: rgba(8,114,72,0.22); background: rgba(222, 248, 235, 0.78); }
+
+    .period-title {
+      margin-top: 0.15em;
+      font-size: clamp(20px, 2.05vw, 34px);
+      font-weight: 900;
+      color: #20294b;
+      white-space: nowrap;
+    }
+
+    .current-card .period-title { color: var(--red); }
+    .period-time {
+      margin-top: 0.45em;
+      display: inline-block;
+      padding: 0.34em 1.1em;
+      border-radius: 0.55vw;
+      background: #f8f9fb;
+      border: 1px solid #d9dde5;
+      color: #20294b;
+      font-size: clamp(10px, 0.9vw, 15px);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .analog-clock {
+      position: absolute;
+      left: 9.2%;
+      top: 36.7%;
+      width: 11.9%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #fffaf0 0 54%, #f7ead2 72%, #a97812 73%, #d9ad43 78%, #7d5109 82%);
+      border: 0.22vw solid #d8ab3a;
+      box-shadow: inset 0 0 18px rgba(108, 67, 5, 0.2), 0 6px 18px rgba(20, 12, 2, 0.22);
+    }
+
+    .tick {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1.2%;
+      height: 7.3%;
+      margin-left: -0.6%;
+      margin-top: -45%;
+      background: #173c30;
+      border-radius: 999px;
+      transform-origin: 50% 45%;
+    }
+
+    .hand {
+      position: absolute;
+      left: 50%;
+      bottom: 50%;
+      transform-origin: 50% 100%;
+      border-radius: 999px;
+      transform: translateX(-50%) rotate(0deg);
+    }
+
+    .hour-hand { width: 3.2%; height: 29%; background: #202020; }
+    .minute-hand { width: 2.2%; height: 39%; background: #202020; }
+    .second-hand { width: 1.1%; height: 42%; background: #df1515; }
+
+    .clock-pin {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 7.5%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #f3b324;
+      border: 0.14vw solid #1b1b1b;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+    }
+
+    .digital-time {
+      position: absolute;
+      left: 25.2%;
+      top: 37.5%;
+      width: 17.8%;
+      height: 6.2%;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 63, 43, 0.88);
+      color: white;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.45);
+      font-family: 'Courier New', monospace;
+      font-size: clamp(28px, 4vw, 62px);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .countdown {
+      position: absolute;
+      left: 29.2%;
+      top: 55.2%;
+      width: 12.2%;
+      height: 9.2%;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      background: rgba(0, 63, 43, 0.88);
+      color: white;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .countdown-label { font-size: clamp(12px, 1.1vw, 18px); }
+    .countdown-value {
+      color: var(--gold);
+      font-family: 'Courier New', monospace;
+      font-size: clamp(28px, 3.2vw, 52px);
+      text-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    }
+
+    .progress-panel {
+      position: absolute;
+      left: 8.5%;
+      top: 65.3%;
+      width: 32.1%;
+      height: 6.8%;
+      padding: 0.8% 1.2%;
+      border: 1px solid rgba(242, 180, 55, 0.72);
+      border-radius: 1vw;
+      background: rgba(0, 62, 42, 0.9);
+      color: white;
+      font-weight: 900;
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: clamp(11px, 1.05vw, 18px);
+      margin-bottom: 0.48em;
+    }
+
+    .progress-percent { color: #ffd54b; }
+    .progress-track {
+      height: 0.68vw;
+      min-height: 7px;
+      border-radius: 999px;
+      background: rgba(230, 244, 229, 0.22);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #fff2a1, #f5b336);
+      transition: width 0.8s ease;
+    }
+
+    .date-card {
+      position: absolute;
+      left: 8.75%;
+      top: 75.4%;
+      width: 12.75%;
+      height: 14.4%;
+      display: grid;
+      align-content: center;
+      gap: 0.5em;
+      padding: 1.2% 1.55%;
+      border: 1px solid rgba(242, 180, 55, 0.75);
+      border-radius: 1.05vw;
+      background: rgba(0, 62, 42, 0.94);
+      color: white;
+      font-weight: 900;
+    }
+
+    .weekday { font-size: clamp(18px, 1.95vw, 31px); }
+    .date-line { font-size: clamp(11px, 1.05vw, 17px); color: #f7c43d; white-space: nowrap; }
+    .gregorian { color: white; }
+
+    .schedule-cover {
+      position: absolute;
+      left: 43.82%;
+      top: 38.62%;
+      width: 52.55%;
+      height: 46.1%;
+      overflow: hidden;
+      border-radius: 0 0 1vw 1vw;
+      background: rgba(255,255,255,0.98);
+    }
+
+    .schedule-table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      color: var(--ink);
+      font-size: clamp(10px, 0.94vw, 16px);
+      font-weight: 700;
+      direction: rtl;
+    }
+
+    .schedule-table td {
+      border-bottom: 1px solid #e3e5e8;
+      padding: 0.37em 0.65em;
+      text-align: center;
+      background: rgba(255,255,255,0.96);
+      white-space: nowrap;
+    }
+
+    .schedule-table .num { width: 7%; }
+    .schedule-table .lesson { width: 28%; color: #123e2a; font-size: clamp(12px, 1.08vw, 18px); font-weight: 900; }
+    .schedule-table .time { width: 38%; direction: rtl; }
+    .schedule-table .state { width: 20%; }
+
+    .num-badge {
+      display: inline-grid;
+      place-items: center;
+      min-width: 1.7em;
+      height: 1.7em;
+      border-radius: 0.43em;
+      background: #0d8863;
+      color: white;
+      font-weight: 900;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 6.4em;
+      padding: 0.32em 0.85em;
+      border-radius: 0.45em;
+      background: #e9f8ef;
+      color: #0f6746;
+      border: 1px solid #bde8ce;
+      font-size: clamp(9px, 0.86vw, 14px);
+    }
+
+    .schedule-table tr.current td {
+      background: linear-gradient(90deg, rgba(255,237,237,0.98), rgba(255,250,250,0.98));
+      border-top: 1px solid #ef3d3d;
+      border-bottom: 1px solid #ef3d3d;
+    }
+
+    .schedule-table tr.current .lesson,
+    .schedule-table tr.current .status-badge { color: var(--red); }
+    .schedule-table tr.current .num-badge { background: var(--red); }
+    .schedule-table tr.current .status-badge { background: #fff1f1; border-color: #f7bebe; }
+
+    .ticker-shell {
+      position: absolute;
+      left: 16.5%;
+      bottom: 2.05%;
+      width: 54%;
+      height: 4.8%;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: rgba(255, 248, 236, 0.94);
+      color: #163725;
+      font-size: clamp(12px, 1.12vw, 18px);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      gap: 4.5em;
+      min-width: max-content;
+      animation: ticker 28s linear infinite;
+    }
+
+    .ticker-item::before,
+    .ticker-item::after {
+      content: '\2726';
+      color: #d99a10;
+      margin: 0 1.2em;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(-8%); }
+      to { transform: translateX(55%); }
+    }
+
+    @media (max-width: 900px) {
+      .top-card { border-radius: 12px; }
+      .period-title { font-size: clamp(14px, 2.2vw, 24px); }
+      .period-time, .pill { font-size: clamp(8px, 1.2vw, 12px); }
+      .schedule-table { font-size: clamp(7px, 1.25vw, 12px); }
+      .status-badge { min-width: 5.5em; }
+      .ticker-shell { font-size: clamp(8px, 1.4vw, 13px); }
+    }
+
+    @media print {
+      @page { size: landscape; margin: 0; }
+      html, body { background: white; }
+      body { display: block; }
+      .dashboard { width: 100vw; box-shadow: none; }
+    }
