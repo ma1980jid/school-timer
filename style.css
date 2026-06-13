@@ -1,15 +1,15 @@
 :root {
-  --primary: #0f766e;
-  --secondary: #d6bd68;
-  --bg: #f7fbf8;
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --border: #e5e7eb;
-  --green: #16a34a;
+  --primary: #064b35;
+  --secondary: #d6a93c;
+  --bg: #f4ead8;
+  --card: rgba(255,255,255,.94);
+  --text: #13213d;
+  --muted: #657083;
+  --red: #cf1414;
+  --green: #0c7a4d;
   --blue: #2563eb;
-  --orange: #f97316;
   --purple: #7c3aed;
+  --shadow: 0 18px 45px rgba(40,25,5,.13);
 }
 
 * {
@@ -20,11 +20,11 @@ html,
 body {
   margin: 0;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   font-family: Tahoma, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body::before {
@@ -32,514 +32,531 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at top right, rgba(15,118,110,.08), transparent 35%),
-    radial-gradient(circle at top left, rgba(214,189,104,.12), transparent 32%),
-    linear-gradient(135deg, rgba(15,118,110,.035) 25%, transparent 25%),
-    linear-gradient(225deg, rgba(15,118,110,.035) 25%, transparent 25%);
-  background-size: auto, auto, 46px 46px, 46px 46px;
+    radial-gradient(circle at top right, rgba(214,169,60,.18), transparent 34%),
+    radial-gradient(circle at top left, rgba(6,75,53,.12), transparent 35%);
   pointer-events: none;
-  z-index: -1;
 }
 
-.app-shell {
-  width: min(1540px, 98vw);
+.dashboard {
+  width: 100vw;
   height: 100vh;
-  margin: 0 auto;
   padding: 18px;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto auto;
-  gap: 12px;
+  grid-template-rows: 108px 142px 1fr 82px 48px;
+  gap: 14px;
   overflow: hidden;
 }
 
-/* Header */
+.header,
+.period-card,
+.weather-card,
+.clock-panel,
+.schedule-panel,
+.next-panel,
+.message-panel,
+.stats-strip,
+.ticker-shell {
+  background: var(--card);
+  border: 1px solid rgba(204,181,144,.65);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
 
-.app-header {
-  background: rgba(255,255,255,.9);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 12px 16px;
+.header {
   display: grid;
-  grid-template-columns: 56px 1fr 190px 210px;
+  grid-template-columns: 56px 110px 1fr 190px 210px;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 14px 34px rgba(15,118,110,.08);
+  gap: 18px;
+  padding: 14px 20px;
 }
 
 .menu-btn {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border: 0;
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  font-size: 22px;
+  background: white;
+  font-size: 24px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
 }
 
-.brand-block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-}
-
-.brand-school-logo {
-  width: 78px;
-  height: 78px;
+.school-logo {
+  width: 100px;
+  height: 76px;
   object-fit: contain;
 }
 
-.brand-text {
+.school-title {
   text-align: center;
 }
 
-.brand-text h1 {
+.school-title h1 {
   margin: 0;
   color: var(--primary);
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 900;
 }
 
-.brand-text p {
-  margin: 5px 0 0;
+.school-title p {
+  margin: 6px 0 0;
   color: var(--secondary);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.ministry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 900;
+}
+
+.ministry img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.date-box {
+  background: white;
+  border: 1px solid rgba(204,181,144,.65);
+  border-radius: 18px;
+  padding: 12px;
+  text-align: center;
+}
+
+.date-box strong,
+.date-box span,
+.date-box small {
+  display: block;
+  font-weight: 900;
+}
+
+.date-box span {
+  margin: 5px 0;
+}
+
+.date-box small {
+  color: var(--muted);
+}
+
+.top-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 230px;
+  gap: 14px;
+}
+
+.period-card {
+  text-align: center;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pill {
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.period-card h2 {
+  margin: 8px 0;
+  font-size: 31px;
+  color: var(--primary);
+}
+
+.period-card p {
+  margin: 0;
+  direction: ltr;
   font-size: 17px;
   font-weight: 900;
 }
 
-.ministry-block {
+.current-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,241,241,.9));
+}
+
+.current-card h2,
+.current-card .pill {
+  color: var(--red);
+}
+
+.break-card h2 {
+  color: var(--purple);
+}
+
+.weather-card {
+  text-align: center;
+  padding: 16px;
+}
+
+.sun {
+  font-size: 44px;
+}
+
+.weather-card strong {
+  display: block;
+  color: var(--primary);
+  font-size: 42px;
+}
+
+.weather-card span,
+.weather-card small {
+  display: block;
+  font-weight: 900;
+}
+
+.main-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  grid-template-rows: 1fr 120px;
+  gap: 14px;
+}
+
+.clock-panel {
+  background: linear-gradient(135deg, var(--primary), #052f25);
+  color: white;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  align-items: center;
+  gap: 26px;
+  padding: 26px;
+  overflow: hidden;
+}
+
+.analog-clock {
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffaf0 0 58%, #f7ead2 72%, #d6a93c 76%, #6f4708 83%);
+  border: 5px solid #d6a93c;
+  position: relative;
+  box-shadow: inset 0 0 18px rgba(108,67,5,.22), 0 8px 20px rgba(0,0,0,.25);
+}
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 15px;
+  margin-left: -1.5px;
+  margin-top: -83px;
+  background: #173c30;
+  border-radius: 999px;
+  transform-origin: 50% 83px;
+}
+
+.hand {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform-origin: 50% 100%;
+  border-radius: 999px;
+  transform: translateX(-50%) rotate(0deg);
+}
+
+.hour-hand {
+  width: 7px;
+  height: 52px;
+  background: #202020;
+}
+
+.minute-hand {
+  width: 5px;
+  height: 70px;
+  background: #202020;
+}
+
+.second-hand {
+  width: 2px;
+  height: 78px;
+  background: var(--red);
+}
+
+.clock-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--secondary);
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
+
+.clock-info {
+  text-align: center;
+}
+
+.digital-time {
+  font-family: "Courier New", monospace;
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.clock-info span {
+  display: block;
+  margin-top: 18px;
+  font-weight: 900;
+}
+
+.clock-info strong {
+  display: block;
+  margin: 10px 0;
+  font-family: "Courier New", monospace;
+  color: var(--secondary);
+  font-size: 58px;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.progress-track {
+  height: 12px;
+  background: rgba(255,255,255,.25);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #fff2a1, var(--secondary));
+  border-radius: inherit;
+  transition: width .5s ease;
+}
+
+.schedule-panel {
+  grid-row: span 2;
+  padding: 18px;
+  overflow: hidden;
+}
+
+.panel-title {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-title h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 27px;
+}
+
+.panel-title span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.schedule-table {
+  width: 100%;
+  height: calc(100% - 48px);
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 17px;
   font-weight: 800;
 }
 
-.ministry-logo {
-  width: 62px;
-  height: 62px;
-  object-fit: contain;
-}
-
-.date-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 18px;
+.schedule-table td {
+  border-bottom: 1px solid #e3e5e8;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 8px 22px rgba(0,0,0,.05);
+  background: rgba(255,255,255,.96);
+  white-space: nowrap;
 }
 
-.date-card span,
-.date-card small {
-  display: block;
-  color: var(--muted);
-  font-weight: 800;
+.schedule-table .num {
+  width: 9%;
 }
 
-.date-card strong {
-  display: block;
-  margin: 4px 0;
+.schedule-table .lesson {
+  width: 32%;
+  color: var(--primary);
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.schedule-table .time {
+  width: 34%;
+  direction: ltr;
+}
+
+.schedule-table .state {
+  width: 25%;
+}
+
+.num-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  font-weight: 900;
+}
+
+.status-badge {
+  display: inline-flex;
+  min-width: 92px;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #e9f8ef;
+  color: var(--green);
+  border: 1px solid #bde8ce;
   font-size: 15px;
 }
 
-/* Alert */
+.schedule-table tr.current td {
+  background: #fff1f1;
+  color: var(--red);
+}
+
+.schedule-table tr.current .lesson,
+.schedule-table tr.current .status-badge {
+  color: var(--red);
+}
+
+.schedule-table tr.current .num-badge {
+  background: var(--red);
+}
+
+.next-panel,
+.message-panel {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.next-panel span,
+.message-panel span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.next-panel strong,
+.message-panel strong {
+  display: block;
+  margin: 7px 0;
+  color: var(--primary);
+  font-size: 27px;
+}
+
+.next-panel p,
+.next-panel small {
+  margin: 2px 0;
+  font-weight: 900;
+}
+
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+}
+
+.stats-strip div {
+  text-align: center;
+  padding: 12px;
+  border-left: 1px solid rgba(204,181,144,.65);
+}
+
+.stats-strip span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.stats-strip strong {
+  display: block;
+  color: var(--primary);
+  font-size: 34px;
+}
+
+.ticker-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 18px;
+  font-weight: 900;
+}
+
+.ticker-shell a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.ticker-track {
+  display: inline-flex;
+  gap: 60px;
+  min-width: max-content;
+  animation: ticker 28s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-item::before,
+.ticker-item::after {
+  content: "✦";
+  color: var(--secondary);
+  margin: 0 16px;
+}
+
+@keyframes ticker {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(55%); }
+}
 
 .alert-bar {
-  padding: 10px;
-  text-align: center;
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  padding: 14px;
   border-radius: 16px;
+  text-align: center;
   background: #fef3c7;
   color: #92400e;
   font-weight: 900;
+  z-index: 100;
 }
 
 .hidden {
   display: none !important;
 }
 
-/* Top Row */
-
-.top-row {
-  display: grid;
-  grid-template-columns: 1fr 250px;
-  gap: 12px;
-}
-
-.summary-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  background: rgba(255,255,255,.93);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: 0 12px 28px rgba(15,118,110,.07);
-  overflow: hidden;
-}
-
-.summary-card {
-  padding: 18px 12px;
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
-
-.summary-card span {
-  color: var(--muted);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.summary-card strong {
-  display: block;
-  margin: 8px 0;
-  font-size: 28px;
-  color: var(--primary);
-}
-
-.summary-card small {
-  font-weight: 800;
-  direction: ltr;
-}
-
-.summary-card.current {
-  background: rgba(214,189,104,.13);
-}
-
-.summary-card.current strong {
-  color: var(--orange);
-}
-
-.break-card strong {
-  color: var(--purple);
-}
-
-.weather-card {
-  background: rgba(255,255,255,.93);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 12px 28px rgba(15,118,110,.07);
-}
-
-.sun-icon {
-  font-size: 44px;
-  line-height: 1;
-}
-
-.weather-card strong {
-  display: block;
-  font-size: 38px;
-  color: var(--primary);
-}
-
-.weather-card span,
-.weather-card small {
-  display: block;
-  font-weight: 800;
-}
-
-/* Main Layout */
-
-.desktop-grid {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: 12px;
-}
-
-.left-column {
-  min-height: 0;
-  display: grid;
-  grid-template-rows: 1.3fr .55fr .55fr;
-  gap: 12px;
-}
-
-.clock-card,
-.modern-table-card,
-.mini-panel,
-.bottom-strip,
-.footer {
-  background: rgba(255,255,255,.93);
-  border: 1px solid var(--border);
-  border-radius: 26px;
-  box-shadow: 0 14px 34px rgba(15,118,110,.08);
-}
-
-/* Clock */
-
-.clock-card {
-  background: linear-gradient(135deg, var(--primary), #064e49);
-  color: white;
-  padding: 22px;
-  display: grid;
-  grid-template-columns: 180px 1fr 160px;
-  align-items: center;
-  gap: 18px;
-  overflow: hidden;
-}
-
-.analog-clock {
-  width: 160px;
-  height: 160px;
-  border: 10px solid rgba(255,255,255,.93);
-  border-radius: 50%;
-  position: relative;
-  background: rgba(255,255,255,.08);
-}
-
-.clock-hand {
-  position: absolute;
-  width: 7px;
-  height: 56px;
-  background: white;
-  border-radius: 99px;
-  top: 36px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-35deg);
-  transform-origin: bottom;
-}
-
-.clock-content {
-  text-align: center;
-}
-
-.clock-content strong {
-  display: block;
-  font-size: 56px;
-  line-height: 1;
-}
-
-.clock-content span {
-  display: block;
-  margin-top: 14px;
-  opacity: .9;
-  font-weight: 800;
-}
-
-.clock-content h2 {
-  margin: 8px 0;
-  font-size: 54px;
-  color: var(--secondary);
-}
-
-.clock-content p {
-  margin: 8px 0 0;
-  direction: ltr;
-  font-weight: 800;
-}
-
-.clock-date {
-  border-right: 1px solid rgba(255,255,255,.35);
-  padding-right: 18px;
-  text-align: center;
-}
-
-.clock-date span {
-  display: block;
-  font-weight: 800;
-}
-
-.clock-date strong {
-  display: block;
-  margin-top: 10px;
-  font-size: 20px;
-}
-
-.progress {
-  width: 100%;
-  height: 11px;
-  background: rgba(255,255,255,.45);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-#progressFill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--secondary), #fff);
-  border-radius: 999px;
-  transition: width .4s ease;
-}
-
-/* Small cards */
-
-.small-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.mini-panel {
-  padding: 18px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.mini-panel span {
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.mini-panel strong {
-  display: block;
-  margin: 6px 0;
-  color: var(--primary);
-  font-size: 25px;
-}
-
-.mini-panel p,
-.mini-panel small {
-  margin: 2px 0;
-  font-weight: 800;
-}
-
-.message-panel strong {
-  line-height: 1.6;
-}
-
-/* Table */
-
-.modern-table-card {
-  padding: 16px;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.section-title h2 {
-  margin: 0;
-  color: var(--primary);
-  font-size: 23px;
-}
-
-.section-title span {
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.schedule-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.item {
-  display: grid;
-  grid-template-columns: 46px 1.25fr 1fr .8fr;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
-  border-radius: 13px;
-  background: #f8fafc;
-  border: 1px solid #eef2f7;
-  min-height: 40px;
-}
-
-.item .icon {
-  text-align: center;
-}
-
-.item .name {
-  font-weight: 900;
-}
-
-.item .time {
-  direction: ltr;
-  text-align: center;
-  color: var(--text);
-  font-weight: 900;
-}
-
-.item .status {
-  text-align: left;
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.item.finished {
-  opacity: .62;
-}
-
-.item.active {
-  background: rgba(249,115,22,.10);
-  border-color: rgba(249,115,22,.45);
-  color: var(--orange);
-}
-
-.item.break {
-  color: var(--purple);
-}
-
-/* Bottom */
-
-.bottom-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  overflow: hidden;
-}
-
-.bottom-strip div {
-  padding: 12px;
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
-
-.bottom-strip span {
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.bottom-strip strong {
-  display: block;
-  font-size: 34px;
-  color: var(--primary);
-}
-
-.footer {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.footer a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-/* Mobile */
-
 @media (max-width: 800px) {
   html,
   body {
     height: auto;
+    overflow: auto;
   }
 
-  .app-shell {
-    width: 100%;
+  .dashboard {
     height: auto;
     min-height: 100vh;
-    display: block;
     padding: 12px;
-    overflow: visible;
+    display: flex;
+    flex-direction: column;
   }
 
-  .app-header {
-    grid-template-columns: 44px 1fr 70px;
+  .header {
+    grid-template-columns: 44px 60px 1fr 62px;
     gap: 8px;
     padding: 10px;
-    margin-bottom: 10px;
   }
 
   .menu-btn {
@@ -547,46 +564,35 @@ body::before {
     height: 42px;
   }
 
-  .brand-block {
-    gap: 8px;
+  .school-logo {
+    width: 58px;
+    height: 50px;
   }
 
-  .brand-school-logo {
-    width: 52px;
-    height: 52px;
-  }
-
-  .brand-text h1 {
+  .school-title h1 {
     font-size: 15px;
-    line-height: 1.35;
   }
 
-  .brand-text p {
+  .school-title p {
     font-size: 12px;
   }
 
-  .ministry-block {
+  .ministry {
     flex-direction: column;
-    gap: 2px;
-    font-size: 11px;
+    font-size: 10px;
   }
 
-  .ministry-logo {
-    width: 46px;
-    height: 46px;
+  .ministry img {
+    width: 45px;
+    height: 45px;
   }
 
-  .date-card {
+  .date-box {
     display: none;
   }
 
-  .top-row {
-    display: block;
-  }
-
-  .summary-strip {
+  .top-cards {
     grid-template-columns: repeat(3, 1fr);
-    margin-bottom: 10px;
   }
 
   .break-card,
@@ -594,127 +600,90 @@ body::before {
     display: none;
   }
 
-  .summary-card {
-    padding: 11px 6px;
+  .period-card {
+    padding: 12px 6px;
   }
 
-  .summary-card span {
+  .pill {
     font-size: 12px;
   }
 
-  .summary-card strong {
+  .period-card h2 {
     font-size: 18px;
   }
 
-  .summary-card small {
+  .period-card p {
     font-size: 12px;
   }
 
-  .desktop-grid {
+  .main-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
   }
 
-  .left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .clock-card {
+  .clock-panel {
     grid-template-columns: 95px 1fr;
     padding: 14px;
-    gap: 10px;
-    border-radius: 22px;
+    gap: 12px;
   }
 
   .analog-clock {
     width: 90px;
     height: 90px;
-    border-width: 7px;
   }
 
-  .clock-hand {
-    height: 31px;
-    top: 17px;
+  .tick {
+    height: 8px;
+    margin-top: -39px;
+    transform-origin: 50% 39px;
   }
 
-  .clock-content strong {
-    font-size: 33px;
+  .hour-hand {
+    height: 25px;
+    width: 5px;
   }
 
-  .clock-content span {
-    margin-top: 8px;
-    font-size: 13px;
+  .minute-hand {
+    height: 34px;
+    width: 4px;
   }
 
-  .clock-content h2 {
-    font-size: 33px;
+  .second-hand {
+    height: 38px;
   }
 
-  .clock-date {
-    display: none;
+  .digital-time {
+    font-size: 34px;
   }
 
-  .small-cards {
-    grid-template-columns: 1fr 1fr;
+  .clock-info strong {
+    font-size: 34px;
   }
 
-  .mini-panel {
-    padding: 14px;
-    border-radius: 20px;
-  }
-
-  .mini-panel strong {
-    font-size: 20px;
-  }
-
-  .weather-mini {
-    display: none;
-  }
-
-  .modern-table-card {
-    padding: 12px;
-    border-radius: 22px;
-  }
-
-  .section-title h2 {
-    font-size: 18px;
-  }
-
-  .item {
-    grid-template-columns: 32px 1fr 1fr .75fr;
-    padding: 8px;
-    min-height: 38px;
+  .schedule-table {
     font-size: 12px;
   }
 
-  .item .name {
+  .schedule-table .lesson {
     font-size: 13px;
   }
 
-  .item .status {
+  .status-badge {
+    min-width: 58px;
     font-size: 11px;
   }
 
-  .bottom-strip {
-    margin-top: 10px;
+  .num-badge {
+    min-width: 24px;
+    height: 24px;
   }
 
-  .bottom-strip div {
-    padding: 10px 4px;
+  .ticker-shell {
+    grid-template-columns: 1fr;
+    min-height: 44px;
   }
 
-  .bottom-strip span {
-    font-size: 12px;
-  }
-
-  .bottom-strip strong {
-    font-size: 24px;
-  }
-
-  .footer {
+  .ticker-shell a {
     display: none;
   }
 }
