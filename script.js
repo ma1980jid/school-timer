@@ -2,7 +2,6 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(window.location.search);
 const schoolSlug = params.get("school") || DEFAULT_SCHOOL_SLUG;
-const isClassroomMode = location.pathname.includes("classroom");
 
 let scheduleItems = [];
 let currentSchool = null;
@@ -27,7 +26,7 @@ async function loadSchool() {
       .single();
 
     if (schoolError || !school) {
-      showError("لم يتم العثور على المدرسة. تأكد من school_slug وحالة التفعيل في جدول schools.");
+      showError("لم يتم العثور على المدرسة.");
       return;
     }
 
@@ -58,7 +57,7 @@ async function loadSchool() {
       .eq("is_active", true);
 
     if (activeScheduleError || !activeSchedules || activeSchedules.length === 0) {
-      showError("لم يتم تحديد توقيت نشط لهذه المدرسة في جدول school_schedules.");
+      showError("لم يتم تحديد توقيت نشط لهذه المدرسة.");
       return;
     }
 
@@ -71,7 +70,7 @@ async function loadSchool() {
       .single();
 
     if (scheduleError || !schedule) {
-      showError("تعذر تحميل اسم التوقيت من جدول schedules.");
+      showError("تعذر تحميل اسم التوقيت.");
       return;
     }
 
@@ -85,7 +84,7 @@ async function loadSchool() {
       .order("period_order", { ascending: true });
 
     if (itemsError) {
-      showError("تعذر تحميل جدول الحصص من schedule_items.");
+      showError("تعذر تحميل جدول الحصص.");
       return;
     }
 
@@ -114,11 +113,17 @@ async function loadSchool() {
 }
 
 async function loadMessages() {
-  const { data, error } = await supabaseClient
+  const query = supabaseClient
     .from("messages")
     .select("*")
     .eq("is_active", true)
     .order("id", { ascending: true });
+
+  if (currentSchool?.id) {
+    query.eq("school_id", currentSchool.id);
+  }
+
+  const { data, error } = await query;
 
   if (!error && data && data.length > 0) {
     messages = data;
@@ -137,20 +142,14 @@ function rotateMessage() {
 
 function applySchoolTheme(school) {
   const primary = school.primary_color || "#0f766e";
-  const secondary = school.secondary_color || "#b7791f";
-  const background = school.background_color || "#ecfdf5";
+  const secondary = school.secondary_color || "#f59e0b";
+  const background = school.background_color || "#f4faf8";
 
   document.documentElement.style.setProperty("--primary", primary);
   document.documentElement.style.setProperty("--secondary", secondary);
-  document.documentElement.style.setProperty("--background", background);
+  document.documentElement.style.setProperty("--bg", background);
 
   document.body.style.background = background;
-
-  if (school.pattern_url) {
-    document.body.style.backgroundImage = `url('${school.pattern_url}')`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundAttachment = "fixed";
-  }
 }
 
 function setClassroomLink() {
@@ -199,7 +198,20 @@ function fmtDate(date) {
   });
 }
 
+function fmtHijri(date) {
+  try {
+    return new Intl.DateTimeFormat("ar-OM-u-ca-islamic", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(date);
+  } catch {
+    return "";
+  }
+}
+
 function fmtRange(item) {
+  if (!item) return "--";
   return `${String(item.start_time).slice(0, 5)} - ${String(item.end_time).slice(0, 5)}`;
 }
 
@@ -225,29 +237,50 @@ function getItemState(item, now) {
   return "upcoming";
 }
 
-function findCurrentAndNext(now) {
+function findPeriods(now) {
+  let previous = null;
   let current = null;
   let next = null;
+  let nextBreak = null;
 
   for (const item of scheduleItems) {
     const start = timeToDate(item.start_time);
     const end = timeToDate(item.end_time);
+    const isBreak = item.is_break === true || String(item.period_name).includes("فسحة");
 
+    if (now > end) previous = item;
     if (now >= start && now <= end) current = item;
     if (now < start && !next) next = item;
+    if (now < start && isBreak && !nextBreak) nextBreak = item;
   }
 
-  return { current, next };
+  return { previous, current, next, nextBreak };
 }
 
 function updateTimer() {
   const now = new Date();
 
-  setText("currentTime", fmtClock(now));
-  setText("dayName", now.toLocaleDateString("ar-OM", { weekday: "long" }));
-  setText("dateText", fmtDate(now));
+  const dayName = now.toLocaleDateString("ar-OM", { weekday: "long" });
+  const dateText = fmtDate(now);
+  const hijriText = fmtHijri(now);
 
-  const { current, next } = findCurrentAndNext(now);
+  setText("currentTime", fmtClock(now));
+  setText("dayName", dayName);
+  setText("dateText", dateText);
+  setText("dayNameClock", dayName);
+  setText("dateTextClock", dateText);
+  setText("hijriDate", hijriText);
+
+  const { previous, current, next, nextBreak } = findPeriods(now);
+
+  setText("prevPeriod", previous?.period_name || "--");
+  setText("prevRange", previous ? fmtRange(previous) : "--");
+
+  setText("nextPeriodMini", next?.period_name || "--");
+  setText("nextRangeMini", next ? fmtRange(next) : "--");
+
+  setText("nextBreakPeriod", nextBreak?.period_name || "--");
+  setText("nextBreakRange", nextBreak ? fmtRange(nextBreak) : "--");
 
   if (current) {
     const start = timeToDate(current.start_time);
@@ -259,6 +292,8 @@ function updateTimer() {
     const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
 
     setText("currentPeriod", current.period_name);
+    setText("currentPeriodMini", current.period_name);
+    setText("currentRangeMini", fmtRange(current));
     setText("remainingTime", formatDuration(remainingMs));
     setText("periodRange", fmtRange(current));
 
@@ -267,6 +302,8 @@ function updateTimer() {
     announceStart(current);
   } else {
     setText("currentPeriod", "لا توجد حصة الآن");
+    setText("currentPeriodMini", "--");
+    setText("currentRangeMini", "--");
     setText("remainingTime", "--:--");
     setText("periodRange", "");
     setProgress(0);
@@ -284,7 +321,25 @@ function updateTimer() {
     setText("nextStartsIn", "");
   }
 
+  updateStats(now);
   renderSchedule(now);
+}
+
+function updateStats(now) {
+  let finished = 0;
+  let active = 0;
+  let upcoming = 0;
+
+  scheduleItems.forEach(item => {
+    const state = getItemState(item, now);
+    if (state === "finished") finished++;
+    if (state === "active") active++;
+    if (state === "upcoming") upcoming++;
+  });
+
+  setText("finishedCount", finished);
+  setText("activeCount", active);
+  setText("upcomingCount", upcoming);
 }
 
 function setProgress(percent) {
