@@ -13,79 +13,81 @@
 </head>
 
 <body>
-  <main class="dashboard" aria-label="لوحة مؤقت الحصص المدرسية">
+  <main class="dashboard">
 
-    <section class="live-layer">
-
-      <div class="school-header">
-        <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة">
-        <div>
-          <h1 id="schoolName">مؤقت الحصص المدرسية</h1>
-          <p id="scheduleName">جاري تحميل التوقيت...</p>
-        </div>
-        <div class="ministry-title">وزارة التعليم</div>
+    <header class="header">
+      <img id="schoolLogo" class="school-logo" src="icons/default-icon.svg" alt="شعار المدرسة">
+      <div class="title">
+        <h1 id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</h1>
+        <p id="scheduleName">جاري تحميل التوقيت...</p>
       </div>
-
-      <div class="top-card ended-card">
-        <div class="pill">الحصة المنتهية <span class="dot"></span></div>
-        <div id="endedTitle" class="period-title">--</div>
-        <div id="endedTime" class="period-time">--</div>
-      </div>
-
-      <div class="top-card current-card">
-        <div class="pill">الحصة الحالية <span class="dot"></span></div>
-        <div id="currentTitle" class="period-title">--</div>
-        <div id="currentTime" class="period-time">--</div>
-      </div>
-
-      <div class="top-card next-card">
-        <div class="pill">الحصة القادمة <span class="dot"></span></div>
-        <div id="nextTitle" class="period-title">--</div>
-        <div id="nextTime" class="period-time">--</div>
-      </div>
-
-      <div id="analogClock" class="analog-clock">
-        <div id="hourHand" class="hand hour-hand"></div>
-        <div id="minuteHand" class="hand minute-hand"></div>
-        <div id="secondHand" class="hand second-hand"></div>
-        <div class="clock-pin"></div>
-      </div>
-
-      <div id="digitalTime" class="digital-time">--:--:--</div>
-
-      <div class="countdown">
-        <div id="countdownLabel" class="countdown-label">متبقي من الحصة الحالية</div>
-        <div id="countdownValue" class="countdown-value">--:--</div>
-      </div>
-
-      <div class="progress-panel">
-        <div class="progress-head">
-          <span id="progressPercent" class="progress-percent">%0</span>
-          <span>تقدم الحصة</span>
-        </div>
-        <div class="progress-track">
-          <div id="progressFill" class="progress-fill"></div>
-        </div>
-      </div>
-
+      <div class="ministry">وزارة التعليم</div>
       <div class="date-card">
-        <div id="weekday" class="weekday">--</div>
-        <div id="gregorianDate" class="date-line gregorian">--</div>
-        <div id="hijriDate" class="date-line">--</div>
+        <strong id="weekday">--</strong>
+        <span id="gregorianDate">--</span>
+        <small id="hijriDate">--</small>
+      </div>
+    </header>
+
+    <section class="cards-row">
+      <div class="period-card ended-card">
+        <div class="pill">الحصة المنتهية <span class="dot"></span></div>
+        <h2 id="endedTitle">--</h2>
+        <p id="endedTime">--</p>
       </div>
 
-      <div class="schedule-cover">
-        <table class="schedule-table" aria-label="جدول الحصص اليومي">
-          <tbody id="scheduleBody"></tbody>
-        </table>
+      <div class="period-card current-card">
+        <div class="pill">الحصة الحالية <span class="dot"></span></div>
+        <h2 id="currentTitle">--</h2>
+        <p id="currentTime">--</p>
       </div>
 
-      <div class="ticker-shell" aria-label="رسائل تربوية متحركة">
-        <a id="classroomLink" href="#" class="classroom-link">وضع الشاشة التفاعلية</a>
-        <div id="tickerTrack" class="ticker-track"></div>
+      <div class="period-card next-card">
+        <div class="pill">الحصة القادمة <span class="dot"></span></div>
+        <h2 id="nextTitle">--</h2>
+        <p id="nextTime">--</p>
       </div>
-
     </section>
+
+    <section class="main-grid">
+      <section class="clock-panel">
+        <div id="analogClock" class="analog-clock">
+          <div id="hourHand" class="hand hour-hand"></div>
+          <div id="minuteHand" class="hand minute-hand"></div>
+          <div id="secondHand" class="hand second-hand"></div>
+          <div class="clock-pin"></div>
+        </div>
+
+        <div class="time-info">
+          <div id="digitalTime" class="digital-time">--:--:--</div>
+          <div id="countdownLabel" class="countdown-label">متبقي من الحصة الحالية</div>
+          <div id="countdownValue" class="countdown-value">--:--</div>
+
+          <div class="progress-head">
+            <span>تقدم الحصة</span>
+            <span id="progressPercent">%0</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="schedule-panel">
+        <h2>جدول الحصص اليومي</h2>
+        <div class="schedule-cover">
+          <table class="schedule-table">
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <footer class="ticker-shell">
+      <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
+      <div id="tickerTrack" class="ticker-track"></div>
+    </footer>
+
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
