@@ -93,6 +93,9 @@ async function loadSchool() {
 
     await loadMessages();
 
+    buildClockTicks();
+    buildTicker();
+
     updateTimer();
 
     if (!timerStarted) {
@@ -113,20 +116,26 @@ async function loadSchool() {
 }
 
 async function loadMessages() {
-  const query = supabaseClient
+  let query = supabaseClient
     .from("messages")
     .select("*")
     .eq("is_active", true)
     .order("id", { ascending: true });
 
   if (currentSchool?.id) {
-    query.eq("school_id", currentSchool.id);
+    query = query.eq("school_id", currentSchool.id);
   }
 
   const { data, error } = await query;
 
   if (!error && data && data.length > 0) {
     messages = data;
+  } else {
+    messages = [
+      { message_text: "الوقت قيمة لا تعوض" },
+      { message_text: "الانضباط طريق التميز" },
+      { message_text: "حصتك فرصة جديدة للتعلم" }
+    ];
   }
 }
 
@@ -138,12 +147,27 @@ function rotateMessage() {
 
   messageIndex++;
   if (messageIndex >= messages.length) messageIndex = 0;
+
+  buildTicker();
+}
+
+function buildTicker() {
+  const ticker = document.getElementById("tickerTrack");
+  if (!ticker) return;
+
+  const source = messages.length
+    ? messages.map(m => m.message_text)
+    : ["الوقت قيمة لا تعوض", "الانضباط طريق التميز"];
+
+  ticker.innerHTML = source.concat(source).map(message => {
+    return `<span class="ticker-item">${message}</span>`;
+  }).join("");
 }
 
 function applySchoolTheme(school) {
-  const primary = school.primary_color || "#0f766e";
-  const secondary = school.secondary_color || "#f59e0b";
-  const background = school.background_color || "#f4faf8";
+  const primary = school.primary_color || "#064b35";
+  const secondary = school.secondary_color || "#d6a93c";
+  const background = school.background_color || "#f4ead8";
 
   document.documentElement.style.setProperty("--primary", primary);
   document.documentElement.style.setProperty("--secondary", secondary);
@@ -186,7 +210,7 @@ function fmtClock(date) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true
+    hour12: false
   });
 }
 
@@ -200,13 +224,21 @@ function fmtDate(date) {
 
 function fmtHijri(date) {
   try {
-    return new Intl.DateTimeFormat("ar-OM-u-ca-islamic", {
+    return new Intl.DateTimeFormat("ar-OM-u-ca-islamic-umalqura", {
       day: "numeric",
       month: "long",
       year: "numeric"
     }).format(date);
   } catch {
-    return "";
+    try {
+      return new Intl.DateTimeFormat("ar-OM-u-ca-islamic", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    } catch {
+      return "";
+    }
   }
 }
 
@@ -237,6 +269,10 @@ function getItemState(item, now) {
   return "upcoming";
 }
 
+function isBreakItem(item) {
+  return item?.is_break === true || String(item?.period_name || "").includes("فسحة");
+}
+
 function findPeriods(now) {
   let previous = null;
   let current = null;
@@ -246,12 +282,11 @@ function findPeriods(now) {
   for (const item of scheduleItems) {
     const start = timeToDate(item.start_time);
     const end = timeToDate(item.end_time);
-    const isBreak = item.is_break === true || String(item.period_name).includes("فسحة");
 
     if (now > end) previous = item;
     if (now >= start && now <= end) current = item;
     if (now < start && !next) next = item;
-    if (now < start && isBreak && !nextBreak) nextBreak = item;
+    if (now < start && isBreakItem(item) && !nextBreak) nextBreak = item;
   }
 
   return { previous, current, next, nextBreak };
@@ -260,55 +295,13 @@ function findPeriods(now) {
 function updateTimer() {
   const now = new Date();
 
-  const dayName = now.toLocaleDateString("ar-OM", { weekday: "long" });
-  const dateText = fmtDate(now);
-  const hijriText = fmtHijri(now);
-
-  setText("currentTime", fmtClock(now));
-  setText("dayName", dayName);
-  setText("dateText", dateText);
-  setText("dayNameClock", dayName);
-  setText("dateTextClock", dateText);
-  setText("hijriDate", hijriText);
+  updateClock(now);
+  updateDate(now);
 
   const { previous, current, next, nextBreak } = findPeriods(now);
 
-  setText("prevPeriod", previous?.period_name || "--");
-  setText("prevRange", previous ? fmtRange(previous) : "--");
-
-  setText("nextPeriodMini", next?.period_name || "--");
-  setText("nextRangeMini", next ? fmtRange(next) : "--");
-
-  setText("nextBreakPeriod", nextBreak?.period_name || "--");
-  setText("nextBreakRange", nextBreak ? fmtRange(nextBreak) : "--");
-
-  if (current) {
-    const start = timeToDate(current.start_time);
-    const end = timeToDate(current.end_time);
-
-    const remainingMs = end - now;
-    const totalMs = end - start;
-    const elapsedMs = now - start;
-    const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
-
-    setText("currentPeriod", current.period_name);
-    setText("currentPeriodMini", current.period_name);
-    setText("currentRangeMini", fmtRange(current));
-    setText("remainingTime", formatDuration(remainingMs));
-    setText("periodRange", fmtRange(current));
-
-    setProgress(progress);
-    updateAlert(current, remainingMs);
-    announceStart(current);
-  } else {
-    setText("currentPeriod", "لا توجد حصة الآن");
-    setText("currentPeriodMini", "--");
-    setText("currentRangeMini", "--");
-    setText("remainingTime", "--:--");
-    setText("periodRange", "");
-    setProgress(0);
-    hideAlert();
-  }
+  updatePeriodCards(previous, current, next, nextBreak);
+  updateMainCountdown(now, current, next);
 
   if (next) {
     const startsIn = timeToDate(next.start_time) - now;
@@ -325,6 +318,92 @@ function updateTimer() {
   renderSchedule(now);
 }
 
+function updateClock(now) {
+  setText("digitalTime", fmtClock(now));
+
+  const seconds = now.getSeconds();
+  const minutes = now.getMinutes() + seconds / 60;
+  const hours = (now.getHours() % 12) + minutes / 60;
+
+  const secondHand = document.getElementById("secondHand");
+  const minuteHand = document.getElementById("minuteHand");
+  const hourHand = document.getElementById("hourHand");
+
+  if (secondHand) {
+    secondHand.style.transform = `translateX(-50%) rotate(${seconds * 6}deg)`;
+  }
+
+  if (minuteHand) {
+    minuteHand.style.transform = `translateX(-50%) rotate(${minutes * 6}deg)`;
+  }
+
+  if (hourHand) {
+    hourHand.style.transform = `translateX(-50%) rotate(${hours * 30}deg)`;
+  }
+}
+
+function updateDate(now) {
+  const weekday = now.toLocaleDateString("ar-OM", { weekday: "long" });
+  const gregorian = fmtDate(now);
+  const hijri = fmtHijri(now);
+
+  setText("weekday", weekday);
+  setText("gregorianDate", gregorian);
+  setText("hijriDate", hijri);
+}
+
+function updatePeriodCards(previous, current, next, nextBreak) {
+  setText("endedTitle", previous?.period_name || "لا يوجد");
+  setText("endedTime", previous ? fmtRange(previous) : "-");
+
+  setText("currentTitle", current?.period_name || "لا توجد حصة الآن");
+  setText("currentTimeRange", current ? fmtRange(current) : "-");
+
+  setText("nextTitle", next?.period_name || "انتهى اليوم الدراسي");
+  setText("nextTime", next ? fmtRange(next) : "-");
+
+  setText("breakTitle", nextBreak?.period_name || "--");
+  setText("breakTime", nextBreak ? fmtRange(nextBreak) : "--");
+}
+
+function updateMainCountdown(now, current, next) {
+  let progress = 0;
+  let countdown = "--:--";
+  let label = "متبقي من الحصة الحالية";
+
+  if (current) {
+    const start = timeToDate(current.start_time);
+    const end = timeToDate(current.end_time);
+
+    const remainingMs = end - now;
+    const totalMs = end - start;
+    const elapsedMs = now - start;
+
+    progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+    countdown = formatDuration(remainingMs);
+
+    updateAlert(current, remainingMs);
+    announceStart(current);
+  } else if (next) {
+    const remainingMs = timeToDate(next.start_time) - now;
+    label = "متبقي على الحصة القادمة";
+    countdown = formatDuration(remainingMs);
+    progress = 0;
+    hideAlert();
+  } else {
+    label = "انتهى اليوم الدراسي";
+    countdown = "--:--";
+    progress = 100;
+    hideAlert();
+  }
+
+  setText("countdownLabel", label);
+  setText("countdownValue", countdown);
+  setText("progressPercent", `%${Math.round(progress)}`);
+
+  setProgress(progress);
+}
+
 function updateStats(now) {
   let finished = 0;
   let active = 0;
@@ -332,6 +411,7 @@ function updateStats(now) {
 
   scheduleItems.forEach(item => {
     const state = getItemState(item, now);
+
     if (state === "finished") finished++;
     if (state === "active") active++;
     if (state === "upcoming") upcoming++;
@@ -345,6 +425,43 @@ function updateStats(now) {
 function setProgress(percent) {
   const fill = document.getElementById("progressFill");
   if (fill) fill.style.width = `${percent}%`;
+}
+
+function renderSchedule(now) {
+  const body = document.getElementById("scheduleBody");
+  if (!body) return;
+
+  body.innerHTML = "";
+
+  scheduleItems.forEach((item, index) => {
+    const state = getItemState(item, now);
+    const isBreak = isBreakItem(item);
+
+    let status = "قادمة";
+
+    if (state === "finished") {
+      status = "انتهت ✓";
+    }
+
+    if (state === "active") {
+      status = isBreak ? "فسحة الآن ☕" : "جارية ↻";
+    }
+
+    const tr = document.createElement("tr");
+
+    if (state === "active") {
+      tr.classList.add("current");
+    }
+
+    tr.innerHTML = `
+      <td class="num"><span class="num-badge">${isBreak ? "-" : index + 1}</span></td>
+      <td class="lesson">${item.period_name}</td>
+      <td class="time">${fmtRange(item)}</td>
+      <td class="state"><span class="status-badge">${status}</span></td>
+    `;
+
+    body.appendChild(tr);
+  });
 }
 
 function updateAlert(current, remainingMs) {
@@ -398,50 +515,6 @@ function hideAlert() {
   if (alertBar) alertBar.classList.add("hidden");
 }
 
-function renderSchedule(now) {
-  const list = document.getElementById("scheduleList");
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  scheduleItems.forEach(item => {
-    const state = getItemState(item, now);
-    const isBreak = item.is_break === true || String(item.period_name).includes("فسحة");
-
-    let icon = "🔵";
-    let status = "قادمة";
-
-    if (state === "finished") {
-      icon = "✔";
-      status = "انتهت";
-    }
-
-    if (state === "active") {
-      icon = isBreak ? "☕" : "🟢";
-      status = "جارية الآن";
-    }
-
-    if (isBreak && state !== "active") {
-      icon = "☕";
-    }
-
-    const classes = ["item", state];
-    if (isBreak) classes.push("break");
-
-    const div = document.createElement("div");
-    div.className = classes.join(" ");
-
-    div.innerHTML = `
-      <span class="icon">${icon}</span>
-      <span class="name">${item.period_name}</span>
-      <span class="time">${fmtRange(item)}</span>
-      <span class="status">${status}</span>
-    `;
-
-    list.appendChild(div);
-  });
-}
-
 function playBeep() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -464,6 +537,26 @@ function playBeep() {
     }, 450);
   } catch (e) {
     console.warn("تعذر تشغيل الصوت", e);
+  }
+}
+
+function buildClockTicks() {
+  const clock = document.getElementById("analogClock");
+  if (!clock) return;
+
+  const existingTicks = clock.querySelectorAll(".tick");
+  if (existingTicks.length > 0) return;
+
+  for (let i = 0; i < 12; i++) {
+    const tick = document.createElement("span");
+    tick.className = "tick";
+    tick.style.transform = `rotate(${i * 30}deg)`;
+
+    if (i % 3 !== 0) {
+      tick.style.opacity = "0.55";
+    }
+
+    clock.prepend(tick);
   }
 }
 
