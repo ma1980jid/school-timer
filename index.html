@@ -1,96 +1,96 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>مدرسة الشيخ سيف بن حمد الأغبري</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#064b35" />
-  <link rel="icon" href="icons/default-icon.svg" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مؤقت الحصص المدرسية</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="icons/default-icon.svg">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <main class="dashboard" aria-label="لوحة مؤقت الحصص المدرسية">
+<main class="app">
 
-    <img class="base-image" src="dashboard.png" alt="تصميم لوحة الحصص" />
-
-    <section class="live-layer" aria-live="polite">
-
-      <div class="top-card ended-card">
-        <div>
-          <div class="pill">الحصة المنتهية <span class="dot"></span></div>
-          <div class="period-title" id="endedTitle">--</div>
-          <div class="period-time" id="endedTime">--</div>
-        </div>
+  <header class="header">
+    <div class="brand">
+      <img id="schoolLogo" src="icons/default-icon.svg" alt="شعار المدرسة">
+      <div>
+        <h1>مدرسة الشيخ سيف بن حمد الأغبري</h1>
+        <p>وزارة التعليم</p>
       </div>
+    </div>
 
-      <div class="top-card current-card">
-        <div>
-          <div class="pill">الحصة الحالية <span class="dot"></span></div>
-          <div class="period-title" id="currentTitle">--</div>
-          <div class="period-time" id="currentTime">--</div>
-        </div>
-      </div>
+    <div class="date-box">
+      <strong id="weekday">--</strong>
+      <span id="gregorianDate">--</span>
+      <small id="hijriDate">--</small>
+    </div>
+  </header>
 
-      <div class="top-card next-card">
-        <div>
-          <div class="pill">الحصة القادمة <span class="dot"></span></div>
-          <div class="period-title" id="nextTitle">--</div>
-          <div class="period-time" id="nextTime">--</div>
-        </div>
-      </div>
+  <section class="cards">
+    <div class="card ended">
+      <span>الحصة المنتهية</span>
+      <h2 id="endedTitle">--</h2>
+      <p id="endedTime">--</p>
+    </div>
 
-      <div class="analog-clock" id="analogClock">
-        <div class="hand hour-hand" id="hourHand"></div>
-        <div class="hand minute-hand" id="minuteHand"></div>
-        <div class="hand second-hand" id="secondHand"></div>
+    <div class="card current">
+      <span>الحصة الحالية</span>
+      <h2 id="currentTitle">--</h2>
+      <p id="currentTime">--</p>
+    </div>
+
+    <div class="card next">
+      <span>الحصة القادمة</span>
+      <h2 id="nextTitle">--</h2>
+      <p id="nextTime">--</p>
+    </div>
+  </section>
+
+  <section class="main-grid">
+    <section class="clock-card">
+      <div id="analogClock" class="analog-clock">
+        <div id="hourHand" class="hand hour-hand"></div>
+        <div id="minuteHand" class="hand minute-hand"></div>
+        <div id="secondHand" class="hand second-hand"></div>
         <div class="clock-pin"></div>
       </div>
 
-      <div class="digital-time" id="digitalTime">--:--:--</div>
+      <div class="time-info">
+        <div id="digitalTime" class="digital-time">--:--:--</div>
+        <div id="countdownLabel" class="label">متبقي من الحصة الحالية</div>
+        <div id="countdownValue" class="countdown">--:--</div>
 
-      <div class="countdown">
-        <div class="countdown-label" id="countdownLabel">متبقي من الحصة الحالية</div>
-        <div class="countdown-value" id="countdownValue">--:--</div>
-      </div>
-
-      <div class="progress-panel">
         <div class="progress-head">
-          <span class="progress-percent" id="progressPercent">%0</span>
           <span>تقدم الحصة</span>
+          <strong id="progressPercent">%0</strong>
         </div>
 
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill"></div>
+        <div class="progress">
+          <div id="progressFill"></div>
         </div>
       </div>
-
-      <div class="date-card">
-        <div class="weekday" id="weekday">--</div>
-        <div class="date-line" id="hijriDate">--</div>
-        <div class="date-line gregorian" id="gregorianDate">--</div>
-      </div>
-
-      <div class="schedule-cover">
-        <table class="schedule-table" aria-label="جدول الحصص اليومي">
-          <tbody id="scheduleBody"></tbody>
-        </table>
-      </div>
-
-      <div class="ticker-shell">
-        <div class="ticker-track" id="tickerTrack"></div>
-      </div>
-
-      <a id="classroomLink" class="classroom-link" href="#">وضع الشاشة التفاعلية</a>
-
     </section>
-  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="script.js"></script>
+    <section class="schedule-card">
+      <h2>جدول الحصص اليومي</h2>
+      <table>
+        <tbody id="scheduleBody"></tbody>
+      </table>
+    </section>
+  </section>
+
+  <footer class="ticker">
+    <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
+    <div id="tickerTrack" class="ticker-track"></div>
+  </footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
