@@ -7,30 +7,29 @@
 
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#064b35">
-  <link rel="icon" href="icons/default-icon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 <main class="app">
 
- <header class="header">
-  <img id="schoolLogo" class="logo school" src="icons/school-logo.svg" alt="شعار المدرسة">
+  <header class="header">
+    <img class="logo school" src="icons/school-logo.svg" alt="شعار المدرسة">
 
-  <div class="title">
-    <h1>مؤقت الحصص المدرسية</h1>
-    <p id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</p>
-    <div class="header-date">
-      <span id="weekday">--</span>
-      <span id="gregorianDate">--</span>
-      <span id="hijriDate">--</span>
+    <div class="title">
+      <h1>مؤقت الحصص المدرسية</h1>
+      <p>مدرسة الشيخ سيف بن حمد الأغبري</p>
+      <div class="header-date">
+        <span id="weekday">--</span>
+        <span id="gregorianDate">--</span>
+        <span id="hijriDate">--</span>
+      </div>
     </div>
-  </div>
 
-  <div class="moe">
-    <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
-  </div>
-</header>
+    <div class="moe">
+      <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
+    </div>
+  </header>
 
   <section class="top-cards">
     <div class="info-card ended">
@@ -50,61 +49,43 @@
       <h2 id="nextTitle">--</h2>
       <p id="nextTime">--</p>
     </div>
+  </section>
 
-    <div class="info-card weather">
-      <span>الطقس</span>
-      <h2>38°</h2>
-      <p>مشمس - مسقط</p>
+  <section class="clock-panel">
+    <div id="digitalTime" class="digital-time">--:--:--</div>
+    <div id="countdownLabel" class="label">متبقي من الحصة الحالية</div>
+    <div id="countdownValue" class="countdown">--:--</div>
+
+    <div class="progress-head">
+      <span>تقدم الفترة</span>
+      <strong id="progressPercent">0%</strong>
+    </div>
+
+    <div class="progress">
+      <div id="progressFill"></div>
     </div>
   </section>
 
-  <section class="main-grid">
+  <section class="schedule-panel">
+    <h2>جدول الفترات اليومي</h2>
 
-    <section class="clock-panel">
-     <div class="date-box">
-  <strong id="weekday">--</strong>
-  <span id="gregorianDate">--</span>
-  <small id="hijriDate">--</small>
-</div>
-
-      <div class="clock-data">
-        <div id="digitalTime" class="digital-time">--:--:--</div>
-        <div id="countdownLabel" class="label">متبقي من الحصة الحالية</div>
-        <div id="countdownValue" class="countdown">--:--</div>
-
-        <div class="progress-head">
-          <span>تقدم الحصة</span>
-          <strong id="progressPercent">%0</strong>
-        </div>
-
-        <div class="progress">
-          <div id="progressFill"></div>
-        </div>
-
-        <div class="date-box">
-          <strong id="weekday">--</strong>
-          <span id="gregorianDate">--</span>
-          <small id="hijriDate">--</small>
-        </div>
-      </div>
-    </section>
-
-    <section class="schedule-panel">
-      <h2>جدول الحصص اليومي</h2>
+    <div class="schedule-columns">
       <table>
-        <tbody id="scheduleBody"></tbody>
+        <tbody id="scheduleBodyRight"></tbody>
       </table>
-    </section>
 
+      <table>
+        <tbody id="scheduleBodyLeft"></tbody>
+      </table>
+    </div>
   </section>
 
-<footer class="footer">
-  <div id="tickerTrack" class="ticker-track"></div>
-</footer>
+  <footer class="footer">
+    <div id="tickerTrack" class="ticker-track"></div>
+  </footer>
+
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
