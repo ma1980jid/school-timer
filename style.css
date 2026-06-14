@@ -591,3 +591,36 @@ td:nth-child(4){
     font-size:15px;
   }
 }
+/* شفافية الشعارات */
+.logo.school,
+.moe {
+  opacity: 0.55;
+}
+
+/* شفافية بطاقات الحصص العلوية */
+.info-card {
+  background: rgba(255, 255, 255, 0.38) !important;
+  border: 1px solid rgba(214, 169, 60, 0.35) !important;
+  backdrop-filter: blur(1.5px);
+}
+
+/* شفافية جدول الحصص */
+table {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+td {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* الصف الحالي فقط يبقى أوضح */
+.current-row td {
+  background: rgba(255, 225, 225, 0.62) !important;
+  color: #c91414 !important;
+}
+
+/* شفافية شريط الرسائل */
+.footer {
+  background: rgba(255, 255, 255, 0.38) !important;
+  backdrop-filter: blur(1.5px);
+}
