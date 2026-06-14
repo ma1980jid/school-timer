@@ -1,4 +1,5 @@
 *{box-sizing:border-box;margin:0;padding:0}
+
 html,body{
   width:100%;
   min-height:100%;
@@ -6,6 +7,7 @@ html,body{
   background:#f6efe2;
   color:#064b35;
 }
+
 body{
   display:grid;
   place-items:center;
@@ -20,7 +22,7 @@ body{
   overflow:hidden;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 .header{
   position:absolute;
   top:3.2%;
@@ -37,11 +39,13 @@ body{
   width:78px;
   height:78px;
   object-fit:contain;
+  transform:translateY(-2px);
 }
 
 .moe{
   text-align:center;
   font-weight:900;
+  transform:translateY(-4px);
 }
 
 .moe img{
@@ -75,16 +79,16 @@ body{
   margin-top:4px;
 }
 
-/* ===== TOP CARDS ===== */
+/* TOP CARDS */
 .top-cards{
   position:absolute;
-  top:24.6%;
-  left:3.2%;
-  right:3.2%;
-  height:11.2%;
+  top:24.8%;
+  left:4.1%;
+  right:4.1%;
+  height:10.9%;
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:1.9%;
+  gap:2.2%;
   z-index:2;
   direction:rtl;
 }
@@ -130,16 +134,16 @@ body{
   color:#c91414;
 }
 
-/* ===== MAIN POSITIONS ===== */
+/* MAIN */
 .main-grid{
   position:absolute;
-  top:38%;
-  left:3.2%;
-  right:3.2%;
-  height:50.5%;
+  top:37.2%;
+  left:4.1%;
+  right:4.1%;
+  height:49.5%;
   display:grid;
-  grid-template-columns:40.7% 57.3%;
-  gap:2%;
+  grid-template-columns:39.5% 58.3%;
+  gap:2.2%;
   z-index:2;
   direction:ltr;
 }
@@ -149,7 +153,7 @@ body{
   direction:rtl;
 }
 
-/* ===== CLOCK PANEL ===== */
+/* CLOCK PANEL */
 .clock-panel{
   position:relative;
   background:transparent;
@@ -161,9 +165,9 @@ body{
 
 .analog-clock{
   position:absolute;
-  left:14%;
-  top:9%;
-  width:31%;
+  left:10%;
+  top:14%;
+  width:27%;
   aspect-ratio:1;
   border-radius:50%;
   background:#fffaf0;
@@ -212,20 +216,20 @@ body{
 
 .clock-data{
   position:absolute;
-  right:8%;
-  top:8%;
-  width:43%;
+  right:10%;
+  top:12%;
+  width:48%;
   height:82%;
   text-align:center;
 }
 
 .digital-time{
-  font-size:54px;
+  font-size:50px;
   font-weight:900;
   font-family:"Courier New",monospace;
   text-shadow:0 4px 8px rgba(0,0,0,.35);
   color:white;
-  margin-bottom:24px;
+  margin-bottom:22px;
 }
 
 .label{
@@ -235,11 +239,11 @@ body{
 }
 
 .countdown{
-  font-size:50px;
+  font-size:46px;
   font-weight:900;
   color:#d6a93c;
   font-family:"Courier New",monospace;
-  margin-bottom:26px;
+  margin-bottom:20px;
 }
 
 .progress-head{
@@ -265,16 +269,16 @@ body{
 }
 
 .date-box{
-  margin-top:18px;
+  margin-top:20px;
   border:1px solid #d6a93c;
   border-radius:14px;
   padding:10px;
-  font-size:14px;
+  font-size:13px;
   font-weight:900;
   line-height:1.7;
 }
 
-/* ===== SCHEDULE ===== */
+/* SCHEDULE */
 .schedule-panel{
   background:transparent;
   border:0;
@@ -283,28 +287,28 @@ body{
 }
 
 .schedule-panel h2{
-  height:13%;
+  height:12%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
+  font-size:27px;
   color:#064b35;
   font-weight:900;
 }
 
 table{
-  width:92%;
+  width:88%;
   margin:0 auto;
-  height:78%;
+  height:80%;
   border-collapse:collapse;
   table-layout:fixed;
 }
 
 td{
-  padding:8px 6px;
+  padding:8px 5px;
   border-bottom:1px solid #e5e7eb;
   text-align:center;
-  font-size:16px;
+  font-size:15px;
   font-weight:900;
   background:rgba(255,255,255,.62);
 }
@@ -334,13 +338,13 @@ td:nth-child(4){
   color:#c91414!important;
 }
 
-/* ===== FOOTER ===== */
+/* FOOTER */
 .footer{
   position:absolute;
-  left:3.2%;
-  right:3.2%;
-  bottom:3.5%;
-  height:6.2%;
+  left:4.1%;
+  right:4.1%;
+  bottom:3.8%;
+  height:5.8%;
   display:grid;
   grid-template-columns:210px 1fr;
   align-items:center;
@@ -369,7 +373,7 @@ td:nth-child(4){
   text-align:center;
 }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 @media(max-width:850px){
   body{
     display:block;
@@ -534,82 +538,5 @@ td:nth-child(4){
 
   .ticker-track{
     font-size:15px;
-  }
-}
-/* تحسين توزيع سطح المكتب */
-@media (min-width:851px){
-
-  .top-cards{
-    top:24.8%;
-    left:4.1%;
-    right:4.1%;
-    height:10.9%;
-    gap:2.2%;
-  }
-
-  .main-grid{
-    top:37.2%;
-    left:4.1%;
-    right:4.1%;
-    height:49.5%;
-    grid-template-columns:39.5% 58.3%;
-    gap:2.2%;
-  }
-
-  .analog-clock{
-    left:10%;
-    top:14%;
-    width:27%;
-  }
-
-  .clock-data{
-    right:10%;
-    top:12%;
-    width:48%;
-  }
-
-  .digital-time{
-    font-size:50px;
-    margin-bottom:22px;
-  }
-
-  .countdown{
-    font-size:46px;
-    margin-bottom:20px;
-  }
-
-  .date-box{
-    margin-top:20px;
-    font-size:13px;
-  }
-
-  .schedule-panel h2{
-    height:12%;
-    font-size:27px;
-  }
-
-  table{
-    width:88%;
-    height:80%;
-  }
-
-  td{
-    font-size:15px;
-    padding:8px 5px;
-  }
-
-  .footer{
-    bottom:3.8%;
-    left:4.1%;
-    right:4.1%;
-    height:5.8%;
-  }
-
-  .moe{
-    transform:translateY(-4px);
-  }
-
-  .logo{
-    transform:translateY(-2px);
   }
 }
