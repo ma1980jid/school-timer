@@ -1,7 +1,3 @@
-//========================
-// الحصص
-//========================
-
 const periods = [
   ["الحصة الأولى","07:15","07:55"],
   ["الحصة الثانية","07:55","08:35"],
@@ -18,26 +14,20 @@ const periods = [
   end:item[2]
 }));
 
-
-//========================
-// الرسائل
-//========================
-
 const messages = [
-"نسعى لبناء مستقبل تعليمي متميز",
-"العلم نور",
-"الانضباط طريق النجاح",
-"معاً نحو التميز",
-"أهلاً بكم في مدرسة الشيخ سيف بن حمد الأغبري"
+  "نسعى لبناء مستقبل تعليمي متميز",
+  "العلم نور",
+  "الانضباط طريق النجاح",
+  "أهلاً بكم في مدرسة الشيخ سيف بن حمد الأغبري"
 ];
-
-
-//========================
-// أدوات مساعدة
-//========================
 
 function el(id){
   return document.getElementById(id);
+}
+
+function setText(id,value){
+  const e = el(id);
+  if(e) e.textContent = value;
 }
 
 function pad(n){
@@ -45,383 +35,168 @@ function pad(n){
 }
 
 function toMinutes(time){
-
-  let p=time.split(":").map(Number);
-
+  const p = time.split(":").map(Number);
   return p[0]*60+p[1];
 }
 
 function formatTime(time){
-
-  let p=time.split(":").map(Number);
-
-  let h=p[0];
-  let m=p[1];
-
-  let period=h>=12 ? "م" : "ص";
-
-  h=h%12 || 12;
-
+  let [h,m] = time.split(":").map(Number);
+  const period = h >= 12 ? "م" : "ص";
+  h = h % 12 || 12;
   return pad(h)+":"+pad(m)+" "+period;
 }
 
-
-//========================
-// تحديد الحصة الحالية
-//========================
-
 function getSchedule(now){
+  const currentMinutes =
+    now.getHours()*60 +
+    now.getMinutes() +
+    now.getSeconds()/60;
 
-  let currentMinutes =
-  now.getHours()*60 +
-  now.getMinutes() +
-  now.getSeconds()/60;
-
-  let current=
-  periods.find(
-    p =>
-      currentMinutes>=toMinutes(p.start)
-      &&
-      currentMinutes<toMinutes(p.end)
+  const current = periods.find(p =>
+    currentMinutes >= toMinutes(p.start) &&
+    currentMinutes < toMinutes(p.end)
   );
 
-  let ended=
-  periods
-  .slice()
-  .reverse()
-  .find(
-    p =>
-      currentMinutes>=toMinutes(p.end)
+  const ended = periods.slice().reverse().find(p =>
+    currentMinutes >= toMinutes(p.end)
   );
 
-  let next=
-  periods.find(
-    p =>
-      currentMinutes<toMinutes(p.start)
+  const next = periods.find(p =>
+    currentMinutes < toMinutes(p.start)
   );
 
-  return{
-    current,
-    ended,
-    next,
-    currentMinutes
-  };
-
+  return {current,ended,next,currentMinutes};
 }
-
-
-
-//========================
-// البطاقات الثلاث
-//========================
 
 function updateCards(now){
+  const s = getSchedule(now);
 
-  let schedule=getSchedule(now);
+  setText("currentTitle", s.current ? s.current.name : "--");
+  setText("currentTime", s.current ? `${formatTime(s.current.start)} - ${formatTime(s.current.end)}` : "--");
 
-  let current=schedule.current;
-  let ended=schedule.ended;
-  let next=schedule.next;
+  setText("endedTitle", s.ended ? s.ended.name : "--");
+  setText("endedTime", s.ended ? `${formatTime(s.ended.start)} - ${formatTime(s.ended.end)}` : "--");
 
-  el("currentTitle").textContent=
-  current ? current.name : "--";
-
-  el("currentTime").textContent=
-  current ?
-  formatTime(current.start)+" - "+formatTime(current.end)
-  :
-  "--";
-
-
-
-  el("endedTitle").textContent=
-  ended ? ended.name : "--";
-
-  el("endedTime").textContent=
-  ended ?
-  formatTime(ended.start)+" - "+formatTime(ended.end)
-  :
-  "--";
-
-
-
-  el("nextTitle").textContent=
-  next ? next.name : "--";
-
-  el("nextTime").textContent=
-  next ?
-  formatTime(next.start)+" - "+formatTime(next.end)
-  :
-  "--";
-
+  setText("nextTitle", s.next ? s.next.name : "--");
+  setText("nextTime", s.next ? `${formatTime(s.next.start)} - ${formatTime(s.next.end)}` : "--");
 }
 
+function updateClock(now){
+  setText("digitalTime", `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);
 
+  const secondHand = el("secondHand");
+  const minuteHand = el("minuteHand");
+  const hourHand = el("hourHand");
 
-//========================
-// الساعة الرقمية
-//========================
+  const seconds = now.getSeconds();
+  const minutes = now.getMinutes() + seconds/60;
+  const hours = (now.getHours()%12) + minutes/60;
 
-function updateDigitalClock(now){
-
-  let h=pad(now.getHours());
-  let m=pad(now.getMinutes());
-  let s=pad(now.getSeconds());
-
-  el("digitalTime").textContent=
-  h+":"+m+":"+s;
-
+  if(secondHand) secondHand.style.transform = `translateX(-50%) rotate(${seconds*6}deg)`;
+  if(minuteHand) minuteHand.style.transform = `translateX(-50%) rotate(${minutes*6}deg)`;
+  if(hourHand) hourHand.style.transform = `translateX(-50%) rotate(${hours*30}deg)`;
 }
-
-
-
-//========================
-// الساعة التناظرية
-//========================
-
-function updateAnalogClock(now){
-
-  let seconds=now.getSeconds();
-
-  let minutes=
-  now.getMinutes()+seconds/60;
-
-  let hours=
-  (now.getHours()%12)+minutes/60;
-
-
-  el("secondHand").style.transform=
-  "translateX(-50%) rotate("+seconds*6+"deg)";
-
-
-  el("minuteHand").style.transform=
-  "translateX(-50%) rotate("+minutes*6+"deg)";
-
-
-  el("hourHand").style.transform=
-  "translateX(-50%) rotate("+hours*30+"deg)";
-
-}
-
-
-
-//========================
-// العد التنازلي
-//========================
 
 function updateCountdown(now){
+  const s = getSchedule(now);
+  const fill = el("progressFill");
 
-  let schedule=getSchedule(now);
-
-  let current=schedule.current;
-
-  if(!current){
-
-    el("countdownValue").textContent="--:--";
+  if(!s.current){
+    setText("countdownLabel","لا توجد حصة حالية");
+    setText("countdownValue","--:--");
+    setText("progressPercent","%0");
+    if(fill) fill.style.width = "0%";
     return;
-
   }
 
-  let end=
-  toMinutes(current.end);
+  const start = toMinutes(s.current.start);
+  const end = toMinutes(s.current.end);
+  const remaining = Math.max(0, Math.round((end - s.currentMinutes)*60));
 
-  let currentMin=
-  schedule.currentMinutes;
+  const mm = Math.floor(remaining/60);
+  const ss = remaining % 60;
 
-  let remaining=
-  Math.round(
-    (end-currentMin)*60
-  );
+  setText("countdownLabel","متبقي من الحصة الحالية");
+  setText("countdownValue",`${pad(mm)}:${pad(ss)}`);
 
-  let mm=
-  Math.floor(remaining/60);
+  let progress = ((s.currentMinutes - start) / (end - start)) * 100;
+  progress = Math.max(0, Math.min(progress,100));
 
-  let ss=
-  remaining%60;
-
-  el("countdownValue").textContent=
-  pad(mm)+":"+pad(ss);
-
-
-  let start=
-  toMinutes(current.start);
-
-  let progress=
-  ((currentMin-start)/(end-start))*100;
-
-  progress=Math.max(
-    0,
-    Math.min(progress,100)
-  );
-
-  el("progressPercent").textContent=
-  Math.round(progress)+"%";
-
-  el("progressFill").style.width=
-  progress+"%";
-
+  setText("progressPercent", Math.round(progress)+"%");
+  if(fill) fill.style.width = progress+"%";
 }
-
-
-
-//========================
-// التاريخ
-//========================
 
 function updateDate(now){
+  setText("weekday", new Intl.DateTimeFormat("ar-OM",{weekday:"long"}).format(now));
 
-  el("weekday").textContent=
-  new Intl.DateTimeFormat(
-    "ar-OM",
-    {weekday:"long"}
-  ).format(now);
+  setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
+    day:"numeric",
+    month:"long",
+    year:"numeric"
+  }).format(now));
 
-
-
-  el("gregorianDate").textContent=
-  new Intl.DateTimeFormat(
-    "ar-OM",
-    {
+  try{
+    setText("hijriDate", new Intl.DateTimeFormat("ar-OM-u-ca-islamic",{
       day:"numeric",
       month:"long",
       year:"numeric"
-    }
-  ).format(now);
-
-
-
-  el("hijriDate").textContent=
-  new Intl.DateTimeFormat(
-    "ar-OM-u-ca-islamic",
-    {
-      day:"numeric",
-      month:"long",
-      year:"numeric"
-    }
-  ).format(now);
-
+    }).format(now));
+  }catch(e){}
 }
-
-
-
-//========================
-// جدول الحصص
-//========================
 
 function renderSchedule(){
+  const body = el("scheduleBody");
+  if(!body) return;
 
-  let schedule=getSchedule(new Date());
+  const s = getSchedule(new Date());
 
-  let html="";
+  body.innerHTML = periods.map(period=>{
+    let state = "قادمة";
 
-  periods.forEach(period=>{
-
-    let state="قادمة";
-
-    if(
-      schedule.current &&
-      period.index===schedule.current.index
-    ){
-
-      state="جارية";
-
+    if(s.current && period.index === s.current.index){
+      state = "جارية";
+    }else if(s.currentMinutes >= toMinutes(period.end)){
+      state = "انتهت";
     }
 
-    else if(
-      schedule.currentMinutes>=
-      toMinutes(period.end)
-    ){
+    const rowClass =
+      s.current && period.index === s.current.index
+      ? "current-row"
+      : "";
 
-      state="انتهت";
-
-    }
-
-
-    let rowClass=
-    (
-      schedule.current &&
-      period.index===schedule.current.index
-    )
-    ?
-    "current-row"
-    :
-    "";
-
-
-    html+=`
-    <tr class="${rowClass}">
-      <td>${period.index}</td>
-      <td>${period.name}</td>
-      <td>${formatTime(period.start)} - ${formatTime(period.end)}</td>
-      <td>${state}</td>
-    </tr>
+    return `
+      <tr class="${rowClass}">
+        <td>${period.index}</td>
+        <td>${period.name}</td>
+        <td>${formatTime(period.start)} - ${formatTime(period.end)}</td>
+        <td>${state}</td>
+      </tr>
     `;
-
-  });
-
-
-  el("scheduleBody").innerHTML=
-  html;
-
+  }).join("");
 }
 
-
-
-//========================
-// شريط الرسائل
-//========================
-
-let msgIndex=0;
+let msgIndex = 0;
 
 function updateTicker(){
+  const ticker = el("tickerTrack");
+  if(!ticker) return;
 
-  el("tickerTrack").textContent=
-  messages[msgIndex];
-
-  msgIndex++;
-
-  if(msgIndex>=messages.length){
-
-    msgIndex=0;
-
-  }
-
+  ticker.textContent = messages[msgIndex];
+  msgIndex = (msgIndex + 1) % messages.length;
 }
-
-setInterval(
-  updateTicker,
-  5000
-);
-
-
-//========================
-// التشغيل
-//========================
 
 function tick(){
+  const now = new Date();
 
-  let now=new Date();
-
-  updateDigitalClock(now);
-
-  updateAnalogClock(now);
-
+  updateClock(now);
   updateCards(now);
-
   updateCountdown(now);
-
   updateDate(now);
-
   renderSchedule();
-
 }
 
-
 tick();
-
-setInterval(
-  tick,
-  1000
-);
-
 updateTicker();
+
+setInterval(tick,1000);
+setInterval(updateTicker,5000);
