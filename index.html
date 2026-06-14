@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>مؤقت الحصص المدرسية</title>
+
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f766e">
+  <meta name="theme-color" content="#064b35">
   <link rel="icon" href="icons/default-icon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -14,43 +15,48 @@
 <main class="app">
 
   <header class="header">
-    <div class="brand">
-      <img id="schoolLogo" src="icons/default-icon.svg" alt="شعار المدرسة">
-      <div>
-        <h1>مدرسة الشيخ سيف بن حمد الأغبري</h1>
-        <p>وزارة التعليم</p>
-      </div>
+    <img id="schoolLogo" class="logo school" src="icons/default-icon.svg" alt="شعار المدرسة">
+
+    <div class="title">
+      <h1 id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</h1>
+      <p id="scheduleName">( 5 - 12 )</p>
     </div>
 
-    <div class="date-box">
-      <strong id="weekday">--</strong>
-      <span id="gregorianDate">--</span>
-      <small id="hijriDate">--</small>
+    <div class="moe">
+      <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
+      <span>وزارة التعليم</span>
     </div>
   </header>
 
-  <section class="cards">
-    <div class="card ended">
+  <section class="top-cards">
+    <div class="info-card ended">
       <span>الحصة المنتهية</span>
       <h2 id="endedTitle">--</h2>
       <p id="endedTime">--</p>
     </div>
 
-    <div class="card current">
+    <div class="info-card current">
       <span>الحصة الحالية</span>
       <h2 id="currentTitle">--</h2>
       <p id="currentTime">--</p>
     </div>
 
-    <div class="card next">
+    <div class="info-card next">
       <span>الحصة القادمة</span>
       <h2 id="nextTitle">--</h2>
       <p id="nextTime">--</p>
     </div>
+
+    <div class="info-card weather">
+      <span>الطقس</span>
+      <h2>38°</h2>
+      <p>مشمس - مسقط</p>
+    </div>
   </section>
 
   <section class="main-grid">
-    <section class="clock-card">
+
+    <section class="clock-panel">
       <div id="analogClock" class="analog-clock">
         <div id="hourHand" class="hand hour-hand"></div>
         <div id="minuteHand" class="hand minute-hand"></div>
@@ -58,7 +64,7 @@
         <div class="clock-pin"></div>
       </div>
 
-      <div class="time-info">
+      <div class="clock-data">
         <div id="digitalTime" class="digital-time">--:--:--</div>
         <div id="countdownLabel" class="label">متبقي من الحصة الحالية</div>
         <div id="countdownValue" class="countdown">--:--</div>
@@ -71,18 +77,25 @@
         <div class="progress">
           <div id="progressFill"></div>
         </div>
+
+        <div class="date-box">
+          <strong id="weekday">--</strong>
+          <span id="gregorianDate">--</span>
+          <small id="hijriDate">--</small>
+        </div>
       </div>
     </section>
 
-    <section class="schedule-card">
+    <section class="schedule-panel">
       <h2>جدول الحصص اليومي</h2>
       <table>
         <tbody id="scheduleBody"></tbody>
       </table>
     </section>
+
   </section>
 
-  <footer class="ticker">
+  <footer class="footer">
     <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
     <div id="tickerTrack" class="ticker-track"></div>
   </footer>
