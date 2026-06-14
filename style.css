@@ -16,10 +16,12 @@ body{
 
 .app{
   position:relative;
-  width:min(100vw,1621px);
+  width:100vw;
+  max-width:none;
   aspect-ratio:1621/970;
   background:url("desktop-bg.png") center/100% 100% no-repeat;
   overflow:hidden;
+}
 }
 
 /* HEADER */
