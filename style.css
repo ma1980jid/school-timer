@@ -22,14 +22,14 @@ body{
   overflow:hidden;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 
 .header{
   position:absolute;
-  top:3.2%;
-  left:4.8%;
-  right:4.8%;
-  height:12%;
+  top:3%;
+  left:5%;
+  right:5%;
+  height:14%;
   z-index:2;
 }
 
@@ -37,65 +37,72 @@ body{
   position:absolute;
   right:0;
   top:0;
-  width:82px;
-  height:82px;
+  width:120px;
+  height:120px;
   object-fit:contain;
-  opacity:.55;
+  opacity:.95;
+  mix-blend-mode:multiply;
 }
 
 .moe{
   position:absolute;
-  right:90px;
-  top:0;
-  width:82px;
-  text-align:center;
-  font-weight:900;
-  opacity:.55;
+  right:130px;
+  top:2px;
+  width:110px;
+  opacity:.95;
+  mix-blend-mode:multiply;
 }
 
 .moe img{
-  width:72px;
-  height:72px;
+  width:105px;
+  height:105px;
   object-fit:contain;
 }
 
 .moe span{
-  display:block;
-  font-size:14px;
-  margin-top:-5px;
-  color:#064b35;
+  display:none!important;
 }
 
 .title{
   position:absolute;
   left:18%;
   right:18%;
-  top:2px;
+  top:0;
   text-align:center;
 }
 
 .title h1{
-  font-size:40px;
+  font-size:38px;
   font-weight:900;
   color:#064b35;
-  line-height:1.2;
+  line-height:1.1;
 }
 
 .title p{
-  font-size:22px;
+  font-size:29px;
   font-weight:900;
-  color:#b88722;
-  margin-top:4px;
+  color:#064b35;
+  margin-top:5px;
 }
 
-/* ===== TOP CARDS ===== */
+.header-date{
+  margin-top:7px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  font-size:15px;
+  font-weight:900;
+  color:#9b6b12;
+}
+
+/* TOP CARDS */
 
 .top-cards{
   position:absolute;
   top:24.8%;
   left:4.1%;
   right:4.1%;
-  height:10.9%;
+  height:10.8%;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:2.2%;
@@ -108,40 +115,33 @@ body{
 }
 
 .info-card{
-  background:rgba(255,255,255,.38);
-  border:1px solid rgba(214,169,60,.35);
-  border-radius:18px;
-  box-shadow:none;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
   text-align:center;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  padding:6px;
-  backdrop-filter:blur(1.5px);
+  padding:4px;
 }
 
 .info-card span{
-  font-size:17px;
+  font-size:18px;
   color:#64748b;
   font-weight:900;
 }
 
 .info-card h2{
-  font-size:36px;
+  font-size:38px;
   margin:6px 0 3px;
   font-weight:900;
-  color:#064b35;
 }
 
 .info-card p{
   font-size:17px;
   font-weight:900;
   color:#111827;
-}
-
-.current{
-  background:rgba(255,235,235,.46);
 }
 
 .current span,
@@ -157,7 +157,7 @@ body{
   color:#087248;
 }
 
-/* ===== MAIN ===== */
+/* MAIN */
 
 .main-grid{
   position:absolute;
@@ -177,7 +177,7 @@ body{
   direction:rtl;
 }
 
-/* ===== CLOCK PANEL ===== */
+/* CLOCK */
 
 .clock-panel{
   position:relative;
@@ -190,14 +190,14 @@ body{
 
 .analog-clock{
   position:absolute;
-  left:9.5%;
-  top:16%;
-  width:27%;
+  left:11.3%;
+  top:16.8%;
+  width:23.5%;
   aspect-ratio:1;
   border-radius:50%;
   background:#fffaf0;
-  border:7px solid #d6a93c;
-  box-shadow:0 8px 22px rgba(0,0,0,.25);
+  border:6px solid #d6a93c;
+  box-shadow:0 8px 20px rgba(0,0,0,.22);
   z-index:3;
 }
 
@@ -212,19 +212,19 @@ body{
 
 .hour-hand{
   width:7px;
-  height:29%;
+  height:30%;
   background:#111;
 }
 
 .minute-hand{
   width:5px;
-  height:39%;
+  height:40%;
   background:#111;
 }
 
 .second-hand{
   width:2px;
-  height:43%;
+  height:44%;
   background:red;
 }
 
@@ -295,18 +295,10 @@ body{
 }
 
 .date-box{
-  margin-top:16px;
-  border:1px solid rgba(214,169,60,.85);
-  border-radius:14px;
-  padding:7px 10px;
-  font-size:13px;
-  font-weight:900;
-  line-height:1.55;
-  background:rgba(3,76,50,.28);
-  transform:translateY(-6px);
+  display:none!important;
 }
 
-/* ===== SCHEDULE ===== */
+/* SCHEDULE */
 
 .schedule-panel{
   background:transparent;
@@ -331,16 +323,16 @@ table{
   height:80%;
   border-collapse:collapse;
   table-layout:fixed;
-  background:rgba(255,255,255,.18);
+  background:transparent!important;
 }
 
 td{
   padding:8px 5px;
-  border-bottom:1px solid rgba(0,0,0,.12);
+  border-bottom:1px solid rgba(0,0,0,.10);
   text-align:center;
   font-size:16px;
   font-weight:900;
-  background:rgba(255,255,255,.28);
+  background:rgba(255,255,255,.22)!important;
 }
 
 td:nth-child(1){
@@ -364,46 +356,36 @@ td:nth-child(4){
 }
 
 .current-row td{
-  background:rgba(255,225,225,.62)!important;
+  background:rgba(255,225,225,.60)!important;
   color:#c91414!important;
 }
 
-/* ===== FOOTER / TICKER ===== */
+/* FOOTER */
 
 .footer{
   position:absolute;
   left:4.1%;
   right:4.1%;
-  bottom:3.8%;
-  height:5.8%;
-  display:grid;
-  grid-template-columns:210px 1fr;
+  bottom:5.1%;
+  height:4%;
+  display:flex;
   align-items:center;
-  gap:16px;
-  padding:0 16px;
-  z-index:2;
-  background:rgba(255,255,255,.38);
-  border-radius:18px;
   overflow:hidden;
-  backdrop-filter:blur(1.5px);
+  z-index:2;
+  background:transparent!important;
+  border:0!important;
 }
 
 .footer a{
-  background:#064b35;
-  color:white;
-  text-decoration:none;
-  padding:10px 14px;
-  border-radius:14px;
-  text-align:center;
-  font-weight:900;
+  display:none!important;
 }
 
 .ticker-track{
   white-space:nowrap;
-  font-size:18px;
+  font-size:19px;
   font-weight:900;
   color:#064b35;
-  animation:tickerMove 20s linear infinite;
+  animation:tickerMove 22s linear infinite;
 }
 
 @keyframes tickerMove{
@@ -411,7 +393,7 @@ td:nth-child(4){
   to{transform:translateX(100%)}
 }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 
 @media(max-width:850px){
   body{
@@ -431,46 +413,48 @@ td:nth-child(4){
     top:5.5%;
     left:8%;
     right:8%;
-    height:8%;
+    height:9%;
   }
 
   .logo.school{
     right:0;
     top:0;
-    width:46px;
-    height:46px;
-    opacity:.55;
+    width:54px;
+    height:54px;
   }
 
   .moe{
-    right:50px;
+    right:58px;
     top:0;
-    width:46px;
-    opacity:.55;
+    width:54px;
   }
 
   .moe img{
-    width:44px;
-    height:44px;
-  }
-
-  .moe span{
-    display:none;
+    width:52px;
+    height:52px;
   }
 
   .title{
-    left:16%;
-    right:16%;
+    left:22%;
+    right:22%;
     top:0;
   }
 
   .title h1{
-    font-size:18px;
-    line-height:1.35;
+    font-size:15px;
+    line-height:1.25;
   }
 
   .title p{
-    font-size:13px;
+    font-size:14px;
+    margin-top:3px;
+  }
+
+  .header-date{
+    margin-top:3px;
+    gap:6px;
+    font-size:8px;
+    flex-wrap:wrap;
   }
 
   .top-cards{
@@ -480,12 +464,6 @@ td:nth-child(4){
     height:10%;
     gap:8px;
     grid-template-columns:repeat(3,1fr);
-  }
-
-  .info-card{
-    border-radius:15px;
-    padding:4px;
-    background:rgba(255,255,255,.45);
   }
 
   .info-card span{
@@ -518,9 +496,9 @@ td:nth-child(4){
 
   .analog-clock{
     left:67%;
-    top:30%;
-    width:22%;
-    border-width:5px;
+    top:31%;
+    width:20%;
+    border-width:4px;
   }
 
   .clock-data{
@@ -552,10 +530,6 @@ td:nth-child(4){
     height:10px;
   }
 
-  .date-box{
-    display:none;
-  }
-
   .schedule-panel{
     height:66%;
   }
@@ -573,7 +547,6 @@ td:nth-child(4){
   td{
     font-size:12px;
     padding:7px 2px;
-    background:rgba(255,255,255,.38);
   }
 
   td:nth-child(1){width:9%}
@@ -584,15 +557,8 @@ td:nth-child(4){
   .footer{
     left:7%;
     right:7%;
-    bottom:12%;
-    height:4.5%;
-    grid-template-columns:1fr;
-    padding:0 10px;
-    border-radius:16px;
-  }
-
-  .footer a{
-    display:none;
+    bottom:12.3%;
+    height:4%;
   }
 
   .ticker-track{
