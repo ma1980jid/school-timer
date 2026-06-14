@@ -277,3 +277,28 @@ td:nth-child(4){width:22%;color:#0f766e}
   .footer a{display:none}
   .ticker-track{font-size:14px;text-align:center}
 }
+@media(max-width:850px){
+  .app{
+    background-image:url("mobile-bg.png");
+    background-size:100% auto;
+    background-position:top center;
+    background-repeat:no-repeat;
+    padding:90px 14px 24px;
+  }
+
+  .top-cards{
+    margin-top:20px;
+  }
+
+  .clock-panel{
+    background:rgba(3,76,50,.93);
+  }
+
+  .schedule-panel{
+    background:rgba(255,255,255,.96);
+  }
+
+  .footer{
+    background:rgba(255,255,255,.96);
+  }
+}
