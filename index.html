@@ -14,19 +14,23 @@
 <body>
 <main class="app">
 
-  <header class="header">
-    <img id="schoolLogo" class="logo school" src="icons/default-icon.svg" alt="شعار المدرسة">
+ <header class="header">
+  <img id="schoolLogo" class="logo school" src="icons/school-logo.svg" alt="شعار المدرسة">
 
-    <div class="title">
-      <h1 id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</h1>
-      <p id="scheduleName">( 5 - 12 )</p>
+  <div class="title">
+    <h1>مؤقت الحصص المدرسية</h1>
+    <p id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</p>
+    <div class="header-date">
+      <span id="weekday">--</span>
+      <span id="gregorianDate">--</span>
+      <span id="hijriDate">--</span>
     </div>
+  </div>
 
-    <div class="moe">
-      <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
-      <span>وزارة التعليم</span>
-    </div>
-  </header>
+  <div class="moe">
+    <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
+  </div>
+</header>
 
   <section class="top-cards">
     <div class="info-card ended">
@@ -57,12 +61,11 @@
   <section class="main-grid">
 
     <section class="clock-panel">
-      <div id="analogClock" class="analog-clock">
-        <div id="hourHand" class="hand hour-hand"></div>
-        <div id="minuteHand" class="hand minute-hand"></div>
-        <div id="secondHand" class="hand second-hand"></div>
-        <div class="clock-pin"></div>
-      </div>
+     <div class="date-box">
+  <strong id="weekday">--</strong>
+  <span id="gregorianDate">--</span>
+  <small id="hijriDate">--</small>
+</div>
 
       <div class="clock-data">
         <div id="digitalTime" class="digital-time">--:--:--</div>
@@ -95,11 +98,9 @@
 
   </section>
 
-  <footer class="footer">
-    <a id="classroomLink" href="#">وضع الشاشة التفاعلية</a>
-    <div id="tickerTrack" class="ticker-track"></div>
-  </footer>
-
+<footer class="footer">
+  <div id="tickerTrack" class="ticker-track"></div>
+</footer>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
