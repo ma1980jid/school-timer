@@ -29,23 +29,27 @@ body{
   left:4.8%;
   right:4.8%;
   height:12%;
-  display:grid;
-  grid-template-columns:120px 1fr 120px;
-  align-items:start;
   z-index:2;
 }
 
-.logo{
-  width:78px;
-  height:78px;
+.logo.school{
+  position:absolute;
+  right:0;
+  top:0;
+  width:82px;
+  height:82px;
   object-fit:contain;
-  transform:translateY(-2px);
+  opacity:.78;
 }
 
 .moe{
+  position:absolute;
+  right:88px;
+  top:0;
+  width:82px;
   text-align:center;
   font-weight:900;
-  transform:translateY(-4px);
+  opacity:.78;
 }
 
 .moe img{
@@ -56,13 +60,17 @@ body{
 
 .moe span{
   display:block;
-  font-size:15px;
-  margin-top:-4px;
+  font-size:14px;
+  margin-top:-5px;
+  color:#064b35;
 }
 
 .title{
+  position:absolute;
+  left:18%;
+  right:18%;
+  top:2px;
   text-align:center;
-  padding-top:5px;
 }
 
 .title h1{
@@ -98,8 +106,8 @@ body{
 }
 
 .info-card{
-  background:rgba(255,255,255,.72);
-  border:0;
+  background:rgba(255,255,255,.48);
+  border:1px solid rgba(214,169,60,.25);
   border-radius:18px;
   box-shadow:none;
   text-align:center;
@@ -108,30 +116,43 @@ body{
   align-items:center;
   justify-content:center;
   padding:6px;
+  backdrop-filter:blur(2px);
 }
 
 .info-card span{
-  font-size:15px;
+  font-size:17px;
   color:#64748b;
   font-weight:900;
 }
 
 .info-card h2{
-  font-size:31px;
-  margin:7px 0 4px;
+  font-size:36px;
+  margin:6px 0 3px;
   font-weight:900;
   color:#064b35;
 }
 
 .info-card p{
-  font-size:15px;
+  font-size:17px;
   font-weight:900;
   color:#111827;
+}
+
+.current{
+  background:rgba(255,235,235,.52);
 }
 
 .current span,
 .current h2{
   color:#c91414;
+}
+
+.ended h2{
+  color:#064b35;
+}
+
+.next h2{
+  color:#087248;
 }
 
 /* MAIN */
@@ -165,14 +186,15 @@ body{
 
 .analog-clock{
   position:absolute;
-  left:10%;
-  top:14%;
-  width:27%;
+  left:8.8%;
+  top:15.5%;
+  width:29%;
   aspect-ratio:1;
   border-radius:50%;
   background:#fffaf0;
   border:7px solid #d6a93c;
   box-shadow:0 8px 22px rgba(0,0,0,.25);
+  z-index:3;
 }
 
 .hand{
@@ -186,13 +208,13 @@ body{
 
 .hour-hand{
   width:7px;
-  height:28%;
+  height:29%;
   background:#111;
 }
 
 .minute-hand{
   width:5px;
-  height:38%;
+  height:39%;
   background:#111;
 }
 
@@ -216,9 +238,9 @@ body{
 
 .clock-data{
   position:absolute;
-  right:10%;
+  right:8.5%;
   top:12%;
-  width:48%;
+  width:50%;
   height:82%;
   text-align:center;
 }
@@ -269,13 +291,15 @@ body{
 }
 
 .date-box{
-  margin-top:20px;
+  margin-top:18px;
   border:1px solid #d6a93c;
   border-radius:14px;
-  padding:10px;
+  padding:8px 10px;
   font-size:13px;
   font-weight:900;
-  line-height:1.7;
+  line-height:1.6;
+  background:rgba(3,76,50,.35);
+  transform:translateY(-4px);
 }
 
 /* SCHEDULE */
@@ -291,26 +315,27 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:27px;
+  font-size:29px;
   color:#064b35;
   font-weight:900;
 }
 
 table{
-  width:88%;
+  width:89%;
   margin:0 auto;
   height:80%;
   border-collapse:collapse;
   table-layout:fixed;
+  background:rgba(255,255,255,.25);
 }
 
 td{
   padding:8px 5px;
-  border-bottom:1px solid #e5e7eb;
+  border-bottom:1px solid rgba(0,0,0,.12);
   text-align:center;
-  font-size:15px;
+  font-size:16px;
   font-weight:900;
-  background:rgba(255,255,255,.62);
+  background:rgba(255,255,255,.38);
 }
 
 td:nth-child(1){
@@ -334,7 +359,7 @@ td:nth-child(4){
 }
 
 .current-row td{
-  background:#fff1f1!important;
+  background:rgba(255,225,225,.72)!important;
   color:#c91414!important;
 }
 
@@ -353,6 +378,7 @@ td:nth-child(4){
   z-index:2;
   background:rgba(255,255,255,.55);
   border-radius:18px;
+  overflow:hidden;
 }
 
 .footer a{
@@ -370,7 +396,12 @@ td:nth-child(4){
   font-size:18px;
   font-weight:900;
   color:#064b35;
-  text-align:center;
+  animation:tickerMove 18s linear infinite;
+}
+
+@keyframes tickerMove{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(100%)}
 }
 
 /* MOBILE */
@@ -393,17 +424,36 @@ td:nth-child(4){
     left:8%;
     right:8%;
     height:8%;
-    grid-template-columns:52px 1fr 52px;
   }
 
-  .logo,
+  .logo.school{
+    right:0;
+    top:0;
+    width:46px;
+    height:46px;
+    opacity:.78;
+  }
+
+  .moe{
+    right:50px;
+    top:0;
+    width:46px;
+    opacity:.78;
+  }
+
   .moe img{
-    width:48px;
-    height:48px;
+    width:44px;
+    height:44px;
   }
 
   .moe span{
     display:none;
+  }
+
+  .title{
+    left:16%;
+    right:16%;
+    top:0;
   }
 
   .title h1{
@@ -427,16 +477,16 @@ td:nth-child(4){
   .info-card{
     border-radius:15px;
     padding:4px;
-    background:rgba(255,255,255,.76);
+    background:rgba(255,255,255,.50);
   }
 
   .info-card span{
-    font-size:10px;
+    font-size:11px;
   }
 
   .info-card h2{
-    font-size:17px;
-    margin:6px 0 3px;
+    font-size:19px;
+    margin:5px 0 2px;
   }
 
   .info-card p{
@@ -460,8 +510,8 @@ td:nth-child(4){
 
   .analog-clock{
     left:67%;
-    top:28%;
-    width:24%;
+    top:30%;
+    width:22%;
     border-width:5px;
   }
 
@@ -515,6 +565,7 @@ td:nth-child(4){
   td{
     font-size:12px;
     padding:7px 2px;
+    background:rgba(255,255,255,.45);
   }
 
   td:nth-child(1){width:9%}
