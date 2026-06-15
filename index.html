@@ -10,16 +10,11 @@
 <body>
 <main class="mobile-app">
 
-  <header class="app-header">
-    <h1>مؤقّت الحصص</h1>
-    <h2 id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</h2>
-  </header>
-
   <section class="period-cards">
-    <div class="period-card previous">
-      <span>الحصة السابقة</span>
-      <strong id="previousName">--</strong>
-      <small id="previousTime">--</small>
+    <div class="period-card next">
+      <span>الحصة القادمة</span>
+      <strong id="nextName">--</strong>
+      <small id="nextTime">--</small>
     </div>
 
     <div class="period-card current">
@@ -28,40 +23,31 @@
       <small id="currentTime">--</small>
     </div>
 
-    <div class="period-card next">
-      <span>الحصة القادمة</span>
-      <strong id="nextName">--</strong>
-      <small id="nextTime">--</small>
+    <div class="period-card previous">
+      <span>الحصة السابقة</span>
+      <strong id="previousName">--</strong>
+      <small id="previousTime">--</small>
     </div>
   </section>
 
   <section class="clock-panel">
+    <div class="clock-area">
+      <div id="digitalClock" class="digital-clock">--:--:--</div>
+      <div class="count-label">متبقي من الحصة الحالية</div>
+      <div id="remainingTime" class="remaining-time">--:--</div>
+    </div>
+
     <div class="date-box">
       <strong id="weekday">--</strong>
       <span id="gregorianDate">--</span>
       <span id="hijriDate">--</span>
-    </div>
-
-    <div class="clock-box">
-      <div id="digitalClock" class="digital-clock">--:--:--</div>
-      <div class="count-label">متبقي من الحصة الحالية</div>
-      <div id="remainingTime" class="remaining-time">--:--</div>
-
-      <div class="progress-wrap">
-        <span>تقدم الحصة</span>
-        <strong id="progressPercent">0%</strong>
-      </div>
-
-      <div class="progress-bar">
-        <div id="progressFill"></div>
-      </div>
     </div>
   </section>
 
   <section class="middle-cards">
     <div class="mini-card">
       <h3>إعلان المدرسة</h3>
-      <p id="schoolAnnouncement">مرحبًا بكم في مدرستنا</p>
+      <p id="schoolAnnouncement">الالتزام بالحضور والانصراف في الوقت المحدد</p>
     </div>
 
     <div class="mini-card logo-card">
@@ -71,18 +57,13 @@
 
   <section class="schedule-section">
     <div class="schedule-grid">
-      <table>
-        <tbody id="scheduleCol1"></tbody>
-      </table>
-
-      <table>
-        <tbody id="scheduleCol2"></tbody>
-      </table>
+      <table><tbody id="scheduleCol1"></tbody></table>
+      <table><tbody id="scheduleCol2"></tbody></table>
     </div>
   </section>
 
   <footer class="ticker">
-    <div id="tickerText">العلم نور</div>
+    <div id="tickerText">مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري</div>
   </footer>
 
 </main>
