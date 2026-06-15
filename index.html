@@ -3,86 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>مؤقت الحصص المدرسية</title>
-
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#064b35">
+  <title>مؤقّت الحصص</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<main class="app">
+<main class="mobile-app">
 
-  <header class="header">
-    <img class="logo school" src="icons/school-logo.svg" alt="شعار المدرسة">
-
-    <div class="title">
-      <h1>مؤقت الحصص المدرسية</h1>
-      <p>مدرسة الشيخ سيف بن حمد الأغبري</p>
-      <div class="header-date">
-        <span id="weekday">--</span>
-        <span id="gregorianDate">--</span>
-        <span id="hijriDate">--</span>
-      </div>
-    </div>
-
-    <div class="moe">
-      <img src="icons/ministry-logo.png" alt="شعار وزارة التعليم">
-    </div>
+  <header class="app-header">
+    <h1>مؤقّت الحصص</h1>
+    <h2 id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</h2>
   </header>
 
-  <section class="top-cards">
-    <div class="info-card ended">
-      <span>الحصة المنتهية</span>
-      <h2 id="endedTitle">--</h2>
-      <p id="endedTime">--</p>
+  <section class="period-cards">
+    <div class="period-card previous">
+      <span>الحصة السابقة</span>
+      <strong id="previousName">--</strong>
+      <small id="previousTime">--</small>
     </div>
 
-    <div class="info-card current">
+    <div class="period-card current">
       <span>الحصة الحالية</span>
-      <h2 id="currentTitle">--</h2>
-      <p id="currentTime">--</p>
+      <strong id="currentName">--</strong>
+      <small id="currentTime">--</small>
     </div>
 
-    <div class="info-card next">
+    <div class="period-card next">
       <span>الحصة القادمة</span>
-      <h2 id="nextTitle">--</h2>
-      <p id="nextTime">--</p>
+      <strong id="nextName">--</strong>
+      <small id="nextTime">--</small>
     </div>
   </section>
 
   <section class="clock-panel">
-    <div id="digitalTime" class="digital-time">--:--:--</div>
-    <div id="countdownLabel" class="label">متبقي من الحصة الحالية</div>
-    <div id="countdownValue" class="countdown">--:--</div>
-
-    <div class="progress-head">
-      <span>تقدم الفترة</span>
-      <strong id="progressPercent">0%</strong>
+    <div class="date-box">
+      <strong id="weekday">--</strong>
+      <span id="gregorianDate">--</span>
+      <span id="hijriDate">--</span>
     </div>
 
-    <div class="progress">
-      <div id="progressFill"></div>
-    </div>
-  </section>
+    <div class="clock-box">
+      <div id="digitalClock" class="digital-clock">--:--:--</div>
+      <div class="count-label">متبقي من الحصة الحالية</div>
+      <div id="remainingTime" class="remaining-time">--:--</div>
 
-  <section class="schedule-panel">
-    <h2>جدول الفترات اليومي</h2>
+      <div class="progress-wrap">
+        <span>تقدم الحصة</span>
+        <strong id="progressPercent">0%</strong>
+      </div>
 
-    <div class="schedule-columns">
-      <table>
-        <tbody id="scheduleBodyRight"></tbody>
-      </table>
-
-      <table>
-        <tbody id="scheduleBodyLeft"></tbody>
-      </table>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
     </div>
   </section>
 
-<footer class="footer">
-  <div id="tickerTrack" class="ticker-track"></div>
-</footer>
+  <section class="middle-cards">
+    <div class="mini-card">
+      <h3>إعلان المدرسة</h3>
+      <p id="schoolAnnouncement">مرحبًا بكم في مدرستنا</p>
+    </div>
+
+    <div class="mini-card logo-card">
+      <img id="schoolLogo" src="icons/school_logo.svg" alt="شعار المدرسة">
+    </div>
+  </section>
+
+  <section class="schedule-section">
+    <div class="schedule-grid">
+      <table>
+        <tbody id="scheduleCol1"></tbody>
+      </table>
+
+      <table>
+        <tbody id="scheduleCol2"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="ticker">
+    <div id="tickerText">العلم نور</div>
+  </footer>
 
 </main>
 
