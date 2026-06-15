@@ -1,30 +1,32 @@
+const schoolSettings = {
+  schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
+  schoolLogo: "icons/school_logo.svg",
+  announcement: "الالتزام بالحضور والانصراف في الوقت المحدد",
+  showPrayer: true,
+  activityDay: 1 // الأحد = 0، الاثنين = 1، الثلاثاء = 2 ...
+};
+
 const periods = [
- const periods = [
-  ["الطابور","07:00","07:15","normal"],
-  ["الحصة الأولى","07:15","07:55","normal"],
-  ["الحصة الثانية","07:55","08:35","normal"],
-  ["الحصة الثالثة","08:35","09:15","normal"],
-  ["الحصة الرابعة","09:15","09:55","normal"],
-  ["الحصة الخامسة","09:55","10:35","normal"],
-  ["الفسحة","10:35","10:55","break"],
-  ["الحصة السادسة","10:55","11:35","normal"],
-  ["الحصة السابعة","11:35","12:15","normal"],
-  ["الحصة الثامنة","12:15","12:55","normal"],
-  ["الصلاة","12:55","13:10","prayer"],
-  ["النشاط","13:10","13:50","activity"]
+  { name:"الطابور", start:"07:00", end:"07:15", type:"normal", col:1 },
+  { name:"حصة النشاط", start:"07:15", end:"07:55", type:"activity", col:1, activityOnly:true },
+  { name:"الحصة الأولى", start:"07:55", end:"08:35", type:"normal", col:1 },
+  { name:"الحصة الثانية", start:"08:35", end:"09:15", type:"normal", col:1 },
+  { name:"الحصة الثالثة", start:"09:15", end:"09:55", type:"normal", col:1 },
+  { name:"الحصة الرابعة", start:"09:55", end:"10:35", type:"normal", col:1 },
+
+  { name:"الحصة الخامسة", start:"10:35", end:"11:15", type:"normal", col:2 },
+  { name:"الحصة السادسة", start:"11:15", end:"11:55", type:"normal", col:2 },
+  { name:"الحصة السابعة", start:"11:55", end:"12:35", type:"normal", col:2 },
+  { name:"الصلاة", start:"12:35", end:"12:50", type:"prayer", col:2, optionalPrayer:true },
+  { name:"الحصة الثامنة", start:"12:50", end:"13:30", type:"normal", col:2 },
+  { name:"الفسحة", start:"13:30", end:"13:50", type:"break", col:2 }
 ];
-].map((item,index)=>({
-  index:index+1,
-  name:item[0],
-  start:item[1],
-  end:item[2]
-}));
 
 const messages = [
-  "نسعى لبناء مستقبل تعليمي متميز",
   "العلم نور",
   "الانضباط طريق النجاح",
-  "أهلاً بكم في مدرسة الشيخ سيف بن حمد الأغبري"
+  "نسعى لبناء مستقبل تعليمي متميز",
+  "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري"
 ];
 
 function el(id){
@@ -41,98 +43,69 @@ function pad(n){
 }
 
 function toMinutes(time){
-  const p = time.split(":").map(Number);
-  return p[0]*60+p[1];
+  const [h,m] = time.split(":").map(Number);
+  return h * 60 + m;
 }
 
 function formatTime(time){
   let [h,m] = time.split(":").map(Number);
-  const period = h >= 12 ? "م" : "ص";
+  const suffix = h >= 12 ? "م" : "ص";
   h = h % 12 || 12;
-  return pad(h)+":"+pad(m)+" "+period;
+  return `${pad(h)}:${pad(m)} ${suffix}`;
 }
 
-function getSchedule(now){
-  const currentMinutes =
-    now.getHours()*60 +
-    now.getMinutes() +
-    now.getSeconds()/60;
+function getVisiblePeriods(){
+  const today = new Date().getDay();
 
-  const current = periods.find(p =>
-    currentMinutes >= toMinutes(p.start) &&
-    currentMinutes < toMinutes(p.end)
-  );
-
-  const ended = periods.slice().reverse().find(p =>
-    currentMinutes >= toMinutes(p.end)
-  );
-
-  const next = periods.find(p =>
-    currentMinutes < toMinutes(p.start)
-  );
-
-  return {current,ended,next,currentMinutes};
+  return periods.filter(p=>{
+    if(p.optionalPrayer && !schoolSettings.showPrayer) return false;
+    if(p.activityOnly && today !== schoolSettings.activityDay) return false;
+    return true;
+  });
 }
 
-function updateCards(now){
-  const s = getSchedule(now);
+function getSchedule(){
+  const now = new Date();
+  const currentMinutes = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+  const list = getVisiblePeriods();
 
-  setText("currentTitle", s.current ? s.current.name : "--");
+  const current = list.find(p=>currentMinutes >= toMinutes(p.start) && currentMinutes < toMinutes(p.end));
+  const previous = [...list].reverse().find(p=>currentMinutes >= toMinutes(p.end));
+  const next = list.find(p=>currentMinutes < toMinutes(p.start));
+
+  return { now, currentMinutes, list, current, previous, next };
+}
+
+function updateHeader(){
+  setText("schoolName", schoolSettings.schoolName);
+
+  const img = el("schoolLogo");
+  if(img) img.src = schoolSettings.schoolLogo;
+
+  setText("schoolAnnouncement", schoolSettings.announcement);
+}
+
+function updateCards(){
+  const s = getSchedule();
+
+  setText("previousName", s.previous ? s.previous.name : "--");
+  setText("previousTime", s.previous ? `${formatTime(s.previous.start)} - ${formatTime(s.previous.end)}` : "--");
+
+  setText("currentName", s.current ? s.current.name : "--");
   setText("currentTime", s.current ? `${formatTime(s.current.start)} - ${formatTime(s.current.end)}` : "--");
 
-  setText("endedTitle", s.ended ? s.ended.name : "--");
-  setText("endedTime", s.ended ? `${formatTime(s.ended.start)} - ${formatTime(s.ended.end)}` : "--");
-
-  setText("nextTitle", s.next ? s.next.name : "--");
+  setText("nextName", s.next ? s.next.name : "--");
   setText("nextTime", s.next ? `${formatTime(s.next.start)} - ${formatTime(s.next.end)}` : "--");
 }
 
-function updateClock(now){
-  setText("digitalTime", `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);
-
-  const secondHand = el("secondHand");
-  const minuteHand = el("minuteHand");
-  const hourHand = el("hourHand");
-
-  const seconds = now.getSeconds();
-  const minutes = now.getMinutes() + seconds/60;
-  const hours = (now.getHours()%12) + minutes/60;
-
-  if(secondHand) secondHand.style.transform = `translateX(-50%) rotate(${seconds*6}deg)`;
-  if(minuteHand) minuteHand.style.transform = `translateX(-50%) rotate(${minutes*6}deg)`;
-  if(hourHand) hourHand.style.transform = `translateX(-50%) rotate(${hours*30}deg)`;
+function updateClock(){
+  const now = new Date();
+  setText("digitalClock", `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);
 }
 
-function updateCountdown(now){
-  const s = getSchedule(now);
-  const fill = el("progressFill");
+function updateDate(){
+  const now = new Date();
 
-  if(!s.current){
-    setText("countdownLabel","لا توجد حصة حالية");
-    setText("countdownValue","--:--");
-    setText("progressPercent","%0");
-    if(fill) fill.style.width = "0%";
-    return;
-  }
-
-  const start = toMinutes(s.current.start);
-  const end = toMinutes(s.current.end);
-  const remaining = Math.max(0, Math.round((end - s.currentMinutes)*60));
-
-  const mm = Math.floor(remaining/60);
-  const ss = remaining % 60;
-
-  setText("countdownLabel","متبقي من الحصة الحالية");
-  setText("countdownValue",`${pad(mm)}:${pad(ss)}`);
-
-  let progress = ((s.currentMinutes - start) / (end - start)) * 100;
-  progress = Math.max(0, Math.min(progress,100));
-
-  setText("progressPercent", Math.round(progress)+"%");
-  if(fill) fill.style.width = progress+"%";
-}
-
-function updateDate(now){
   setText("weekday", new Intl.DateTimeFormat("ar-OM",{weekday:"long"}).format(now));
 
   setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
@@ -147,60 +120,87 @@ function updateDate(now){
       month:"long",
       year:"numeric"
     }).format(now));
-  }catch(e){}
+  }catch(e){
+    setText("hijriDate","");
+  }
+}
+
+function updateCountdown(){
+  const s = getSchedule();
+  const fill = el("progressFill");
+
+  if(!s.current){
+    setText("remainingTime","--:--");
+    setText("progressPercent","0%");
+    if(fill) fill.style.width = "0%";
+    return;
+  }
+
+  const start = toMinutes(s.current.start);
+  const end = toMinutes(s.current.end);
+  const remaining = Math.max(0, Math.round((end - s.currentMinutes) * 60));
+
+  const mm = Math.floor(remaining / 60);
+  const ss = remaining % 60;
+
+  setText("remainingTime", `${pad(mm)}:${pad(ss)}`);
+
+  let progress = ((s.currentMinutes - start) / (end - start)) * 100;
+  progress = Math.max(0, Math.min(progress,100));
+
+  setText("progressPercent", Math.round(progress) + "%");
+  if(fill) fill.style.width = progress + "%";
+}
+
+function rowHtml(p,s){
+  let state = "قادمة";
+
+  if(s.current && s.current.name === p.name) state = "جارية";
+  else if(s.currentMinutes >= toMinutes(p.end)) state = "انتهت";
+
+  const currentClass = state === "جارية" ? "current-row" : "";
+  const typeClass =
+    p.type === "break" ? "break-row" :
+    p.type === "prayer" ? "prayer-row" :
+    p.type === "activity" ? "activity-row" : "";
+
+  return `
+    <tr class="${currentClass} ${typeClass}">
+      <td>${p.name}</td>
+      <td>${formatTime(p.start)} - ${formatTime(p.end)}</td>
+      <td>${state}</td>
+    </tr>
+  `;
 }
 
 function renderSchedule(){
-  const body = el("scheduleBody");
-  if(!body) return;
+  const s = getSchedule();
+  const col1 = el("scheduleCol1");
+  const col2 = el("scheduleCol2");
 
-  const s = getSchedule(new Date());
+  const list1 = s.list.filter(p=>p.col === 1);
+  const list2 = s.list.filter(p=>p.col === 2);
 
-  body.innerHTML = periods.map(period=>{
-    let state = "قادمة";
-
-    if(s.current && period.index === s.current.index){
-      state = "جارية";
-    }else if(s.currentMinutes >= toMinutes(period.end)){
-      state = "انتهت";
-    }
-
-    const rowClass =
-      s.current && period.index === s.current.index
-      ? "current-row"
-      : "";
-
-    return `
-      <tr class="${rowClass}">
-        <td>${period.index}</td>
-        <td>${period.name}</td>
-        <td>${formatTime(period.start)} - ${formatTime(period.end)}</td>
-        <td>${state}</td>
-      </tr>
-    `;
-  }).join("");
+  if(col1) col1.innerHTML = list1.map(p=>rowHtml(p,s)).join("");
+  if(col2) col2.innerHTML = list2.map(p=>rowHtml(p,s)).join("");
 }
 
 let msgIndex = 0;
 
 function updateTicker(){
-  const ticker = el("tickerTrack");
-  if(!ticker) return;
-
-  ticker.textContent = messages[msgIndex];
+  setText("tickerText", messages[msgIndex]);
   msgIndex = (msgIndex + 1) % messages.length;
 }
 
 function tick(){
-  const now = new Date();
-
-  updateClock(now);
-  updateCards(now);
-  updateCountdown(now);
-  updateDate(now);
+  updateClock();
+  updateDate();
+  updateCards();
+  updateCountdown();
   renderSchedule();
 }
 
+updateHeader();
 tick();
 updateTicker();
 
