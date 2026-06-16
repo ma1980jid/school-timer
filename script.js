@@ -1,7 +1,14 @@
 const settings = {
   schoolLogo: "icons/school_logo.svg",
-  announcement: "الالتزام بالحضور والانصراف في الوقت المحدد",
+
+  announcements: [
+    "الالتزام بالحضور والانصراف في الوقت المحدد",
+    "المحافظة على نظافة المدرسة",
+    "الانضباط طريق النجاح"
+  ],
+
   showPrayer: true,
+
   activityDay: 1
 };
 
@@ -71,6 +78,7 @@ function getVisiblePeriods(){
 
 function getSchedule(){
   const now = new Date();
+
   const currentMinutes =
     now.getHours() * 60 +
     now.getMinutes() +
@@ -206,11 +214,15 @@ function renderTable(){
   }
 }
 
-let messageIndex = 0;
+function updateAnnouncement(){
+  setText("schoolAnnouncement", settings.announcements.join(" • "));
+}
 
 function updateTicker(){
-  setText("tickerText", messages[messageIndex]);
-  messageIndex = (messageIndex + 1) % messages.length;
+  const ticker = el("tickerText");
+  if(!ticker) return;
+
+  ticker.textContent = messages.join("   •   ");
 }
 
 function init(){
@@ -220,7 +232,8 @@ function init(){
     logo.src = settings.schoolLogo;
   }
 
-  setText("schoolAnnouncement", settings.announcement);
+  updateAnnouncement();
+  updateTicker();
 }
 
 function tick(){
@@ -233,7 +246,5 @@ function tick(){
 
 init();
 tick();
-updateTicker();
 
 setInterval(tick,1000);
-setInterval(updateTicker,5000);
