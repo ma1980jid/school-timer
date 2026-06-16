@@ -147,40 +147,37 @@ body{
 }
 
 .mini-card{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
   overflow:hidden;
-  padding:4px 8px;
-}
-
-.announcement-card{
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  padding:0;
 }
 
 .announcement-card p{
-  width:100%;
-  height:100%;
+  width:92%;
+  height:92%;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  font-size:clamp(13px,3.4vw,20px);
+  margin:auto;
+  font-size:clamp(14px,3.5vw,21px);
   font-weight:900;
-  color:#111;
+  color:#064b35;
   line-height:1.35;
   overflow:hidden;
 }
 
 .logo-card img{
-  width:100%;
-  height:100%;
-  max-width:96%;
-  max-height:96%;
+  width:115%;
+  height:115%;
+  max-width:none;
+  max-height:none;
   object-fit:contain;
+  display:block;
 }
 
 /* الجدول */
@@ -262,8 +259,9 @@ td:nth-child(3){
   font-size:clamp(14px,3.5vw,22px);
   font-weight:900;
   color:#f7e6b0;
-  padding-left:100%;
-  animation:tickerMove 24s linear infinite;
+  padding-left:110%;
+  will-change:transform;
+  animation:tickerMove 32s linear infinite;
 }
 
 @keyframes tickerMove{
