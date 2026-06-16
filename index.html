@@ -11,10 +11,10 @@
 <main class="mobile-app">
 
   <section class="period-cards">
-    <div class="period-card next">
-      <span>الحصة القادمة</span>
-      <strong id="nextName">--</strong>
-      <small id="nextTime">--</small>
+    <div class="period-card previous">
+      <span>الحصة السابقة</span>
+      <strong id="previousName">--</strong>
+      <small id="previousTime">--</small>
     </div>
 
     <div class="period-card current">
@@ -23,10 +23,10 @@
       <small id="currentTime">--</small>
     </div>
 
-    <div class="period-card previous">
-      <span>الحصة السابقة</span>
-      <strong id="previousName">--</strong>
-      <small id="previousTime">--</small>
+    <div class="period-card next">
+      <span>الحصة القادمة</span>
+      <strong id="nextName">--</strong>
+      <small id="nextTime">--</small>
     </div>
   </section>
 
@@ -45,12 +45,12 @@
   </section>
 
   <section class="middle-cards">
-    <div class="mini-card logo-card">
-      <img id="schoolLogo" src="icons/school_logo.svg" alt="شعار المدرسة">
+    <div class="mini-card announcement-card">
+      <p id="schoolAnnouncement">الالتزام بالحضور والانصراف في الوقت المحدد</p>
     </div>
 
-    <div class="mini-card">
-      <p id="schoolAnnouncement">الالتزام بالحضور والانصراف في الوقت المحدد</p>
+    <div class="mini-card logo-card">
+      <img id="schoolLogo" src="icons/school_logo.svg" alt="شعار المدرسة">
     </div>
   </section>
 
@@ -62,7 +62,7 @@
   </section>
 
   <footer class="ticker">
-    <div id="tickerText">مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري</div>
+    <div id="tickerText"></div>
   </footer>
 
 </main>
