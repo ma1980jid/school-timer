@@ -210,7 +210,7 @@ function updateTicker(){
   const ticker = el("tickerText");
   if(!ticker) return;
 
-  ticker.textContent = messages.join("     •     ");
+  ticker.textContent = messages.join("          •          ");
 }
 
 function init(){
