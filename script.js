@@ -1,8 +1,11 @@
 const settings = {
+  schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
   schoolLogo: "icons/school_logo.svg",
 
-  announcements: [
-    "الالتزام بالحضور والانصراف في الوقت المحدد"
+  visionMessages: [
+    "رؤيتنا: تعليم ملهم لمستقبل مشرق",
+    "رسالتنا: بيئة مدرسية آمنة ومحفزة للتعلم",
+    "قيمنا: الانضباط، الإبداع، المسؤولية"
   ],
 
   showPrayer: true,
@@ -202,8 +205,11 @@ function renderTable(){
   }
 }
 
-function updateAnnouncement(){
-  setText("schoolAnnouncement", settings.announcements.join(" • "));
+let visionIndex = 0;
+
+function updateVision(){
+  setText("visionText", settings.visionMessages[visionIndex]);
+  visionIndex = (visionIndex + 1) % settings.visionMessages.length;
 }
 
 function updateTicker(){
@@ -227,7 +233,8 @@ function init(){
     logo.src = settings.schoolLogo;
   }
 
-  updateAnnouncement();
+  setText("schoolName", settings.schoolName);
+  updateVision();
   updateTicker();
 }
 
@@ -243,3 +250,4 @@ init();
 tick();
 
 setInterval(tick,1000);
+setInterval(updateVision,5000);
