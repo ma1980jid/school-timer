@@ -1,6 +1,8 @@
 const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
-schoolLogo: "icons/school_logo.png",
+  schoolLogo: "icons/school_logo.png",
+  timeZone: "Asia/Muscat",
+
   visionMessages: [
     "رؤيتنا: تعليم ملهم لمستقبل مشرق",
     "رسالتنا: بيئة مدرسية آمنة ومحفزة للتعلم",
@@ -8,6 +10,8 @@ schoolLogo: "icons/school_logo.png",
   ],
 
   showPrayer: true,
+
+  // الأيام: 0 الأحد، 1 الاثنين، 2 الثلاثاء، 3 الأربعاء، 4 الخميس، 5 الجمعة، 6 السبت
   activityDay: 1
 };
 
@@ -34,6 +38,34 @@ const messages = [
   "نسعى لبناء مستقبل تعليمي متميز"
 ];
 
+const dayMap = {
+  Sun:0,
+  Mon:1,
+  Tue:2,
+  Wed:3,
+  Thu:4,
+  Fri:5,
+  Sat:6
+};
+
+function updateViewportHeight(){
+  const viewport = window.visualViewport;
+  const height = viewport ? viewport.height : window.innerHeight;
+
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
+}
+
+updateViewportHeight();
+window.addEventListener("resize", updateViewportHeight, {passive:true});
+window.addEventListener("orientationchange", ()=>{
+  setTimeout(updateViewportHeight, 250);
+}, {passive:true});
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", updateViewportHeight, {passive:true});
+  window.visualViewport.addEventListener("scroll", updateViewportHeight, {passive:true});
+}
+
 function el(id){
   return document.getElementById(id);
 }
@@ -57,185 +89,11 @@ function formatTime(time){
   return `${pad(hours)}:${pad(minutes)}`;
 }
 
-function getVisiblePeriods(){
-  const today = new Date().getDay();
-
-  return periods.filter(period=>{
-    if(period.optionalPrayer && !settings.showPrayer) return false;
-    if(period.activityOnly && today !== settings.activityDay) return false;
-    return true;
-  });
-}
-
-function getSchedule(){
-  const now = new Date();
-
-  const currentMinutes =
-    now.getHours() * 60 +
-    now.getMinutes() +
-    now.getSeconds() / 60;
-
-  const list = getVisiblePeriods();
-
-  const current = list.find(period =>
-    currentMinutes >= toMinutes(period.start) &&
-    currentMinutes < toMinutes(period.end)
-  );
-
-  const previous = [...list].reverse().find(period =>
-    currentMinutes >= toMinutes(period.end)
-  );
-
-  const next = list.find(period =>
-    currentMinutes < toMinutes(period.start)
-  );
-
-  return {now,currentMinutes,list,current,previous,next};
-}
-
-function updateCards(){
-  const schedule = getSchedule();
-
-  setText("previousName", schedule.previous ? schedule.previous.name : "--");
-  setText("previousTime", schedule.previous ? `${formatTime(schedule.previous.start)} - ${formatTime(schedule.previous.end)}` : "--");
-
-  setText("currentName", schedule.current ? schedule.current.name : "--");
-  setText("currentTime", schedule.current ? `${formatTime(schedule.current.start)} - ${formatTime(schedule.current.end)}` : "--");
-
-  setText("nextName", schedule.next ? schedule.next.name : "--");
-  setText("nextTime", schedule.next ? `${formatTime(schedule.next.start)} - ${formatTime(schedule.next.end)}` : "--");
-}
-
-function updateClock(){
-  const now = new Date();
-  setText("digitalClock", `${pad(now.getHours())}:${pad(now.getMinutes())}`);
-}
-
-function updateDate(){
-  const now = new Date();
-
-  setText("weekday", new Intl.DateTimeFormat("ar-OM",{weekday:"long"}).format(now));
-
-  setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
-    day:"numeric",
-    month:"long",
-    year:"numeric"
-  }).format(now));
-
-  try{
-    setText("hijriDate", new Intl.DateTimeFormat("ar-OM-u-ca-islamic",{
-      day:"numeric",
-      month:"long",
-      year:"numeric"
-    }).format(now));
-  }catch(error){
-    setText("hijriDate","");
-  }
-}
-
-function updateRemaining(){
-  const schedule = getSchedule();
-
-  if(!schedule.current){
-    setText("remainingTime","--:--");
-    return;
-  }
-
-  const end = toMinutes(schedule.current.end);
-  const remainingSeconds = Math.max(0, Math.round((end - schedule.currentMinutes) * 60));
-
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = remainingSeconds % 60;
-
-  setText("remainingTime", `${pad(minutes)}:${pad(seconds)}`);
-}
-
-function rowHtml(period,schedule){
-  let state = "قادمة";
-
-  if(schedule.current && schedule.current.name === period.name){
-    state = "جارية";
-  }else if(schedule.currentMinutes >= toMinutes(period.end)){
-    state = "انتهت";
-  }
-
-  const currentClass = state === "جارية" ? "current-row" : "";
-
-  const typeClass =
-    period.type === "break" ? "break-row" :
-    period.type === "prayer" ? "prayer-row" :
-    period.type === "activity" ? "activity-row" : "";
-
-  return `
-    <tr class="${currentClass} ${typeClass}">
-      <td>${period.name}</td>
-      <td>${formatTime(period.start)} - ${formatTime(period.end)}</td>
-      <td>${state}</td>
-    </tr>
-  `;
-}
-
-function renderTable(){
-  const schedule = getSchedule();
-
-  const column1 = el("scheduleCol1");
-  const column2 = el("scheduleCol2");
-
-  if(column1){
-    column1.innerHTML = schedule.list
-      .filter(period => period.col === 1)
-      .map(period => rowHtml(period,schedule))
-      .join("");
-  }
-
-  if(column2){
-    column2.innerHTML = schedule.list
-      .filter(period => period.col === 2)
-      .map(period => rowHtml(period,schedule))
-      .join("");
-  }
-}
-
-let visionIndex = 0;
-
-function updateVision(){
-  setText("visionText", settings.visionMessages[visionIndex]);
-  visionIndex = (visionIndex + 1) % settings.visionMessages.length;
-}
-
-function updateTicker(){
-  const ticker = el("tickerTrack");
-  if(!ticker) return;
-
-  const group = messages
-    .map(message => `<span class="ticker-item">${message}</span>`)
-    .join("");
-
-  ticker.innerHTML = `
-    <div class="ticker-group">${group}</div>
-    <div class="ticker-group">${group}</div>
-  `;
-}
-
-function init(){
-  const logo = el("schoolLogo");
-  if(logo) logo.src = settings.schoolLogo;
-
-  setText("schoolName", settings.schoolName);
-  updateVision();
-  updateTicker();
-}
-
-function tick(){
-  updateClock();
-  updateDate();
-  updateCards();
-  updateRemaining();
-  renderTable();
-}
-
-init();
-tick();
-
-setInterval(tick,1000);
-setInterval(updateVision,5000);
+function getOmanTimeParts(date = new Date()){
+  const parts = new Intl.DateTimeFormat("en-GB",{
+    timeZone: settings.timeZone,
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).formatToParts(date);
