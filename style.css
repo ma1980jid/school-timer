@@ -20,7 +20,6 @@ body{
   justify-content:center;
 }
 
-/* الإطار العام للهاتف */
 .mobile-app{
   position:relative;
   width:min(100vw, calc(100dvh * 768 / 1792));
@@ -32,10 +31,10 @@ body{
 /* شعار المدرسة بجانب شعار وزارة التعليم */
 .top-school-logo{
   position:absolute;
-  top:7.1%;
-  right:18.5%;
-  width:12%;
-  height:6%;
+  top:8.2%;
+  right:20.8%;
+  width:9.2%;
+  height:4.8%;
   z-index:30;
   display:flex;
   align-items:center;
@@ -74,12 +73,12 @@ body{
 
 .period-card span{
   position:absolute;
-  top:25%;
+  top:24%;
   left:50%;
   transform:translateX(-50%);
   width:100%;
   text-align:center;
-  font-size:clamp(11px,2.6vw,16px);
+  font-size:clamp(10px,2.35vw,15px);
   font-weight:900;
   color:#64748b;
   line-height:1.2;
@@ -92,7 +91,7 @@ body{
   transform:translate(-50%,-50%);
   width:100%;
   text-align:center;
-  font-size:clamp(22px,5.4vw,34px);
+  font-size:clamp(21px,5.1vw,32px);
   font-weight:900;
   color:#064b35;
   line-height:1.15;
@@ -105,7 +104,7 @@ body{
   transform:translateX(-50%);
   width:100%;
   text-align:center;
-  font-size:clamp(11px,2.8vw,17px);
+  font-size:clamp(10px,2.55vw,16px);
   font-weight:900;
   color:#111;
   line-height:1.2;
@@ -117,7 +116,7 @@ body{
 }
 
 .period-card.current strong{
-  font-size:clamp(27px,6vw,40px);
+  font-size:clamp(25px,5.7vw,38px);
 }
 
 /* المستطيل الأخضر */
@@ -132,7 +131,6 @@ body{
   overflow:hidden;
 }
 
-/* الساعة والعداد */
 .clock-area{
   position:absolute;
   top:6%;
@@ -179,7 +177,6 @@ body{
   text-align:center;
 }
 
-/* اليوم والتاريخ */
 .date-box{
   position:absolute;
   top:17%;
@@ -202,7 +199,7 @@ body{
   font-size:clamp(17px,4vw,26px);
 }
 
-/* المربعان أسفل المستطيل الأخضر */
+/* المربعان أسفل الأخضر */
 .middle-cards{
   position:absolute;
   top:52.65%;
@@ -230,22 +227,22 @@ body{
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:90%;
-  max-height:88%;
+  width:86%;
+  max-height:72%;
   text-align:center;
   font-weight:900;
-  line-height:1.35;
+  line-height:1.25;
   overflow:hidden;
 }
 
 .school-name-card p{
   color:#064b35;
-  font-size:clamp(15px,3.8vw,23px);
+  font-size:clamp(13px,3.1vw,19px);
 }
 
 .vision-card p{
   color:#8a6418;
-  font-size:clamp(13px,3.25vw,19px);
+  font-size:clamp(12px,2.85vw,17px);
 }
 
 /* جدول الحصص */
@@ -318,7 +315,7 @@ td:nth-child(3){
   color:#0369a1!important;
 }
 
-/* شريط الرسائل السفلي */
+/* شريط الرسائل */
 .ticker{
   position:absolute;
   bottom:2.1%;
