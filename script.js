@@ -1,6 +1,6 @@
 const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
-  schoolLogo: "icons/school_logo.svg",
+  schoolLogo: "school_logo.png",
 
   visionMessages: [
     "رؤيتنا: تعليم ملهم لمستقبل مشرق",
