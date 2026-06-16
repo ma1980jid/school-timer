@@ -207,10 +207,17 @@ function updateAnnouncement(){
 }
 
 function updateTicker(){
-  const ticker = el("tickerText");
+  const ticker = el("tickerTrack");
   if(!ticker) return;
 
-  ticker.textContent = messages.join("          •          ");
+  const group = messages
+    .map(message => `<span class="ticker-item">${message}</span>`)
+    .join("");
+
+  ticker.innerHTML = `
+    <div class="ticker-group">${group}</div>
+    <div class="ticker-group">${group}</div>
+  `;
 }
 
 function init(){
