@@ -23,14 +23,14 @@ body{
   overflow:hidden;
 }
 
-/* شعار المدرسة بجانب شعار وزارة التعليم */
+/* شعار المدرسة بجانب شعار وزارة التعليم أعلى اليمين */
 .top-school-logo{
   position:absolute;
-  top:6.2%;
-  right:63%;
-  width:17%;
-  height:8.5%;
-  z-index:5;
+  top:6.4%;
+  right:77%;
+  width:13%;
+  height:7%;
+  z-index:10;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -41,6 +41,7 @@ body{
   width:100%;
   height:100%;
   object-fit:contain;
+  display:block;
 }
 
 /* البطاقات العلوية */
@@ -61,6 +62,14 @@ body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  text-align:center;
+  padding:0 4px;
+}
+
+.period-card span,
+.period-card strong,
+.period-card small{
+  width:100%;
   text-align:center;
 }
 
@@ -154,7 +163,7 @@ body{
   font-size:clamp(16px,4vw,25px);
 }
 
-/* المربعان أسفل المربع الأخضر */
+/* المربعان أسفل الأخضر */
 .middle-cards{
   position:absolute;
   top:52.7%;
@@ -172,23 +181,10 @@ body{
   justify-content:center;
   text-align:center;
   overflow:hidden;
-  padding:4px 8px;
+  padding:0 10px;
 }
 
-.school-name-card p{
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:#064b35;
-  font-size:clamp(15px,3.7vw,23px);
-  font-weight:900;
-  line-height:1.35;
-  padding:0 8px;
-}
-
+.school-name-card p,
 .vision-card p{
   width:100%;
   height:100%;
@@ -196,11 +192,19 @@ body{
   align-items:center;
   justify-content:center;
   text-align:center;
+  line-height:1.35;
+  font-weight:900;
+  overflow:hidden;
+}
+
+.school-name-card p{
+  color:#064b35;
+  font-size:clamp(15px,3.7vw,23px);
+}
+
+.vision-card p{
   color:#8a6418;
   font-size:clamp(13px,3.2vw,19px);
-  font-weight:900;
-  line-height:1.35;
-  padding:0 8px;
 }
 
 /* الجدول */
@@ -237,21 +241,9 @@ td{
   background:rgba(255,255,255,.28);
 }
 
-td:nth-child(1){
-  width:36%;
-  color:#064b35;
-}
-
-td:nth-child(2){
-  width:42%;
-  color:#111;
-  font-size:clamp(9px,2.4vw,15px);
-}
-
-td:nth-child(3){
-  width:22%;
-  color:#0f766e;
-}
+td:nth-child(1){width:36%;color:#064b35}
+td:nth-child(2){width:42%;color:#111;font-size:clamp(9px,2.4vw,15px)}
+td:nth-child(3){width:22%;color:#0f766e}
 
 .current-row td{
   color:#c91414!important;
@@ -282,28 +274,24 @@ td:nth-child(3){
   width:max-content;
   white-space:nowrap;
   will-change:transform;
-  animation:tickerMove 42s linear infinite;
+  animation:tickerMove 55s linear infinite;
 }
 
 .ticker-group{
   display:flex;
   align-items:center;
   white-space:nowrap;
-  padding-inline:38px;
+  padding-inline:90px;
 }
 
 .ticker-item{
   font-size:clamp(14px,3.5vw,22px);
   font-weight:900;
   color:#f7e6b0;
-  padding-inline:28px;
+  padding-inline:70px;
 }
 
 @keyframes tickerMove{
-  from{
-    transform:translateX(-50%);
-  }
-  to{
-    transform:translateX(0);
-  }
+  from{transform:translateX(-50%)}
+  to{transform:translateX(0)}
 }
