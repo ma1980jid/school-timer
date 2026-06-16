@@ -23,6 +23,26 @@ body{
   overflow:hidden;
 }
 
+/* شعار المدرسة بجانب شعار وزارة التعليم */
+.top-school-logo{
+  position:absolute;
+  top:6.4%;
+  right:63%;
+  width:15%;
+  height:8%;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.top-school-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
 /* البطاقات العلوية */
 .period-cards{
   position:absolute;
@@ -134,7 +154,7 @@ body{
   font-size:clamp(16px,4vw,25px);
 }
 
-/* الإعلان والشعار */
+/* المربعان أسفل المربع الأخضر */
 .middle-cards{
   position:absolute;
   top:52.7%;
@@ -147,45 +167,42 @@ body{
 }
 
 .mini-card{
-  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
   overflow:hidden;
-  padding:0;
+  padding:4px 8px;
 }
 
-/* الإعلان في مركز المربع */
-.announcement-card p{
-  position:absolute;
-  inset:0;
+/* المربع الأيمن: اسم المدرسة */
+.school-name-card p{
   width:100%;
   height:100%;
-  padding:0 10%;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  font-size:clamp(14px,3.6vw,22px);
-  font-weight:900;
   color:#064b35;
+  font-size:clamp(15px,3.7vw,23px);
+  font-weight:900;
   line-height:1.35;
-  overflow:hidden;
+  padding:0 8px;
 }
 
-/* تكبير الشعار داخل المربع */
-.logo-card img{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:145%;
-  height:145%;
-  max-width:none;
-  max-height:none;
-  object-fit:contain;
-  transform:translate(-50%,-50%);
-  display:block;
+/* المربع الأيسر: رؤية ورسالة المدرسة */
+.vision-card p{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#8a6418;
+  font-size:clamp(13px,3.2vw,19px);
+  font-weight:900;
+  line-height:1.35;
+  padding:0 8px;
 }
 
 /* الجدول */
@@ -248,7 +265,7 @@ td:nth-child(3){
 .prayer-row td{color:#b45309!important}
 .activity-row td{color:#0369a1!important}
 
-/* شريط الرسائل المستمر */
+/* شريط الرسائل */
 .ticker{
   position:absolute;
   bottom:2.1%;
@@ -291,51 +308,4 @@ td:nth-child(3){
   to{
     transform:translateX(0);
   }
-}
-.middle-cards{
-  display:none!important;
-}
-
-.announcement-layer{
-  position:absolute;
-  top:52.7%;
-  right:7%;
-  width:42.5%;
-  height:7.5%;
-  z-index:5;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  overflow:hidden;
-  padding:0 6%;
-}
-
-.announcement-layer p{
-  width:100%;
-  margin:0;
-  color:#064b35;
-  font-size:clamp(14px,3.6vw,22px);
-  font-weight:900;
-  line-height:1.35;
-  text-align:center;
-}
-
-.school-logo-layer{
-  position:absolute;
-  top:52.7%;
-  left:7%;
-  width:42.5%;
-  height:7.5%;
-  z-index:5;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-.school-logo-layer img{
-  width:88%;
-  height:88%;
-  object-fit:contain;
 }
