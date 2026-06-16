@@ -1,4 +1,8 @@
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
 html,body{
   width:100%;
@@ -23,17 +27,18 @@ body{
   overflow:hidden;
 }
 
-/* شعار المدرسة بجانب شعار وزارة التعليم في أعلى اليمين */
+/* شعار المدرسة بجانب شعار وزارة التعليم أعلى اليمين */
 .top-school-logo{
   position:absolute;
-  top:6.2%;
-  right:19%;
-  width:13%;
-  height:7%;
+  top:9.4%;
+  right:27%;
+  width:12%;
+  height:5.8%;
   z-index:20;
   display:flex;
   align-items:center;
   justify-content:center;
+  overflow:hidden;
 }
 
 .top-school-logo img{
@@ -58,10 +63,10 @@ body{
 
 .period-card{
   position:relative;
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-rows:auto auto auto;
   align-items:center;
-  justify-content:center;
+  justify-items:center;
   text-align:center;
   padding:0 6px;
 }
@@ -69,8 +74,10 @@ body{
 .period-card span,
 .period-card strong,
 .period-card small{
-  display:block;
   width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   text-align:center;
 }
 
@@ -179,12 +186,11 @@ body{
 
 .mini-card{
   position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:grid;
+  place-items:center;
   text-align:center;
   overflow:hidden;
-  padding:0 12px;
+  padding:0 10px;
 }
 
 .school-name-card p,
@@ -193,7 +199,7 @@ body{
   inset:0;
   width:100%;
   height:100%;
-  padding:0 12px;
+  padding:0 14px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -213,7 +219,7 @@ body{
   font-size:clamp(13px,3.2vw,19px);
 }
 
-/* الجدول */
+/* جدول الحصص */
 .schedule-section{
   position:absolute;
   top:62.8%;
@@ -247,9 +253,21 @@ td{
   background:rgba(255,255,255,.28);
 }
 
-td:nth-child(1){width:36%;color:#064b35}
-td:nth-child(2){width:42%;color:#111;font-size:clamp(9px,2.4vw,15px)}
-td:nth-child(3){width:22%;color:#0f766e}
+td:nth-child(1){
+  width:36%;
+  color:#064b35;
+}
+
+td:nth-child(2){
+  width:42%;
+  color:#111;
+  font-size:clamp(9px,2.4vw,15px);
+}
+
+td:nth-child(3){
+  width:22%;
+  color:#0f766e;
+}
 
 .current-row td{
   color:#c91414!important;
@@ -257,9 +275,17 @@ td:nth-child(3){width:22%;color:#0f766e}
   font-size:clamp(10px,2.6vw,16px);
 }
 
-.break-row td{color:#7c3aed!important}
-.prayer-row td{color:#b45309!important}
-.activity-row td{color:#0369a1!important}
+.break-row td{
+  color:#7c3aed!important;
+}
+
+.prayer-row td{
+  color:#b45309!important;
+}
+
+.activity-row td{
+  color:#0369a1!important;
+}
 
 /* شريط الرسائل */
 .ticker{
@@ -298,6 +324,10 @@ td:nth-child(3){width:22%;color:#0f766e}
 }
 
 @keyframes tickerMove{
-  from{transform:translateX(-50%)}
-  to{transform:translateX(0)}
+  from{
+    transform:translateX(-50%);
+  }
+  to{
+    transform:translateX(0);
+  }
 }
