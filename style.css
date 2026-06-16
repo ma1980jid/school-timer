@@ -626,3 +626,193 @@ td:nth-child(3){
   font-size:clamp(14px,3.5vw,22px) !important;
   color:#8a6418 !important;
 }
+/* ضبط نهائي للشاشات المختلفة: iPhone / Honor / Android */
+
+:root{
+  --arabic-font: Tahoma, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", "Droid Arabic Kufi", "Segoe UI", sans-serif;
+}
+
+html,
+body,
+.mobile-app{
+  font-family:var(--arabic-font) !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+
+.mobile-app{
+  container-type:inline-size;
+}
+
+/* رفع شعار المدرسة */
+.top-school-logo{
+  top:4.8% !important;
+  right:18.4% !important;
+  width:13.6% !important;
+  height:7% !important;
+  z-index:60 !important;
+}
+
+.top-school-logo img,
+#schoolLogo{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  display:block !important;
+}
+
+/* البطاقات الثلاث العلوية */
+.period-card{
+  position:relative !important;
+  display:block !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+.period-card span{
+  position:absolute !important;
+  top:14.5% !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:100% !important;
+  text-align:center !important;
+  font-size:clamp(11px,2.45vw,15px) !important;
+  font-weight:900 !important;
+  line-height:1.12 !important;
+}
+
+.period-card strong{
+  position:absolute !important;
+  top:47.5% !important;
+  left:50% !important;
+  transform:translate(-50%,-50%) !important;
+  width:100% !important;
+  text-align:center !important;
+  font-size:clamp(23px,5.45vw,35px) !important;
+  font-weight:900 !important;
+  line-height:1.02 !important;
+}
+
+.period-card.current strong{
+  font-size:clamp(24px,5.6vw,36px) !important;
+}
+
+.period-card small{
+  position:absolute !important;
+  top:74.5% !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:100% !important;
+  text-align:center !important;
+  font-size:clamp(11px,2.65vw,16px) !important;
+  font-weight:900 !important;
+  line-height:1.15 !important;
+}
+
+/* في المتصفحات التي تدعم حجم خط بحسب عرض التطبيق */
+@supports (font-size:1cqw){
+  .period-card span{
+    font-size:clamp(11px,2.75cqw,15px) !important;
+  }
+
+  .period-card strong{
+    font-size:clamp(23px,5.85cqw,35px) !important;
+  }
+
+  .period-card.current strong{
+    font-size:clamp(24px,6cqw,36px) !important;
+  }
+
+  .period-card small{
+    font-size:clamp(11px,2.95cqw,16px) !important;
+  }
+}
+
+/* التوقيت من اليمين إلى اليسار */
+.period-card small,
+.time-cell{
+  direction:rtl !important;
+  unicode-bidi:normal !important;
+}
+
+.time-range{
+  display:inline-flex !important;
+  flex-direction:row-reverse !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:.24em !important;
+  white-space:nowrap !important;
+  direction:rtl !important;
+}
+
+.time-start,
+.time-end{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+}
+
+.time-separator{
+  direction:rtl !important;
+}
+
+/* المربعان تحت اللوحة الخضراء */
+.mini-card{
+  position:relative !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 8% !important;
+  text-align:center !important;
+  overflow:hidden !important;
+}
+
+.school-name-card p,
+.vision-card p{
+  position:absolute !important;
+  top:52% !important;
+  left:50% !important;
+  transform:translate(-50%,-50%) !important;
+  width:88% !important;
+  max-height:88% !important;
+  margin:0 !important;
+  text-align:center !important;
+  font-weight:900 !important;
+  line-height:1.18 !important;
+  overflow:hidden !important;
+}
+
+.school-name-card p{
+  font-size:clamp(14px,3.35vw,20px) !important;
+  color:#064b35 !important;
+}
+
+.vision-card p{
+  font-size:clamp(13px,3.2vw,19px) !important;
+  color:#8a6418 !important;
+}
+
+@supports (font-size:1cqw){
+  .school-name-card p{
+    font-size:clamp(14px,3.55cqw,20px) !important;
+  }
+
+  .vision-card p{
+    font-size:clamp(13px,3.4cqw,19px) !important;
+  }
+}
+
+/* تحسين الجدول في أندرويد عند اختلاف الخطوط */
+td{
+  line-height:1.12 !important;
+}
+
+td:nth-child(2){
+  white-space:nowrap !important;
+  font-size:clamp(8px,2.15vw,13px) !important;
+}
+
+.status-cell .duration-text{
+  font-size:.72em !important;
+  line-height:1.05 !important;
+}
