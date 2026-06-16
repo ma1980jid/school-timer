@@ -41,9 +41,7 @@ function el(id){
 
 function setText(id,value){
   const element = el(id);
-  if(element){
-    element.textContent = value;
-  }
+  if(element) element.textContent = value;
 }
 
 function pad(number){
@@ -64,14 +62,8 @@ function getVisiblePeriods(){
   const today = new Date().getDay();
 
   return periods.filter(period=>{
-    if(period.optionalPrayer && !settings.showPrayer){
-      return false;
-    }
-
-    if(period.activityOnly && today !== settings.activityDay){
-      return false;
-    }
-
+    if(period.optionalPrayer && !settings.showPrayer) return false;
+    if(period.activityOnly && today !== settings.activityDay) return false;
     return true;
   });
 }
@@ -228,10 +220,7 @@ function updateTicker(){
 
 function init(){
   const logo = el("schoolLogo");
-
-  if(logo){
-    logo.src = settings.schoolLogo;
-  }
+  if(logo) logo.src = settings.schoolLogo;
 
   setText("schoolName", settings.schoolName);
   updateVision();
