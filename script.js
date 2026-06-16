@@ -86,6 +86,39 @@ function toMinutes(time){
 }
 
 function formatTime(time){
+  function normalizePeriod(period, baseStart){
+  let startMinutes = toMinutes(period.start);
+  let endMinutes = toMinutes(period.end);
+
+  if(startMinutes < baseStart){
+    startMinutes += 1440;
+  }
+
+  if(endMinutes <= startMinutes){
+    endMinutes += 1440;
+  }
+
+  return {
+    ...period,
+    startMinutes,
+    endMinutes
+  };
+}
+
+function getDurationMinutes(period){
+  let startMinutes = period.startMinutes ?? toMinutes(period.start);
+  let endMinutes = period.endMinutes ?? toMinutes(period.end);
+
+  if(endMinutes <= startMinutes){
+    endMinutes += 1440;
+  }
+
+  return endMinutes - startMinutes;
+}
+
+function formatDuration(period){
+  return `${getDurationMinutes(period)} دقيقة`;
+}
   const [hours,minutes] = time.split(":").map(Number);
   return `${pad(hours)}:${pad(minutes)}`;
 }
@@ -149,30 +182,59 @@ function getSchedule(){
   const now = new Date();
   const time = getOmanTimeParts(now);
 
-  const currentMinutes =
+  const rawCurrentMinutes =
     time.hour * 60 +
     time.minute +
     time.second / 60;
 
-  const list = getVisiblePeriods();
-  const first = list[0] || null;
-  const last = list[list.length - 1] || null;
+  const visibleList = getVisiblePeriods();
+  const firstVisible = visibleList[0] || null;
+
+  if(!firstVisible){
+    return {
+      now,
+      time,
+      currentMinutes:rawCurrentMinutes,
+      list:[],
+      first:null,
+      last:null,
+      current:null,
+      previous:null,
+      next:null,
+      beforeSchool:false,
+      afterSchool:false
+    };
+  }
+
+  const baseStart = toMinutes(firstVisible.start);
+  const list = visibleList.map(period => normalizePeriod(period, baseStart));
+  const first = list[0];
+  const last = list[list.length - 1];
+
+  let currentMinutes = rawCurrentMinutes;
+
+  const crossesMidnight = last.endMinutes >= 1440;
+  const lastEndAfterMidnight = last.endMinutes - 1440;
+
+  if(crossesMidnight && rawCurrentMinutes <= lastEndAfterMidnight){
+    currentMinutes += 1440;
+  }
 
   const current = list.find(period =>
-    currentMinutes >= toMinutes(period.start) &&
-    currentMinutes < toMinutes(period.end)
+    currentMinutes >= period.startMinutes &&
+    currentMinutes < period.endMinutes
   ) || null;
 
   const previous = [...list].reverse().find(period =>
-    currentMinutes >= toMinutes(period.end)
+    currentMinutes >= period.endMinutes
   ) || null;
 
   const next = list.find(period =>
-    currentMinutes < toMinutes(period.start)
+    currentMinutes < period.startMinutes
   ) || null;
 
-  const beforeSchool = first ? currentMinutes < toMinutes(first.start) : false;
-  const afterSchool = last ? currentMinutes >= toMinutes(last.end) : false;
+  const beforeSchool = currentMinutes < first.startMinutes;
+  const afterSchool = currentMinutes >= last.endMinutes;
 
   return {
     now,
@@ -313,12 +375,29 @@ function createCell(text,className){
   return cell;
 }
 
+function createStatusCell(state,period){
+  const cell = document.createElement("td");
+  const stateText = document.createElement("span");
+  const durationText = document.createElement("small");
+
+  cell.className = "status-cell";
+  stateText.className = "state-text";
+  durationText.className = "duration-text";
+
+  stateText.textContent = state;
+  durationText.textContent = formatDuration(period);
+
+  cell.append(stateText,durationText);
+
+  return cell;
+}
+
 function createRow(period,schedule){
   let state = "قادمة";
 
   if(schedule.current === period){
     state = "جارية";
-  }else if(schedule.currentMinutes >= toMinutes(period.end)){
+  }else if(schedule.currentMinutes >= period.endMinutes){
     state = "انتهت";
   }
 
@@ -343,7 +422,7 @@ function createRow(period,schedule){
   row.append(
     createCell(period.name),
     createCell(periodRange(period),"time-cell"),
-    createCell(state)
+    createStatusCell(state,period)
   );
 
   return row;
