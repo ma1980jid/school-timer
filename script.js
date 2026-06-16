@@ -16,19 +16,18 @@ const settings = {
 };
 
 const periods = [
-  {name:"الطابور",start:"05:00",end:"05:10",type:"normal",col:1},
-  {name:"النشاط",start:"05:10",end:"05:55",type:"activity",col:1,activityOnly:true},
-  {name:"الأولى",start:"05:55",end:"06:40",type:"normal",col:1},
-  {name:"الثانية",start:"06:40",end:"07:25",type:"normal",col:1},
-  {name:"الثالثة",start:"07:25",end:"08:10",type:"normal",col:1},
-  {name:"الرابعة",start:"08:10",end:"08:55",type:"normal",col:1},
+  {name:"الطابور",start:"19:00",end:"19:15",type:"normal",col:1},
+  {name:"الأولى",start:"19:15",end:"19:55",type:"normal",col:1},
+  {name:"الثانية",start:"19:55",end:"20:35",type:"normal",col:1},
+  {name:"الثالثة",start:"20:35",end:"21:15",type:"normal",col:1},
+  {name:"الرابعة",start:"21:15",end:"21:55",type:"normal",col:1},
 
-  {name:"الفسحة",start:"08:55",end:"09:15",type:"break",col:2},
-  {name:"الخامسة",start:"09:15",end:"10:00",type:"normal",col:2},
-  {name:"السادسة",start:"10:00",end:"10:45",type:"normal",col:2},
-  {name:"السابعة",start:"10:45",end:"11:30",type:"normal",col:2},
-  {name:"الصلاة",start:"11:30",end:"11:45",type:"prayer",col:2,optionalPrayer:true},
-  {name:"الثامنة",start:"11:45",end:"12:30",type:"normal",col:2}
+  {name:"الفسحة",start:"21:55",end:"22:15",type:"break",col:2},
+  {name:"الخامسة",start:"22:15",end:"22:55",type:"normal",col:2},
+  {name:"السادسة",start:"22:55",end:"23:35",type:"normal",col:2},
+  {name:"السابعة",start:"23:35",end:"00:15",type:"normal",col:2},
+  {name:"الصلاة",start:"00:15",end:"00:35",type:"prayer",col:2,optionalPrayer:true},
+  {name:"الثامنة",start:"00:35",end:"01:15",type:"normal",col:2}
 ];
 
 const messages = [
