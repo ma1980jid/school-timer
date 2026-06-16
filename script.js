@@ -2,13 +2,10 @@ const settings = {
   schoolLogo: "icons/school_logo.svg",
 
   announcements: [
-    "الالتزام بالحضور والانصراف في الوقت المحدد",
-    "المحافظة على نظافة المدرسة",
-    "الانضباط طريق النجاح"
+    "الالتزام بالحضور والانصراف في الوقت المحدد"
   ],
 
   showPrayer: true,
-
   activityDay: 1
 };
 
@@ -99,14 +96,7 @@ function getSchedule(){
     currentMinutes < toMinutes(period.start)
   );
 
-  return {
-    now,
-    currentMinutes,
-    list,
-    current,
-    previous,
-    next
-  };
+  return {now,currentMinutes,list,current,previous,next};
 }
 
 function updateCards(){
@@ -130,9 +120,7 @@ function updateClock(){
 function updateDate(){
   const now = new Date();
 
-  setText("weekday", new Intl.DateTimeFormat("ar-OM",{
-    weekday:"long"
-  }).format(now));
+  setText("weekday", new Intl.DateTimeFormat("ar-OM",{weekday:"long"}).format(now));
 
   setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
     day:"numeric",
@@ -222,7 +210,7 @@ function updateTicker(){
   const ticker = el("tickerText");
   if(!ticker) return;
 
-  ticker.textContent = messages.join("   •   ");
+  ticker.textContent = messages.join("     •     ");
 }
 
 function init(){
