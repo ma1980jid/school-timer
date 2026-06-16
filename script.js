@@ -524,6 +524,14 @@ function createStatusCell(state,period){
 
   return cell;
 }
+function createTimeCell(period){
+  const cell = document.createElement("td");
+
+  cell.className = "time-cell";
+  cell.appendChild(createTimeRange(period));
+
+  return cell;
+}
 
 function createRow(period,schedule){
   let state = "قادمة";
@@ -554,7 +562,7 @@ function createRow(period,schedule){
 
   row.append(
     createCell(period.name),
-    createCell(periodRange(period),"time-cell"),
+    createTimeCell(period),
     createStatusCell(state,period)
   );
 
