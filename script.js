@@ -15,7 +15,7 @@ const settings = {
   activityDay: 1
 };
 
-const periods = [
+const defaultPeriods = [
   {name:"الطابور",start:"19:00",end:"19:15",type:"normal",col:1},
   {name:"الأولى",start:"19:15",end:"19:55",type:"normal",col:1},
   {name:"الثانية",start:"19:55",end:"20:35",type:"normal",col:1},
@@ -29,6 +29,8 @@ const periods = [
   {name:"الصلاة",start:"00:15",end:"00:35",type:"prayer",col:2,optionalPrayer:true},
   {name:"الثامنة",start:"00:35",end:"01:15",type:"normal",col:2}
 ];
+
+const periods = loadPeriods();
 
 const messages = [
   "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري",
@@ -46,6 +48,95 @@ const dayMap = {
   Fri:5,
   Sat:6
 };
+
+function loadPeriods(){
+  const stored = readStoredPeriods();
+
+  if(stored && stored.length){
+    return stored;
+  }
+
+  return defaultPeriods;
+}
+
+function readStoredPeriods(){
+  const keys = [
+    "schoolTimerPeriods",
+    "schoolPeriods",
+    "periods",
+    "schoolSchedule",
+    "schoolSettings",
+    "schoolTimerSettings"
+  ];
+
+  try{
+    for(const key of keys){
+      const raw = localStorage.getItem(key);
+
+      if(!raw){
+        continue;
+      }
+
+      const data = JSON.parse(raw);
+      const extracted = extractPeriods(data);
+
+      if(extracted && extracted.length){
+        return extracted;
+      }
+    }
+  }catch(error){
+    return null;
+  }
+
+  return null;
+}
+
+function extractPeriods(data){
+  if(Array.isArray(data)){
+    return cleanPeriods(data);
+  }
+
+  if(!data || typeof data !== "object"){
+    return null;
+  }
+
+  const candidates = [
+    data.periods,
+    data.schedule,
+    data.schoolPeriods,
+    data.schoolSchedule,
+    data.settings && data.settings.periods,
+    data.schoolSettings && data.schoolSettings.periods
+  ];
+
+  for(const candidate of candidates){
+    if(Array.isArray(candidate)){
+      return cleanPeriods(candidate);
+    }
+  }
+
+  return null;
+}
+
+function cleanPeriods(list){
+  return list
+    .map((period,index)=>{
+      if(!period || !period.name || !period.start || !period.end){
+        return null;
+      }
+
+      return {
+        name:String(period.name),
+        start:String(period.start),
+        end:String(period.end),
+        type:period.type || "normal",
+        col:Number(period.col) || (index < 5 ? 1 : 2),
+        optionalPrayer:Boolean(period.optionalPrayer),
+        activityOnly:Boolean(period.activityOnly)
+      };
+    })
+    .filter(Boolean);
+}
 
 function updateViewportHeight(){
   const viewport = window.visualViewport;
@@ -73,7 +164,10 @@ function el(id){
 
 function setText(id,value){
   const element = el(id);
-  if(element) element.textContent = value;
+
+  if(element){
+    element.textContent = value;
+  }
 }
 
 function pad(number){
@@ -82,11 +176,17 @@ function pad(number){
 
 function toMinutes(time){
   const [hours,minutes] = time.split(":").map(Number);
+
   return hours * 60 + minutes;
 }
 
 function formatTime(time){
-  function normalizePeriod(period, baseStart){
+  const [hours,minutes] = time.split(":").map(Number);
+
+  return `${pad(hours)}:${pad(minutes)}`;
+}
+
+function normalizePeriod(period,baseStart){
   let startMinutes = toMinutes(period.start);
   let endMinutes = toMinutes(period.end);
 
@@ -113,23 +213,20 @@ function getDurationMinutes(period){
     endMinutes += 1440;
   }
 
-  return endMinutes - startMinutes;
+  return Math.round(endMinutes - startMinutes);
 }
 
 function formatDuration(period){
   return `${getDurationMinutes(period)} دقيقة`;
 }
-  const [hours,minutes] = time.split(":").map(Number);
-  return `${pad(hours)}:${pad(minutes)}`;
-}
 
 function getOmanTimeParts(date = new Date()){
   const parts = new Intl.DateTimeFormat("en-GB",{
-    timeZone: settings.timeZone,
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
+    timeZone:settings.timeZone,
+    hour12:false,
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit"
   }).formatToParts(date);
 
   const values = {};
@@ -155,8 +252,8 @@ function getOmanTimeParts(date = new Date()){
 
 function getOmanDay(date = new Date()){
   const dayName = new Intl.DateTimeFormat("en-US",{
-    timeZone: settings.timeZone,
-    weekday: "short"
+    timeZone:settings.timeZone,
+    weekday:"short"
   }).format(date);
 
   return dayMap[dayName] ?? new Date().getDay();
@@ -207,9 +304,10 @@ function getSchedule(){
   }
 
   const baseStart = toMinutes(firstVisible.start);
-  const list = visibleList.map(period => normalizePeriod(period, baseStart));
-  const first = list[0];
-  const last = list[list.length - 1];
+  const list = visibleList.map(period => normalizePeriod(period,baseStart));
+  const ordered = [...list].sort((a,b)=>a.startMinutes - b.startMinutes);
+  const first = ordered[0];
+  const last = ordered[ordered.length - 1];
 
   let currentMinutes = rawCurrentMinutes;
 
@@ -220,16 +318,16 @@ function getSchedule(){
     currentMinutes += 1440;
   }
 
-  const current = list.find(period =>
+  const current = ordered.find(period =>
     currentMinutes >= period.startMinutes &&
     currentMinutes < period.endMinutes
   ) || null;
 
-  const previous = [...list].reverse().find(period =>
+  const previous = [...ordered].reverse().find(period =>
     currentMinutes >= period.endMinutes
   ) || null;
 
-  const next = list.find(period =>
+  const next = ordered.find(period =>
     currentMinutes < period.startMinutes
   ) || null;
 
@@ -293,23 +391,23 @@ function updateDate(){
   const now = new Date();
 
   setText("weekday", new Intl.DateTimeFormat("ar-OM",{
-    timeZone: settings.timeZone,
-    weekday: "long"
+    timeZone:settings.timeZone,
+    weekday:"long"
   }).format(now));
 
   setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
-    timeZone: settings.timeZone,
-    day: "numeric",
-    month: "long",
-    year: "numeric"
+    timeZone:settings.timeZone,
+    day:"numeric",
+    month:"long",
+    year:"numeric"
   }).format(now));
 
   try{
     setText("hijriDate", new Intl.DateTimeFormat("ar-OM-u-ca-islamic",{
-      timeZone: settings.timeZone,
-      day: "numeric",
-      month: "long",
-      year: "numeric"
+      timeZone:settings.timeZone,
+      day:"numeric",
+      month:"long",
+      year:"numeric"
     }).format(now));
   }catch(error){
     setText("hijriDate","");
@@ -333,8 +431,8 @@ function updateRemaining(){
   const schedule = getSchedule();
 
   if(schedule.current){
-    const end = toMinutes(schedule.current.end);
-    const remainingSeconds = (end - schedule.currentMinutes) * 60;
+    const remainingSeconds =
+      (schedule.current.endMinutes - schedule.currentMinutes) * 60;
 
     setText("countLabel","متبقي من الحصة الحالية");
     setText("remainingTime",formatCountdown(remainingSeconds));
@@ -342,8 +440,8 @@ function updateRemaining(){
   }
 
   if(schedule.beforeSchool && schedule.first){
-    const start = toMinutes(schedule.first.start);
-    const remainingSeconds = (start - schedule.currentMinutes) * 60;
+    const remainingSeconds =
+      (schedule.first.startMinutes - schedule.currentMinutes) * 60;
 
     setText("countLabel","متبقي على بداية الدوام");
     setText("remainingTime",formatCountdown(remainingSeconds));
@@ -351,8 +449,8 @@ function updateRemaining(){
   }
 
   if(schedule.next){
-    const start = toMinutes(schedule.next.start);
-    const remainingSeconds = (start - schedule.currentMinutes) * 60;
+    const remainingSeconds =
+      (schedule.next.startMinutes - schedule.currentMinutes) * 60;
 
     setText("countLabel","متبقي على الحصة القادمة");
     setText("remainingTime",formatCountdown(remainingSeconds));
