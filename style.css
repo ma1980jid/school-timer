@@ -1,3 +1,203 @@
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --app-height:100vh;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+}
+
+@supports (height:100svh){
+  :root{
+    --app-height:100svh;
+  }
+}
+
+html,
+body{
+  width:100%;
+  min-height:100%;
+  font-family:Tahoma,Arial,sans-serif;
+  background:#f8f2e8;
+  color:#064b35;
+}
+
+body{
+  min-height:var(--app-height);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.mobile-app{
+  position:relative;
+  aspect-ratio:9 / 16;
+  width:min(100vw, calc(var(--app-height) * 9 / 16));
+  height:min(var(--app-height), calc(100vw * 16 / 9));
+  flex:0 0 auto;
+  background:url("mobile-bg.png") center/100% 100% no-repeat;
+  overflow:hidden;
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  html,
+  body{
+    overflow-x:hidden;
+    overflow-y:auto;
+  }
+
+  body{
+    align-items:flex-start;
+    min-height:var(--app-height);
+    padding:
+      max(8px,var(--safe-top))
+      max(8px,var(--safe-right))
+      max(8px,var(--safe-bottom))
+      max(8px,var(--safe-left));
+  }
+
+  .mobile-app{
+    width:min(calc(100vw - 16px), 520px);
+    height:auto;
+  }
+}
+
+.top-school-logo{
+  position:absolute;
+  top:8.2%;
+  right:20.8%;
+  width:9.2%;
+  height:4.8%;
+  z-index:30;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.top-school-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.period-cards{
+  position:absolute;
+  top:19.65%;
+  left:7.3%;
+  right:7.3%;
+  height:11.25%;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4.2%;
+  direction:rtl;
+  z-index:10;
+}
+
+.period-card{
+  position:relative;
+  width:100%;
+  height:100%;
+  text-align:center;
+  overflow:hidden;
+}
+
+.period-card span{
+  position:absolute;
+  top:24%;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  text-align:center;
+  font-size:clamp(10px,2.35vw,15px);
+  font-weight:900;
+  color:#64748b;
+  line-height:1.2;
+}
+
+.period-card strong{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:100%;
+  text-align:center;
+  font-size:clamp(20px,5vw,32px);
+  font-weight:900;
+  color:#064b35;
+  line-height:1.15;
+}
+
+.period-card small{
+  position:absolute;
+  top:72%;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  text-align:center;
+  font-size:clamp(10px,2.55vw,16px);
+  font-weight:900;
+  color:#111;
+  line-height:1.2;
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+
+.period-card.current span,
+.period-card.current strong{
+  color:#c91414;
+}
+
+.period-card.current strong{
+  font-size:clamp(23px,5.45vw,36px);
+}
+
+.clock-panel{
+  position:absolute;
+  top:33.65%;
+  left:7.2%;
+  right:7.2%;
+  height:15.75%;
+  color:#fff;
+  z-index:10;
+  overflow:hidden;
+}
+
+.clock-area{
+  position:absolute;
+  top:6%;
+  right:4%;
+  width:58%;
+  height:88%;
+  text-align:center;
+}
+
+.digital-clock{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  font-family:"Courier New",monospace;
+  font-size:clamp(40px,9.6vw,70px);
+  font-weight:900;
+  line-height:1;
+  color:#fff;
+  text-shadow:0 4px 8px rgba(0,0,0,.35);
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+
+.count-label{
+  position:absolute;
+  top:39%;
+  left:0;
   right:0;
   font-size:clamp(12px,3vw,20px);
   font-weight:900;
