@@ -357,15 +357,50 @@ function periodRange(period){
   return `${formatTime(period.start)} - ${formatTime(period.end)}`;
 }
 
+function createTimeRange(period){
+  const wrap = document.createElement("span");
+  const start = document.createElement("span");
+  const separator = document.createElement("span");
+  const end = document.createElement("span");
+
+  wrap.className = "time-range";
+  start.className = "time-start";
+  separator.className = "time-separator";
+  end.className = "time-end";
+
+  start.textContent = formatTime(period.start);
+  separator.textContent = "-";
+  end.textContent = formatTime(period.end);
+
+  wrap.append(start,separator,end);
+
+  return wrap;
+}
+
+function setTimeRange(id,period){
+  const element = el(id);
+
+  if(!element){
+    return;
+  }
+
+  if(!period){
+    element.textContent = "--";
+    return;
+  }
+
+  element.replaceChildren(createTimeRange(period));
+}
+
 function updateCards(){
   const schedule = getSchedule();
 
   setText("previousName", schedule.previous ? schedule.previous.name : "--");
-  setText("previousTime", schedule.previous ? periodRange(schedule.previous) : "--");
+  setTimeRange("previousTime", schedule.previous);
 
   if(schedule.current){
     setText("currentName", schedule.current.name);
-    setText("currentTime", periodRange(schedule.current));
+    setTimeRange("currentTime", schedule.current);
   }else if(schedule.beforeSchool){
     setText("currentName", "لم يبدأ الدوام");
     setText("currentTime", "--");
@@ -378,7 +413,7 @@ function updateCards(){
   }
 
   setText("nextName", schedule.next ? schedule.next.name : "--");
-  setText("nextTime", schedule.next ? periodRange(schedule.next) : "--");
+  setTimeRange("nextTime", schedule.next);
 }
 
 function updateClock(){
