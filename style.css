@@ -292,3 +292,50 @@ td:nth-child(3){
     transform:translateX(0);
   }
 }
+.middle-cards{
+  display:none!important;
+}
+
+.announcement-layer{
+  position:absolute;
+  top:52.7%;
+  right:7%;
+  width:42.5%;
+  height:7.5%;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+  padding:0 6%;
+}
+
+.announcement-layer p{
+  width:100%;
+  margin:0;
+  color:#064b35;
+  font-size:clamp(14px,3.6vw,22px);
+  font-weight:900;
+  line-height:1.35;
+  text-align:center;
+}
+
+.school-logo-layer{
+  position:absolute;
+  top:52.7%;
+  left:7%;
+  width:42.5%;
+  height:7.5%;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.school-logo-layer img{
+  width:88%;
+  height:88%;
+  object-fit:contain;
+}
