@@ -1,100 +1,209 @@
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
+  right:0;
+  font-size:clamp(12px,3vw,20px);
+  font-weight:900;
+  line-height:1.2;
+  text-align:center;
 }
 
-:root{
-  --app-height:100vh;
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-right:env(safe-area-inset-right,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-  --safe-left:env(safe-area-inset-left,0px);
+.remaining-time{
+  position:absolute;
+  top:60%;
+  left:0;
+  right:0;
+  font-family:"Courier New",monospace;
+  font-size:clamp(28px,6.8vw,52px);
+  font-weight:900;
+  line-height:1;
+  color:#d6a93c;
+  text-align:center;
+  direction:ltr;
+  unicode-bidi:isolate;
 }
 
-@supports (height:100svh){
-  :root{
-    --app-height:100svh;
-  }
+.date-box{
+  position:absolute;
+  top:17%;
+  left:0%;
+  width:35%;
+  height:66%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8%;
+  text-align:center;
+  font-size:clamp(12px,3vw,18px);
+  font-weight:900;
+  color:#f7e6b0;
+  line-height:1.2;
 }
 
-html,
-body{
+.date-box strong{
+  font-size:clamp(17px,4vw,26px);
+}
+
+.middle-cards{
+  position:absolute;
+  top:52.65%;
+  left:7.2%;
+  right:7.2%;
+  height:7.55%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4.2%;
+  direction:rtl;
+  z-index:10;
+}
+
+.mini-card{
+  position:relative;
   width:100%;
-  min-height:100%;
-  font-family:Tahoma,Arial,sans-serif;
-  background:#f8f2e8;
+  height:100%;
+  overflow:hidden;
+  text-align:center;
+}
+
+.school-name-card p,
+.vision-card p{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:88%;
+  max-height:82%;
+  text-align:center;
+  font-weight:900;
+  line-height:1.25;
+  overflow:hidden;
+}
+
+.school-name-card p{
+  color:#064b35;
+  font-size:clamp(13px,3.1vw,19px);
+}
+
+.vision-card p{
+  color:#8a6418;
+  font-size:clamp(12px,2.85vw,17px);
+}
+
+.schedule-section{
+  position:absolute;
+  top:62.75%;
+  left:7.2%;
+  right:7.2%;
+  height:27.8%;
+  z-index:10;
+  overflow:hidden;
+}
+
+.schedule-grid{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2.6%;
+  padding:18px 10px 12px;
+  direction:rtl;
+}
+
+table{
+  width:100%;
+  height:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+td{
+  padding:5px 2px;
+  border-bottom:1px solid rgba(6,75,53,.18);
+  text-align:center;
+  font-size:clamp(8px,2.1vw,13px);
+  font-weight:900;
+  background:rgba(255,255,255,.28);
+  line-height:1.22;
+}
+
+td:nth-child(1){
+  width:36%;
   color:#064b35;
 }
 
-body{
-  min-height:var(--app-height);
+td:nth-child(2){
+  width:42%;
+  color:#111;
+  font-size:clamp(9px,2.35vw,15px);
+}
+
+td:nth-child(3){
+  width:22%;
+  color:#0f766e;
+}
+
+.time-cell{
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+
+.current-row td{
+  color:#c91414!important;
+  background:rgba(255,225,225,.65)!important;
+  font-size:clamp(10px,2.55vw,16px);
+}
+
+.break-row td{
+  color:#7c3aed!important;
+}
+
+.prayer-row td{
+  color:#b45309!important;
+}
+
+.activity-row td{
+  color:#0369a1!important;
+}
+
+.ticker{
+  position:absolute;
+  bottom:2.1%;
+  left:7.2%;
+  right:7.2%;
+  height:3.1%;
+  z-index:10;
   display:flex;
   align-items:center;
-  justify-content:center;
   overflow:hidden;
+  direction:ltr;
 }
 
-.mobile-app{
-  position:relative;
-  aspect-ratio:9 / 16;
-  width:min(100vw, calc(var(--app-height) * 9 / 16));
-  height:min(var(--app-height), calc(100vw * 16 / 9));
-  flex:0 0 auto;
-  background:url("mobile-bg.png") center/100% 100% no-repeat;
-  overflow:hidden;
-}
-
-@media (orientation:landscape) and (max-height:560px){
-  html,
-  body{
-    overflow-x:hidden;
-    overflow-y:auto;
-  }
-
-  body{
-    align-items:flex-start;
-    min-height:var(--app-height);
-    padding:
-      max(8px,var(--safe-top))
-      max(8px,var(--safe-right))
-      max(8px,var(--safe-bottom))
-      max(8px,var(--safe-left));
-  }
-
-  .mobile-app{
-    width:min(calc(100vw - max(16px, calc(var(--safe-left) + var(--safe-right)))), 520px);
-    height:auto;
-  }
-}
-
-.top-school-logo{
-  position:absolute;
-  top:8.2%;
-  right:20.8%;
-  width:9.2%;
-  height:4.8%;
-  z-index:30;
+.ticker-track{
   display:flex;
   align-items:center;
-  justify-content:center;
-  overflow:hidden;
+  width:max-content;
+  white-space:nowrap;
+  will-change:transform;
+  animation:tickerMove 55s linear infinite;
 }
 
-.top-school-logo img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  display:block;
+.ticker-group{
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  padding-inline:100px;
 }
 
-.period-cards{
-  position:absolute;
-  top:19.65%;
-  left:7.3%;
-  right:7.3%;
-  height:11.25%;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:4.2%;
-  direction:rtl;
+.ticker-item{
+  font-size:clamp(14px,3.5vw,22px);
+  font-weight:900;
+  color:#f7e6b0;
+  padding-inline:80px;
+}
+
+@keyframes tickerMove{
+  from{
+    transform:translateX(-50%);
+  }
+  to{
+    transform:translateX(0);
+  }
+}
