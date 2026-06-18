@@ -428,7 +428,10 @@ function updateCards(){
 function updateClock(){
   const time = getOmanTimeParts();
 
-  setText("digitalClock", `${pad(time.hour)}:${pad(time.minute)}`);
+  setText(
+    "digitalClock",
+    `${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}`
+  );
 }
 
 function updateDate(){
