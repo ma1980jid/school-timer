@@ -413,13 +413,17 @@ body{
     border-radius:24px;
   }
 
-  /* محاذاة اليوم والتاريخ إلى اليمين */
+/* اليوم والتاريخ داخل المربع الأخضر */
 .date-box{
-  top:18%;
+  top:22%;
   left:13%;
   width:22%;
   height:46%;
-  text-align:center;
+  text-align:center !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
 }
 
   .date-box strong{
