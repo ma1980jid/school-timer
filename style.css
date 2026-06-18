@@ -926,7 +926,7 @@ body{
 .period-time{
   position:absolute !important;
   top:auto !important;
-  bottom:3% !important;
+  bottom:-3% !important;
   left:50% !important;
   transform:translateX(-50%) !important;
 
