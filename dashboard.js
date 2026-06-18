@@ -6,7 +6,6 @@ const schoolSlug = params.get("school") || DEFAULT_SCHOOL_SLUG;
 let currentSchool = null;
 let allSchedules = [];
 let teacherUrl = "";
-let classroomUrl = "";
 
 async function loadDashboard() {
   const { data: school, error: schoolError } = await supabaseClient
@@ -28,10 +27,8 @@ async function loadDashboard() {
 
   const baseUrl = window.location.origin;
   teacherUrl = `${baseUrl}/?school=${school.school_slug}`;
-  classroomUrl = `${baseUrl}/classroom.html?school=${school.school_slug}`;
 
   document.getElementById("teacherLink").textContent = teacherUrl;
-  document.getElementById("classroomDisplayLink").textContent = classroomUrl;
 
   await loadSchedules();
   await loadMessages();
@@ -247,16 +244,8 @@ function copyTeacherLink() {
   copyText(teacherUrl, "تم نسخ رابط المعلمين.");
 }
 
-function copyClassroomLink() {
-  copyText(classroomUrl, "تم نسخ رابط الشاشة التفاعلية.");
-}
-
 function openTeacherLink() {
   window.open(teacherUrl, "_blank");
-}
-
-function openClassroomLink() {
-  window.open(classroomUrl, "_blank");
 }
 
 async function copyText(text, successMessage) {

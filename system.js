@@ -25,7 +25,6 @@ function renderSchools() {
   schools.forEach(school => {
     const teacherLink = `${window.location.origin}/?school=${school.school_slug}`;
     const dashboardLink = `${window.location.origin}/dashboard.html?school=${school.school_slug}`;
-    const classroomLink = `${window.location.origin}/classroom.html?school=${school.school_slug}`;
     const settingsLink = `${window.location.origin}/school-settings.html?id=${school.id}`;
 
     const div = document.createElement("div");
@@ -38,7 +37,6 @@ function renderSchools() {
       <span class="status">
         <button class="admin-btn" onclick="copyText('${teacherLink}')">رابط المعلمين</button>
         <button class="admin-btn" onclick="copyText('${dashboardLink}')">رابط المدير</button>
-        <button class="admin-btn" onclick="copyText('${classroomLink}')">الشاشة</button>
         <button class="admin-btn" onclick="location.href='${settingsLink}'">تعديل</button>
         <button class="admin-btn" onclick="toggleSchool(${school.id}, ${school.is_active})">
           ${school.is_active ? "إيقاف" : "تفعيل"}
