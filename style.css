@@ -930,7 +930,7 @@ body{
 #currentTime,
 #nextTime,
 .period-time{
-  top:80% !important;              /* تنزيل الوقت للأسفل */
+  top:85% !important;              /* تنزيل الوقت للأسفل */
   direction:rtl !important;        /* الوقت من اليمين إلى اليسار */
   unicode-bidi:plaintext !important;
   text-align:center !important;
