@@ -82,13 +82,15 @@ body{
   width:100%;
   font-weight:900;
   color:#7a6d56;
-  line-height:1.15;
+  line-height:1.2;
+  margin-bottom:.35rem;
 }
 
 .period-name{
   width:100%;
   font-weight:900;
   line-height:1.05;
+  margin-bottom:.55rem;
 }
 
 .next-card .period-name,
@@ -102,10 +104,11 @@ body{
 }
 
 .period-line{
-  width:72%;
+  width:70%;
   height:2px;
   background:linear-gradient(to left, transparent, rgba(190,145,45,.95), transparent);
   flex-shrink:0;
+  margin-bottom:.55rem;
 }
 
 .period-time{
@@ -113,7 +116,11 @@ body{
   text-align:center;
   font-weight:900;
   color:#5c5141;
-  line-height:1.2;
+  line-height:1.25;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+  margin-top:.1rem;
 }
 
 /* =========================
@@ -166,6 +173,7 @@ body{
   font-weight:900;
   line-height:1.25;
   position:relative;
+  margin-top:.35rem;
 }
 
 .count-label::after{
@@ -351,12 +359,12 @@ body{
   }
 
   /* تكبير ومحاذاة شعار المدرسة */
-  .school-logo-wrap{
-    top:2.65%;
-    right:18.4%;
-    width:8.4%;
-    height:10.2%;
-  }
+.school-logo-wrap{
+  top:2.35%;
+  right:15.9%;
+  width:10.2%;
+  height:11.4%;
+}
 
   .top-cards{
     top:17.6%;
@@ -407,12 +415,12 @@ body{
   }
 
   /* محاذاة اليوم والتاريخ إلى اليمين */
-  .date-box{
-    top:18%;
-    left:5.6%;
-    width:25%;
-    height:46%;
-  }
+.date-box{
+  top:18%;
+  left:8.2%;
+  width:25%;
+  height:46%;
+}
 
   .date-box strong{
     font-size:clamp(24px,1.55vw,36px);
@@ -503,12 +511,12 @@ body{
 
   /* حذف النجمة نهائيا + تحريك من اليسار إلى اليمين + رفع الشريط */
   .ticker{
-    left:5.2%;
-    right:5.2%;
-    bottom:4.25%;
-    height:4.8%;
-    padding-inline:1.8%;
-  }
+  left:5.2%;
+  right:5.2%;
+  bottom:5.1%;
+  height:4.8%;
+  padding-inline:1.8%;
+}
 
   .ticker-track{
     animation:tickerMoveDesktop 28s linear infinite;
@@ -552,12 +560,12 @@ body{
   }
 
   /* تكبير ومحاذاة شعار المدرسة */
-  .school-logo-wrap{
-    top:4.4%;
-    right:18.7%;
-    width:15%;
-    height:8.1%;
-  }
+.school-logo-wrap{
+  top:4.1%;
+  right:16.8%;
+  width:17%;
+  height:8.8%;
+}
 
   .top-cards{
     top:22.8%;
@@ -605,12 +613,12 @@ body{
     border-radius:18px;
   }
 
-  .date-box{
-    top:20%;
-    left:8.5%;
-    width:27%;
-    height:58%;
-  }
+.date-box{
+  top:20%;
+  left:10.2%;
+  width:27%;
+  height:58%;
+}
 
   .date-box strong{
     font-size:clamp(18px,5vw,30px);
@@ -703,13 +711,13 @@ body{
   }
 
   /* حذف النجمة + تحريك من اليسار إلى اليمين + رفع الشريط */
-  .ticker{
-    left:5.5%;
-    right:5.5%;
-    bottom:6.4%;
-    height:4.0%;
-    padding-inline:2%;
-  }
+.ticker{
+  left:5.5%;
+  right:5.5%;
+  bottom:7.1%;
+  height:4.0%;
+  padding-inline:2%;
+}
 
   .ticker-track{
     animation:tickerMoveMobile 24s linear infinite;
