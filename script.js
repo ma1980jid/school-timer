@@ -16,19 +16,19 @@ const settings = {
 };
 
 const defaultPeriods = [
-  {name:"الطابور", start:"19:00", end:"19:15", type:"normal", col:1},
-  {name:"الأولى",  start:"19:15", end:"19:55", type:"normal", col:1},
-  {name:"الثانية", start:"19:55", end:"20:35", type:"normal", col:1},
-  {name:"الثالثة", start:"20:35", end:"21:15", type:"normal", col:1},
-  {name:"الرابعة", start:"21:15", end:"21:55", type:"normal", col:1},
+  { name: "الطابور",  start: "12:00", end: "12:15", type: "normal", col: 1 },
+  { name: "الأولى",   start: "12:15", end: "12:55", type: "normal", col: 1 },
+  { name: "الثانية",  start: "12:55", end: "13:35", type: "normal", col: 1 },
+  { name: "الثالثة",  start: "13:35", end: "14:15", type: "normal", col: 1 },
+  { name: "الرابعة",  start: "14:15", end: "14:55", type: "normal", col: 1 },
 
-  {name:"الفسحة",  start:"21:55", end:"22:15", type:"break", col:2},
-  {name:"الخامسة", start:"22:15", end:"22:55", type:"normal", col:2},
-  {name:"السادسة", start:"22:55", end:"23:35", type:"normal", col:2},
-  {name:"السابعة", start:"23:35", end:"00:15", type:"normal", col:2},
-  {name:"الصلاة",  start:"00:15", end:"00:35", type:"prayer", col:2, optionalPrayer:true},
-  {name:"الثامنة", start:"00:35", end:"01:15", type:"normal", col:2}
-];
+  { name: "الفسحة",   start: "14:55", end: "15:15", type: "break",  col: 2 },
+  { name: "الخامسة",  start: "15:15", end: "15:55", type: "normal", col: 2 },
+  { name: "السادسة",  start: "15:55", end: "16:35", type: "normal", col: 2 },
+  { name: "السابعة",  start: "16:35", end: "17:15", type: "normal", col: 2 },
+  { name: "الصلاة",   start: "17:15", end: "17:35", type: "prayer", col: 2, optionalPrayer: true },
+  { name: "الثامنة",  start: "17:35", end: "18:15", type: "normal", col: 2 }
+]
 
 // مؤقتًا للتجربة: استخدام جدول يبدأ 7 مساءً في الحاسوب والهاتف بدل أي جدول محفوظ محليًا.
 const periods = defaultPeriods;
@@ -371,7 +371,6 @@ function periodRange(period){
 
   return `${formatTime(period.start)} - ${formatTime(period.end)}`;
 }
-
 /*
   بدل إنشاء أجزاء كثيرة للوقت، نجعله نصًا واحدًا ثابتًا.
   هذا يمنع الوميض ويمنع انعكاس الوقت.
@@ -429,7 +428,6 @@ function updateCards(){
   setText("nextName", schedule.next ? schedule.next.name : "--");
   setTimeRange("nextTime", schedule.next);
 }
-
 function updateClock(){
   const time = getOmanTimeParts();
 
