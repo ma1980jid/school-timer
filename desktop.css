@@ -1,0 +1,260 @@
+/* واجهة الحاسوب 16:9 باستخدام desktop-bg.png
+   لا يؤثر هذا الملف على واجهة الهاتف؛ يعمل فقط للشاشات العريضة. */
+
+@media (min-width: 900px) and (min-aspect-ratio: 4/3){
+  html,
+  body{
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden !important;
+    background:#f8f2e8;
+  }
+
+  body{
+    align-items:center !important;
+    justify-content:center !important;
+    padding:0 !important;
+  }
+
+  .mobile-app{
+    width:min(100vw, calc(var(--app-height) * 16 / 9)) !important;
+    height:min(var(--app-height), calc(100vw * 9 / 16)) !important;
+    aspect-ratio:16 / 9 !important;
+    background:url("desktop-bg.png?v=1") center/100% 100% no-repeat !important;
+    overflow:hidden !important;
+    container-type:inline-size;
+  }
+
+  /* في خلفية الحاسوب توجد الشعارات والعنوان ثابتة */
+  .top-school-logo{
+    display:none !important;
+  }
+
+  /* البطاقات الثلاث العلوية */
+  .period-cards{
+    top:14.05% !important;
+    left:1.85% !important;
+    right:1.85% !important;
+    height:10.65% !important;
+    display:grid !important;
+    grid-template-columns:repeat(3, 1fr) !important;
+    gap:1.4% !important;
+    direction:ltr !important;
+    z-index:20 !important;
+  }
+
+  .period-card{
+    position:relative !important;
+    display:block !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    border:0 !important;
+  }
+
+  .period-card span{
+    position:absolute !important;
+    top:21% !important;
+    left:50% !important;
+    transform:translateX(-50%) !important;
+    width:92% !important;
+    text-align:center !important;
+    font-size:clamp(16px,1.08vw,25px) !important;
+    font-weight:900 !important;
+    line-height:1.15 !important;
+    color:#6b6659 !important;
+  }
+
+  .period-card strong{
+    position:absolute !important;
+    top:52% !important;
+    left:50% !important;
+    transform:translate(-50%, -50%) !important;
+    width:94% !important;
+    text-align:center !important;
+    font-size:clamp(30px,2.05vw,50px) !important;
+    font-weight:900 !important;
+    line-height:1.02 !important;
+    color:#064b35 !important;
+  }
+
+  .period-card.current span,
+  .period-card.current strong{
+    color:#c91414 !important;
+  }
+
+  .period-card.current strong{
+    font-size:clamp(32px,2.12vw,54px) !important;
+  }
+
+  .period-card small{
+    position:absolute !important;
+    top:75% !important;
+    left:50% !important;
+    transform:translateX(-50%) !important;
+    width:92% !important;
+    text-align:center !important;
+    font-size:clamp(14px,.92vw,22px) !important;
+    font-weight:900 !important;
+    line-height:1.1 !important;
+    color:#3b3323 !important;
+    direction:rtl !important;
+    unicode-bidi:normal !important;
+  }
+
+  /* اللوحة الخضراء: الساعة والتاريخ */
+  .clock-panel{
+    top:30.85% !important;
+    left:1.8% !important;
+    right:auto !important;
+    width:42.1% !important;
+    height:20.05% !important;
+    color:#fff !important;
+    overflow:hidden !important;
+    z-index:20 !important;
+  }
+
+  .clock-area{
+    top:9% !important;
+    right:6.5% !important;
+    left:auto !important;
+    width:62% !important;
+    height:82% !important;
+    text-align:center !important;
+  }
+
+  .digital-clock{
+    top:0 !important;
+    font-size:clamp(56px,4.25vw,90px) !important;
+    letter-spacing:.04em !important;
+  }
+
+  .count-label{
+    top:43% !important;
+    font-size:clamp(18px,1.25vw,28px) !important;
+  }
+
+  .remaining-time{
+    top:65% !important;
+    font-size:clamp(38px,3vw,70px) !important;
+    color:#d6a93c !important;
+    letter-spacing:.05em !important;
+  }
+
+  .date-box{
+    top:22% !important;
+    left:7% !important;
+    width:26% !important;
+    height:58% !important;
+    gap:8% !important;
+    color:#f7e6b0 !important;
+    font-size:clamp(15px,1.05vw,24px) !important;
+  }
+
+  .date-box strong{
+    font-size:clamp(20px,1.35vw,32px) !important;
+  }
+
+  /* لا تظهر مربعات الهاتف في واجهة الحاسوب */
+  .middle-cards{
+    display:none !important;
+  }
+
+  /* جدول الحصص داخل الصندوق الفاتح يمين الشاشة */
+  .schedule-section{
+    top:29.9% !important;
+    right:2.0% !important;
+    left:auto !important;
+    width:43.5% !important;
+    height:31.7% !important;
+    z-index:20 !important;
+    overflow:hidden !important;
+  }
+
+  .schedule-grid{
+    width:100% !important;
+    height:100% !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:4.3% !important;
+    padding:2.5% 3.2% 2.1% !important;
+    direction:rtl !important;
+  }
+
+  table{
+    width:100% !important;
+    height:100% !important;
+    table-layout:fixed !important;
+    border-collapse:collapse !important;
+  }
+
+  td{
+    padding:.35em .2em !important;
+    border-bottom:1px solid rgba(6,75,53,.18) !important;
+    background:transparent !important;
+    text-align:center !important;
+    font-size:clamp(13px,.78vw,18px) !important;
+    line-height:1.18 !important;
+    font-weight:900 !important;
+  }
+
+  td:nth-child(1){
+    width:32% !important;
+    color:#064b35 !important;
+  }
+
+  td:nth-child(2){
+    width:42% !important;
+    color:#111 !important;
+    white-space:nowrap !important;
+    font-size:clamp(13px,.86vw,19px) !important;
+  }
+
+  td:nth-child(3){
+    width:26% !important;
+    color:#0f766e !important;
+  }
+
+  .status-cell .duration-text{
+    margin-top:.16em !important;
+    font-size:.72em !important;
+    line-height:1.05 !important;
+  }
+
+  .current-row td{
+    color:#c91414 !important;
+    background:rgba(255,225,225,.34) !important;
+  }
+
+  .break-row td{
+    color:#7c3aed !important;
+  }
+
+  .prayer-row td{
+    color:#b45309 !important;
+  }
+
+  .activity-row td{
+    color:#0369a1 !important;
+  }
+
+  /* شريط الرسائل السفلي */
+  .ticker{
+    bottom:4.95% !important;
+    left:6.2% !important;
+    right:6.2% !important;
+    height:4.35% !important;
+    z-index:20 !important;
+    color:#064b35 !important;
+    direction:ltr !important;
+  }
+
+  .ticker-item{
+    font-size:clamp(18px,1.18vw,30px) !important;
+    color:#064b35 !important;
+    font-weight:900 !important;
+    padding-inline:120px !important;
+  }
+}
