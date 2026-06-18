@@ -15,6 +15,7 @@ const settings = {
   activityDay: 1
 };
 
+/* جدول تجريبي يبدأ الساعة 1 صباحًا */
 const defaultPeriods = [
   { name: "الطابور",  start: "01:00", end: "01:15", type: "normal", col: 1 },
   { name: "الأولى",   start: "01:15", end: "01:55", type: "normal", col: 1 },
@@ -40,108 +41,14 @@ const messages = [
 ];
 
 const dayMap = {
-  Sun:0,
-  Mon:1,
-  Tue:2,
-  Wed:3,
-  Thu:4,
-  Fri:5,
-  Sat:6
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6
 };
-
-function formatTimeRange(start, end) {
-  if (!start || !end) return "--";
-  return `${start} - ${end}`;
-}
-
-function loadPeriods(){
-  const stored = readStoredPeriods();
-
-  if(stored && stored.length){
-    return stored;
-  }
-
-  return defaultPeriods;
-}
-
-function readStoredPeriods(){
-  const keys = [
-    "schoolTimerPeriods",
-    "schoolPeriods",
-    "periods",
-    "schoolSchedule",
-    "schoolSettings",
-    "schoolTimerSettings"
-  ];
-
-  try{
-    for(const key of keys){
-      const raw = localStorage.getItem(key);
-
-      if(!raw){
-        continue;
-      }
-
-      const data = JSON.parse(raw);
-      const extracted = extractPeriods(data);
-
-      if(extracted && extracted.length){
-        return extracted;
-      }
-    }
-  }catch(error){
-    return null;
-  }
-
-  return null;
-}
-
-function extractPeriods(data){
-  if(Array.isArray(data)){
-    return cleanPeriods(data);
-  }
-
-  if(!data || typeof data !== "object"){
-    return null;
-  }
-
-  const candidates = [
-    data.periods,
-    data.schedule,
-    data.schoolPeriods,
-    data.schoolSchedule,
-    data.settings && data.settings.periods,
-    data.schoolSettings && data.schoolSettings.periods
-  ];
-
-  for(const candidate of candidates){
-    if(Array.isArray(candidate)){
-      return cleanPeriods(candidate);
-    }
-  }
-
-  return null;
-}
-
-function cleanPeriods(list){
-  return list
-    .map((period,index)=>{
-      if(!period || !period.name || !period.start || !period.end){
-        return null;
-      }
-
-      return {
-        name:String(period.name),
-        start:String(period.start),
-        end:String(period.end),
-        type:period.type || "normal",
-        col:Number(period.col) || (index < 5 ? 1 : 2),
-        optionalPrayer:Boolean(period.optionalPrayer),
-        activityOnly:Boolean(period.activityOnly)
-      };
-    })
-    .filter(Boolean);
-}
 
 function updateViewportHeight(){
   const viewport = window.visualViewport;
@@ -152,22 +59,22 @@ function updateViewportHeight(){
 
 updateViewportHeight();
 
-window.addEventListener("resize", updateViewportHeight, {passive:true});
+window.addEventListener("resize", updateViewportHeight, { passive: true });
 
-window.addEventListener("orientationchange", ()=>{
+window.addEventListener("orientationchange", () => {
   setTimeout(updateViewportHeight, 250);
-}, {passive:true});
+}, { passive: true });
 
 if(window.visualViewport){
-  window.visualViewport.addEventListener("resize", updateViewportHeight, {passive:true});
-  window.visualViewport.addEventListener("scroll", updateViewportHeight, {passive:true});
+  window.visualViewport.addEventListener("resize", updateViewportHeight, { passive: true });
+  window.visualViewport.addEventListener("scroll", updateViewportHeight, { passive: true });
 }
 
 function el(id){
   return document.getElementById(id);
 }
 
-function setText(id,value){
+function setText(id, value){
   const element = el(id);
 
   if(element){
@@ -176,12 +83,11 @@ function setText(id,value){
 }
 
 function pad(number){
-  return String(number).padStart(2,"0");
+  return String(number).padStart(2, "0");
 }
 
 function toMinutes(time){
-  const [hours,minutes] = time.split(":").map(Number);
-
+  const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
 }
 
@@ -190,12 +96,30 @@ function formatTime(time){
     return "--";
   }
 
-  const [hours,minutes] = time.split(":").map(Number);
-
+  const [hours, minutes] = time.split(":").map(Number);
   return `${pad(hours)}:${pad(minutes)}`;
 }
 
-function normalizePeriod(period,baseStart){
+function periodRange(period){
+  if(!period){
+    return "--";
+  }
+
+  return `${formatTime(period.start)} - ${formatTime(period.end)}`;
+}
+
+function setTimeRange(id, period){
+  const element = el(id);
+
+  if(!element){
+    return;
+  }
+
+  element.textContent = periodRange(period);
+  element.setAttribute("dir", "ltr");
+}
+
+function normalizePeriod(period, baseStart){
   let startMinutes = toMinutes(period.start);
   let endMinutes = toMinutes(period.end);
 
@@ -230,17 +154,17 @@ function formatDuration(period){
 }
 
 function getOmanTimeParts(date = new Date()){
-  const parts = new Intl.DateTimeFormat("en-GB",{
-    timeZone:settings.timeZone,
-    hour12:false,
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit"
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: settings.timeZone,
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
   }).formatToParts(date);
 
   const values = {};
 
-  parts.forEach(part=>{
+  parts.forEach(part => {
     if(part.type !== "literal"){
       values[part.type] = part.value;
     }
@@ -254,15 +178,15 @@ function getOmanTimeParts(date = new Date()){
 
   return {
     hour,
-    minute:Number(values.minute),
-    second:Number(values.second)
+    minute: Number(values.minute),
+    second: Number(values.second)
   };
 }
 
 function getOmanDay(date = new Date()){
-  const dayName = new Intl.DateTimeFormat("en-US",{
-    timeZone:settings.timeZone,
-    weekday:"short"
+  const dayName = new Intl.DateTimeFormat("en-US", {
+    timeZone: settings.timeZone,
+    weekday: "short"
   }).format(date);
 
   return dayMap[dayName] ?? new Date().getDay();
@@ -271,7 +195,7 @@ function getOmanDay(date = new Date()){
 function getVisiblePeriods(){
   const today = getOmanDay();
 
-  return periods.filter(period=>{
+  return periods.filter(period => {
     if(period.optionalPrayer && !settings.showPrayer){
       return false;
     }
@@ -300,21 +224,21 @@ function getSchedule(){
     return {
       now,
       time,
-      currentMinutes:rawCurrentMinutes,
-      list:[],
-      first:null,
-      last:null,
-      current:null,
-      previous:null,
-      next:null,
-      beforeSchool:false,
-      afterSchool:false
+      currentMinutes: rawCurrentMinutes,
+      list: [],
+      first: null,
+      last: null,
+      current: null,
+      previous: null,
+      next: null,
+      beforeSchool: false,
+      afterSchool: false
     };
   }
 
   const baseStart = toMinutes(firstVisible.start);
-  const list = visibleList.map(period => normalizePeriod(period,baseStart));
-  const ordered = [...list].sort((a,b)=>a.startMinutes - b.startMinutes);
+  const list = visibleList.map(period => normalizePeriod(period, baseStart));
+  const ordered = [...list].sort((a, b) => a.startMinutes - b.startMinutes);
   const first = ordered[0];
   const last = ordered[ordered.length - 1];
 
@@ -358,128 +282,60 @@ function getSchedule(){
   };
 }
 
-/* 
-  هذه الدالة هي الأهم:
-  تجعل الوقت يظهر بصيغة:
-  بداية الحصة - نهاية الحصة
-*/
-function periodRange(period){
-  if(!period){
-    return "--";
-  }
-
-  return `${formatTime(period.start)} - ${formatTime(period.end)}`;
-}
-/*
-  بدل إنشاء أجزاء كثيرة للوقت، نجعله نصًا واحدًا ثابتًا.
-  هذا يمنع الوميض ويمنع انعكاس الوقت.
-*/
-function createTimeRange(period){
-  const span = document.createElement("span");
-
-  span.className = "time-range";
-  span.textContent = periodRange(period);
-  span.setAttribute("dir","ltr");
-
-  span.style.setProperty("direction","ltr","important");
-  span.style.setProperty("unicode-bidi","isolate","important");
-  span.style.setProperty("white-space","nowrap","important");
-  span.style.setProperty("display","inline-block","important");
-
-  return span;
-}
-
-function setTimeRange(id,period){
-  const element = el(id);
-
-  if(!element){
-    return;
-  }
-
-  if(!period){
-    element.textContent = "--";
-    return;
-  }
-
-  element.replaceChildren(createTimeRange(period));
-}
-
-function cardTime(period){
-  if(!period){
-    return "--";
-  }
-
-  return `${formatTime(period.start)} - ${formatTime(period.end)}`;
-}
-
-function setCardTime(id, period){
-  const element = document.getElementById(id);
-
-  if(!element){
-    return;
-  }
-
-  element.textContent = cardTime(period);
-  element.setAttribute("dir", "ltr");
-}
-
 function updateCards(){
   const schedule = getSchedule();
 
   setText("previousName", schedule.previous ? schedule.previous.name : "--");
-  setCardTime("previousTime", schedule.previous);
+  setTimeRange("previousTime", schedule.previous);
 
   if(schedule.current){
     setText("currentName", schedule.current.name);
-    setCardTime("currentTime", schedule.current);
+    setTimeRange("currentTime", schedule.current);
   }else if(schedule.beforeSchool){
     setText("currentName", "لم يبدأ الدوام");
-    setCardTime("currentTime", schedule.first);
+    setTimeRange("currentTime", schedule.first);
   }else if(schedule.afterSchool){
     setText("currentName", "انتهى الدوام");
-    setCardTime("currentTime", null);
+    setTimeRange("currentTime", null);
   }else{
     setText("currentName", "لا توجد حصة");
-    setCardTime("currentTime", null);
+    setTimeRange("currentTime", null);
   }
 
   setText("nextName", schedule.next ? schedule.next.name : "--");
-  setCardTime("nextTime", schedule.next);
+  setTimeRange("nextTime", schedule.next);
 }
 
 function updateClock(){
   const time = getOmanTimeParts();
 
-  setText(
-    "digitalClock",
-    `${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}`
-  );
+  setText("digitalClock", `${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}`);
 }
 
 function updateDate(){
   const now = new Date();
 
-  setText("weekday", new Intl.DateTimeFormat("ar-OM",{
-    timeZone:settings.timeZone,
-    weekday:"long"
+  setText("weekday", new Intl.DateTimeFormat("ar-OM", {
+    timeZone: settings.timeZone,
+    weekday: "long"
   }).format(now));
 
-  setText("gregorianDate", new Intl.DateTimeFormat("ar-OM",{
-    timeZone:settings.timeZone,
-    day:"numeric",
-    month:"long",
-    year:"numeric"
+  setText("gregorianDate", new Intl.DateTimeFormat("ar-OM", {
+    timeZone: settings.timeZone,
+    day: "numeric",
+    month: "long",
+    year: "numeric"
   }).format(now));
 
   try{
-    setText("hijriDate", new Intl.DateTimeFormat("ar-OM-u-ca-islamic",{
-      timeZone:settings.timeZone,
-      day:"numeric",
-      month:"long",
-      year:"numeric"
+    setText("hijriDate", new Intl.DateTimeFormat("ar-OM-u-ca-islamic", {
+      timeZone: settings.timeZone,
+      day: "numeric",
+      month: "long",
+      year: "numeric"
     }).format(now));
   }catch(error){
-    setText("hijriDate","");
+    setText("hijriDate", "");
   }
 }
 
@@ -503,8 +359,8 @@ function updateRemaining(){
     const remainingSeconds =
       (schedule.current.endMinutes - schedule.currentMinutes) * 60;
 
-    setText("countLabel","متبقي من الحصة الحالية");
-    setText("remainingTime",formatCountdown(remainingSeconds));
+    setText("countLabel", "متبقي من الحصة الحالية");
+    setText("remainingTime", formatCountdown(remainingSeconds));
     return;
   }
 
@@ -512,8 +368,8 @@ function updateRemaining(){
     const remainingSeconds =
       (schedule.first.startMinutes - schedule.currentMinutes) * 60;
 
-    setText("countLabel","متبقي على بداية الدوام");
-    setText("remainingTime",formatCountdown(remainingSeconds));
+    setText("countLabel", "متبقي على بداية الدوام");
+    setText("remainingTime", formatCountdown(remainingSeconds));
     return;
   }
 
@@ -521,16 +377,16 @@ function updateRemaining(){
     const remainingSeconds =
       (schedule.next.startMinutes - schedule.currentMinutes) * 60;
 
-    setText("countLabel","متبقي على الحصة القادمة");
-    setText("remainingTime",formatCountdown(remainingSeconds));
+    setText("countLabel", "متبقي على الحصة القادمة");
+    setText("remainingTime", formatCountdown(remainingSeconds));
     return;
   }
 
-  setText("countLabel","انتهى اليوم الدراسي");
-  setText("remainingTime","00:00");
+  setText("countLabel", "انتهى اليوم الدراسي");
+  setText("remainingTime", "00:00");
 }
 
-function createCell(text,className){
+function createCell(text, className){
   const cell = document.createElement("td");
 
   cell.textContent = text;
@@ -542,7 +398,7 @@ function createCell(text,className){
   return cell;
 }
 
-function createStatusCell(state,period){
+function createStatusCell(state, period){
   const cell = document.createElement("td");
   const stateText = document.createElement("span");
   const durationText = document.createElement("small");
@@ -554,7 +410,7 @@ function createStatusCell(state,period){
   stateText.textContent = state;
   durationText.textContent = formatDuration(period);
 
-  cell.append(stateText,durationText);
+  cell.append(stateText, durationText);
 
   return cell;
 }
@@ -563,12 +419,13 @@ function createTimeCell(period){
   const cell = document.createElement("td");
 
   cell.className = "time-cell";
-  cell.appendChild(createTimeRange(period));
+  cell.textContent = periodRange(period);
+  cell.setAttribute("dir", "ltr");
 
   return cell;
 }
 
-function createRow(period,schedule){
+function createRow(period, schedule){
   let state = "قادمة";
 
   if(schedule.current === period){
@@ -598,7 +455,7 @@ function createRow(period,schedule){
   row.append(
     createCell(period.name),
     createTimeCell(period),
-    createStatusCell(state,period)
+    createStatusCell(state, period)
   );
 
   return row;
@@ -612,7 +469,7 @@ function renderTable(){
   if(column1){
     const rows = schedule.list
       .filter(period => period.col === 1)
-      .map(period => createRow(period,schedule));
+      .map(period => createRow(period, schedule));
 
     column1.replaceChildren(...rows);
   }
@@ -620,7 +477,7 @@ function renderTable(){
   if(column2){
     const rows = schedule.list
       .filter(period => period.col === 2)
-      .map(period => createRow(period,schedule));
+      .map(period => createRow(period, schedule));
 
     column2.replaceChildren(...rows);
   }
@@ -633,7 +490,7 @@ function updateVision(){
     return;
   }
 
-  setText("visionText",settings.visionMessages[visionIndex]);
+  setText("visionText", settings.visionMessages[visionIndex]);
 
   visionIndex = (visionIndex + 1) % settings.visionMessages.length;
 }
@@ -643,7 +500,7 @@ function createTickerGroup(){
 
   group.className = "ticker-group";
 
-  messages.forEach(message=>{
+  messages.forEach(message => {
     const item = document.createElement("span");
 
     item.className = "ticker-item";
@@ -662,7 +519,7 @@ function updateTicker(){
     return;
   }
 
-  ticker.replaceChildren(createTickerGroup(),createTickerGroup());
+  ticker.replaceChildren(createTickerGroup(), createTickerGroup());
 }
 
 function init(){
@@ -672,7 +529,7 @@ function init(){
     logo.src = settings.schoolLogo;
   }
 
-  setText("schoolName",settings.schoolName);
+  setText("schoolName", settings.schoolName);
   updateVision();
   updateTicker();
 }
@@ -688,103 +545,5 @@ function tick(){
 init();
 tick();
 
-setInterval(tick,1000);
-setInterval(updateVision,5000);
-
-/* إظهار وقت الحصة في المربعات العلوية */
-.period-card{
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-}
-
-.period-title,
-.period-name,
-.period-line,
-.period-time{
-  position:static !important;
-  transform:none !important;
-}
-
-.period-title{
-  margin-top:.75rem !important;
-  margin-bottom:.35rem !important;
-}
-
-.period-name{
-  margin-bottom:.55rem !important;
-}
-
-.period-line{
-  margin-bottom:.55rem !important;
-}
-
-.period-time{
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  font-size:clamp(18px,1.15vw,28px) !important;
-  font-weight:900 !important;
-  color:#5c5141 !important;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  white-space:nowrap !important;
-  text-align:center !important;
-  z-index:5 !important;
-}
-
-/* تكبير جدول الحصص في الحاسوب */
-@media (min-width:900px){
-
-  .schedule-section{
-    top:38.4% !important;
-    right:2.45% !important;
-    width:48.2% !important;
-    height:45.4% !important;
-  }
-
-  .schedule-grid{
-    gap:1.8% !important;
-    padding:2.1% 2.1% 2.4% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 9px !important;
-  }
-
-  .schedule-grid tr{
-    min-height:52px !important;
-    padding:.38rem .62rem !important;
-    border-radius:16px !important;
-  }
-
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(18px,1.12vw,26px) !important;
-  }
-
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(17px,1.02vw,24px) !important;
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(13px,.82vw,18px) !important;
-  }
-
-  .status-cell{
-    padding:.16rem .32rem !important;
-  }
-
-  .status-cell .duration-text{
-    display:block !important;
-    font-size:clamp(10px,.65vw,15px) !important;
-    margin-top:2px !important;
-  }
-
-  .current-row{
-    transform:scale(1.018) !important;
-    box-shadow:
-      0 0 0 4px rgba(214,163,61,.22),
-      0 10px 20px rgba(0,0,0,.07) !important;
-  }
-}
+setInterval(tick, 1000);
+setInterval(updateVision, 5000);
