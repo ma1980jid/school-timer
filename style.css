@@ -920,7 +920,8 @@ body{
   .remaining-time{
     margin-top:1.35rem !important;
     transform:translateY(8px) !important;
-  }#previousTime,
+  }
+#previousTime,
 #currentTime,
 #nextTime,
 .period-time{
