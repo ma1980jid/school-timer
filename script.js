@@ -182,6 +182,10 @@ function toMinutes(time){
 }
 
 function formatTime(time){
+  if(!time || typeof time !== "string"){
+    return "--";
+  }
+
   const [hours,minutes] = time.split(":").map(Number);
 
   return `${pad(hours)}:${pad(minutes)}`;
@@ -350,6 +354,11 @@ function getSchedule(){
   };
 }
 
+/* 
+  هذه الدالة هي الأهم:
+  تجعل الوقت يظهر بصيغة:
+  بداية الحصة - نهاية الحصة
+*/
 function periodRange(period){
   if(!period){
     return "--";
@@ -358,39 +367,23 @@ function periodRange(period){
   return `${formatTime(period.start)} - ${formatTime(period.end)}`;
 }
 
+/*
+  بدل إنشاء أجزاء كثيرة للوقت، نجعله نصًا واحدًا ثابتًا.
+  هذا يمنع الوميض ويمنع انعكاس الوقت.
+*/
 function createTimeRange(period){
-  const wrap = document.createElement("span");
-  const start = document.createElement("span");
-  const separator = document.createElement("span");
-  const end = document.createElement("span");
+  const span = document.createElement("span");
 
-  wrap.className = "time-range";
-  start.className = "time-start";
-  separator.className = "time-separator";
-  end.className = "time-end";
+  span.className = "time-range";
+  span.textContent = periodRange(period);
+  span.setAttribute("dir","ltr");
 
-  wrap.style.setProperty("display","inline-flex","important");
-  wrap.style.setProperty("flex-direction","row","important");
-  wrap.style.setProperty("align-items","center","important");
-  wrap.style.setProperty("justify-content","center","important");
-  wrap.style.setProperty("gap","0.25em","important");
-  wrap.style.setProperty("direction","rtl","important");
-  wrap.style.setProperty("unicode-bidi","isolate","important");
-  wrap.style.setProperty("white-space","nowrap","important");
+  span.style.setProperty("direction","ltr","important");
+  span.style.setProperty("unicode-bidi","isolate","important");
+  span.style.setProperty("white-space","nowrap","important");
+  span.style.setProperty("display","inline-block","important");
 
-  start.style.setProperty("direction","ltr","important");
-  start.style.setProperty("unicode-bidi","isolate","important");
-  separator.style.setProperty("direction","rtl","important");
-  end.style.setProperty("direction","ltr","important");
-  end.style.setProperty("unicode-bidi","isolate","important");
-
-  start.textContent = formatTime(period.start);
-  separator.textContent = "-";
-  end.textContent = formatTime(period.end);
-
-  wrap.append(start,separator,end);
-
-  return wrap;
+  return span;
 }
 
 function setTimeRange(id,period){
@@ -540,6 +533,7 @@ function createStatusCell(state,period){
 
   return cell;
 }
+
 function createTimeCell(period){
   const cell = document.createElement("td");
 
