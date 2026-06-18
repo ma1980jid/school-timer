@@ -19,25 +19,66 @@
       <img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة">
     </div>
 
-    <section class="period-cards">
-      <div class="period-card previous">
-        <span>الحصة السابقة</span>
-        <strong id="previousName">--</strong>
-        <small id="previousTime">--</small>
+   <section class="top-cards">
+  <div class="period-card next-card">
+    <div class="period-title">الحصة القادمة</div>
+    <div id="nextName" class="period-name">--</div>
+    <div class="period-line"></div>
+    <div id="nextTime" class="period-time">--</div>
+  </div>
+
+  <div class="period-card current-card">
+    <div class="period-title">الحصة الحالية</div>
+    <div id="currentName" class="period-name">--</div>
+    <div class="period-line"></div>
+    <div id="currentTime" class="period-time">--</div>
+  </div>
+
+  <div class="period-card previous-card">
+    <div class="period-title">الحصة السابقة</div>
+    <div id="previousName" class="period-name">--</div>
+    <div class="period-line"></div>
+    <div id="previousTime" class="period-time">--</div>
+  </div>
+</section>
+
+    <section class="hero-layout">
+  <div class="green-panel">
+    <div class="green-panel-overlay">
+      <div class="green-date-box">
+        <div id="weekday" class="weekday-text">الخميس</div>
+        <div id="gregorianDate" class="date-text">18 يونيو 2026</div>
+        <div id="hijriDate" class="date-text">3 محرم 1448 هـ</div>
       </div>
 
-      <div class="period-card current">
-        <span>الحصة الحالية</span>
-        <strong id="currentName">--</strong>
-        <small id="currentTime">--</small>
+      <div class="green-time-box">
+        <div id="digitalClock" class="digital-clock">09:58</div>
+        <div id="countLabel" class="count-label">متبقي من الحصة الحالية</div>
+        <div id="remainingTime" class="remaining-time">16:36</div>
       </div>
+    </div>
+  </div>
 
-      <div class="period-card next">
-        <span>الحصة القادمة</span>
-        <strong id="nextName">--</strong>
-        <small id="nextTime">--</small>
-      </div>
-    </section>
+  <div class="schedule-panel">
+    <table class="schedule-table">
+      <tbody id="scheduleCol1"></tbody>
+    </table>
+
+    <table class="schedule-table">
+      <tbody id="scheduleCol2"></tbody>
+    </table>
+  </div>
+</section>
+
+    <section class="ticker-bar">
+  <div class="ticker-star left-star">✿</div>
+
+  <div class="ticker-window">
+    <div id="tickerTrack" class="ticker-track"></div>
+  </div>
+
+  <div class="ticker-star right-star">✿</div>
+</section>
 
     <section class="clock-panel">
       <div class="clock-area">
