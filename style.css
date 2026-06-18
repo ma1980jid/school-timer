@@ -920,29 +920,31 @@ body{
   .remaining-time{
     margin-top:1.35rem !important;
     transform:translateY(8px) !important;
-  }
-}/* إصلاح ظهور وقت الحصة في المربعات العلوية */
-#previousTime,
+  }#previousTime,
 #currentTime,
 #nextTime,
 .period-time{
   position:absolute !important;
   top:auto !important;
-  bottom:0% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
+  bottom:3% !important;
   left:50% !important;
   transform:translateX(-50%) !important;
+
   width:90% !important;
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+
   text-align:center !important;
   font-weight:900 !important;
   color:#5c5141 !important;
-  direction:ltr !important;       /* يحافظ على ترتيب الوقت بشكل صحيح */
-  unicode-bidi:isolate !important;
   white-space:nowrap !important;
   z-index:20 !important;
-}/* ================================
+
+  direction:rtl !important;
+  unicode-bidi:plaintext !important;
+}
+  /* ================================
    تنزيل متبقي الحصة داخل المربع الأخضر
 ================================ */
 .count-label{
