@@ -105,7 +105,8 @@ function periodRange(period){
     return "--";
   }
 
-  return `${formatTime(period.start)} - ${formatTime(period.end)}`;
+  // عرض الوقت من اليمين إلى اليسار بصريًا
+  return `${formatTime(period.end)} - ${formatTime(period.start)}`;
 }
 
 function setTimeRange(id, period){
