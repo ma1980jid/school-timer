@@ -922,21 +922,28 @@ body{
     transform:translateY(8px) !important;
   }
 }
-
-/* ================================
-   تنزيل وقت المربعات العلوية + اتجاه الوقت
-================================ */
+/* إصلاح ظهور وقت الحصة في المربعات العلوية */
 #previousTime,
 #currentTime,
 #nextTime,
 .period-time{
-  top:85% !important;              /* تنزيل الوقت للأسفل */
-  direction:rtl !important;        /* الوقت من اليمين إلى اليسار */
-  unicode-bidi:plaintext !important;
+  position:absolute !important;
+  top:auto !important;
+  bottom:12% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:90% !important;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
   text-align:center !important;
   font-weight:900 !important;
+  color:#5c5141 !important;
+  direction:ltr !important;       /* يحافظ على ترتيب الوقت بشكل صحيح */
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+  z-index:20 !important;
 }
-
 /* ================================
    تنزيل متبقي الحصة داخل المربع الأخضر
 ================================ */
