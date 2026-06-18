@@ -494,24 +494,27 @@ body{
     font-size:clamp(12px,.72vw,16px);
   }
 
-  .status-cell{
-    padding:.12rem .26rem;
-  }
+ .status-cell{
+  padding:.12rem .26rem;
+}
 
-  .status-cell .duration-text{
-    display:none;
-  }
+.status-cell .duration-text{
+  display:block;
+  font-size:clamp(10px,.62vw,14px);
+  line-height:1.15;
+  margin-top:2px;
+}
 
   .current-row{
     transform:scale(1.012);
   }
 
   /* حذف النجمة نهائيا + تحريك من اليسار إلى اليمين + رفع الشريط */
-  .ticker{
+ .ticker{
   left:5.2%;
   right:5.2%;
-  bottom:5.1%;
-  height:4.8%;
+  bottom:6.1%;
+  height:4.4%;
   padding-inline:1.8%;
 }
 
