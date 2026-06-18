@@ -759,3 +759,109 @@ body{
     visibility:hidden !important;
   }
 }
+
+/* ================================
+   إظهار وقت الحصة في المربعات العلوية
+================================ */
+.period-card{
+  position:relative !important;
+}
+
+#previousTime,
+#currentTime,
+#nextTime,
+.period-time{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:absolute !important;
+  left:50% !important;
+  top:66% !important;
+  transform:translateX(-50%) !important;
+  width:90% !important;
+  text-align:center !important;
+  font-size:clamp(18px,1.15vw,27px) !important;
+  font-weight:900 !important;
+  color:#5c5141 !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+  z-index:20 !important;
+}
+
+#previousName,
+#currentName,
+#nextName,
+.period-name{
+  top:38% !important;
+}
+
+/* ================================
+   تكبير جدول الحصص ومربعات الحصص
+================================ */
+@media (min-width:900px){
+
+  .schedule-section{
+    top:37.8% !important;
+    right:2.35% !important;
+    width:48.8% !important;
+    height:46.8% !important;
+  }
+
+  .schedule-grid{
+    gap:1.8% !important;
+    padding:2.1% 2.1% 2.5% !important;
+  }
+
+  .schedule-grid table{
+    border-spacing:0 10px !important;
+  }
+
+  .schedule-grid tr{
+    min-height:58px !important;
+    padding:.46rem .70rem !important;
+    border-radius:18px !important;
+  }
+
+  .schedule-grid td:nth-child(1){
+    font-size:clamp(19px,1.20vw,28px) !important;
+  }
+
+  .schedule-grid td:nth-child(2){
+    font-size:clamp(18px,1.08vw,26px) !important;
+  }
+
+  .schedule-grid td:nth-child(3){
+    font-size:clamp(14px,.88vw,20px) !important;
+  }
+
+  .status-cell{
+    padding:.18rem .38rem !important;
+  }
+
+  .status-cell .duration-text{
+    display:block !important;
+    font-size:clamp(11px,.72vw,16px) !important;
+    margin-top:3px !important;
+  }
+
+  .current-row{
+    transform:scale(1.02) !important;
+  }
+
+  /* ================================
+     إزاحة متبقي الحصة للأسفل
+  ================================ */
+  .digital-clock{
+    margin-bottom:1.05rem !important;
+  }
+
+  .count-label{
+    margin-top:.85rem !important;
+    margin-bottom:1.45rem !important;
+  }
+
+  .remaining-time{
+    margin-top:.95rem !important;
+  }
+}
