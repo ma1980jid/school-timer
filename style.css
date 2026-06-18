@@ -922,3 +922,30 @@ body{
     transform:translateY(8px) !important;
   }
 }
+
+/* ================================
+   تنزيل وقت المربعات العلوية + اتجاه الوقت
+================================ */
+#previousTime,
+#currentTime,
+#nextTime,
+.period-time{
+  top:80% !important;              /* تنزيل الوقت للأسفل */
+  direction:rtl !important;        /* الوقت من اليمين إلى اليسار */
+  unicode-bidi:plaintext !important;
+  text-align:center !important;
+  font-weight:900 !important;
+}
+
+/* ================================
+   تنزيل متبقي الحصة داخل المربع الأخضر
+================================ */
+.count-label{
+  margin-top:1.45rem !important;
+  transform:translateY(10px) !important;
+}
+
+.remaining-time{
+  margin-top:1.9rem !important;
+  transform:translateY(18px) !important;
+}
