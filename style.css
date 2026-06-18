@@ -929,7 +929,7 @@ body{
 .period-time{
   position:absolute !important;
   top:auto !important;
-  bottom:12% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
+  bottom:9% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
   left:50% !important;
   transform:translateX(-50%) !important;
   width:90% !important;
