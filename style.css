@@ -865,3 +865,60 @@ body{
     margin-top:.95rem !important;
   }
 }
+
+/* ================================
+   التعديل الأخير
+================================ */
+
+/* 1) تنزيل وقت الحصص في المربعات العلوية للأسفل */
+#previousTime,
+#currentTime,
+#nextTime,
+.period-time{
+  top:73% !important;
+}
+
+/* 2) تصغير مربعات جدول الحصص قليلًا حتى لا تتداخل مع شريط الرسائل */
+@media (min-width:900px){
+
+  .schedule-section{
+    top:38.0% !important;
+    height:43.8% !important;
+  }
+
+  .schedule-grid{
+    padding:1.9% 2.1% 2.0% !important;
+  }
+
+  .schedule-grid table{
+    border-spacing:0 7px !important;
+  }
+
+  .schedule-grid tr{
+    min-height:50px !important;
+    padding:.34rem .60rem !important;
+    border-radius:15px !important;
+  }
+
+  .schedule-grid td:nth-child(1){
+    font-size:clamp(18px,1.08vw,25px) !important;
+  }
+
+  .schedule-grid td:nth-child(2){
+    font-size:clamp(17px,1.02vw,23px) !important;
+  }
+
+  .schedule-grid td:nth-child(3){
+    font-size:clamp(13px,.80vw,18px) !important;
+  }
+
+  .status-cell .duration-text{
+    font-size:clamp(10px,.64vw,14px) !important;
+  }
+
+  /* 3) تنزيل متبقي الحصة للأسفل */
+  .remaining-time{
+    margin-top:1.35rem !important;
+    transform:translateY(8px) !important;
+  }
+}
