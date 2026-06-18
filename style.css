@@ -13,6 +13,10 @@ body{
   color:#064b35;
 }
 
+html{
+  overflow:hidden;
+}
+
 body{
   display:flex;
   align-items:center;
@@ -40,7 +44,7 @@ body{
   display:block;
 }
 
-/* الوقت */
+/* ضبط عرض الأوقات */
 .period-time,
 .time-cell,
 .time-range,
@@ -64,28 +68,25 @@ body{
 }
 
 .period-card{
-  position:relative;
+  background:rgba(255,255,255,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  text-align:center;
   overflow:hidden;
-  background:rgba(255,255,255,.10);
+  padding-inline:1rem;
 }
 
 .period-title{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  width:92%;
-  text-align:center;
+  width:100%;
   font-weight:900;
-  color:#776a52;
+  color:#7a6d56;
   line-height:1.15;
 }
 
 .period-name{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  width:92%;
-  text-align:center;
+  width:100%;
   font-weight:900;
   line-height:1.05;
 }
@@ -101,22 +102,18 @@ body{
 }
 
 .period-line{
-  position:absolute;
-  left:22%;
-  right:22%;
+  width:72%;
   height:2px;
   background:linear-gradient(to left, transparent, rgba(190,145,45,.95), transparent);
+  flex-shrink:0;
 }
 
 .period-time{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  width:90%;
+  width:100%;
   text-align:center;
   font-weight:900;
   color:#5c5141;
-  line-height:1.1;
+  line-height:1.2;
 }
 
 /* =========================
@@ -130,7 +127,11 @@ body{
 
 .date-box{
   position:absolute;
-  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:flex-start;
+  text-align:right;
   color:#f3df9c;
   z-index:3;
 }
@@ -185,7 +186,7 @@ body{
 }
 
 /* =========================
-   بطاقات وسط الهاتف
+   بطاقتا وسط الهاتف
 ========================= */
 .middle-cards{
   position:absolute;
@@ -309,7 +310,7 @@ body{
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  direction:rtl;
+  direction:ltr;
 }
 
 .ticker-track{
@@ -349,53 +350,51 @@ body{
     background:url("desktop-bg.png?v=1") center/100% 100% no-repeat;
   }
 
+  /* تكبير ومحاذاة شعار المدرسة */
   .school-logo-wrap{
-    top:3.05%;
-    right:18.0%;
-    width:7.2%;
-    height:8.6%;
+    top:2.65%;
+    right:18.4%;
+    width:8.4%;
+    height:10.2%;
   }
 
   .top-cards{
-    top:17.8%;
+    top:17.6%;
     left:2.8%;
     right:2.8%;
-    height:16.4%;
+    height:16.7%;
     grid-template-columns:1fr 1fr 1fr;
     grid-template-areas:"next current previous";
     gap:1.9%;
     direction:ltr;
   }
 
-  .next-card{
-    grid-area:next;
-  }
+  .next-card{ grid-area:next; }
+  .current-card{ grid-area:current; }
+  .previous-card{ grid-area:previous; }
 
-  .current-card{
-    grid-area:current;
-  }
-
-  .previous-card{
-    grid-area:previous;
+  .period-card{
+    padding-top:1.1rem;
   }
 
   .period-title{
-    top:18%;
     font-size:clamp(20px,1.2vw,30px);
+    margin-bottom:.6rem;
   }
 
   .period-name{
-    top:45%;
     font-size:clamp(34px,2.45vw,60px);
+    margin-bottom:.9rem;
   }
 
   .period-line{
-    bottom:31%;
+    margin-bottom:.95rem;
   }
 
+  /* تنظيم الوقت أسفل الخط مع ترك مسافة */
   .period-time{
-    top:70%;
     font-size:clamp(18px,1.12vw,26px);
+    margin-top:.15rem;
   }
 
   /* المربع الأخضر */
@@ -407,11 +406,12 @@ body{
     border-radius:24px;
   }
 
+  /* محاذاة اليوم والتاريخ إلى اليمين */
   .date-box{
     top:18%;
-    left:5.5%;
-    width:24%;
-    height:45%;
+    left:5.6%;
+    width:25%;
+    height:46%;
   }
 
   .date-box strong{
@@ -426,20 +426,22 @@ body{
   }
 
   .clock-area{
-    top:9%;
+    top:8%;
     right:7%;
     width:60%;
-    height:45%;
+    height:48%;
   }
 
+  /* عرض الساعة مع الثواني */
   .digital-clock{
-    font-size:clamp(60px,4.3vw,94px);
+    font-size:clamp(54px,3.85vw,82px);
     margin-bottom:.45rem;
+    letter-spacing:1px;
   }
 
   .count-label{
     font-size:clamp(19px,1.18vw,28px);
-    margin-bottom:1.2rem;
+    margin-bottom:1.15rem;
   }
 
   .remaining-time{
@@ -450,7 +452,6 @@ body{
     display:none;
   }
 
-  /* جدول الحصص */
   .schedule-section{
     top:39.0%;
     right:2.7%;
@@ -462,7 +463,7 @@ body{
   .schedule-grid{
     grid-template-columns:1fr 1fr;
     gap:1.5%;
-    padding:2.2% 2.2% 2.4%;
+    padding:2.0% 2.2% 2.2%;
   }
 
   .schedule-grid table{
@@ -500,37 +501,17 @@ body{
     transform:scale(1.012);
   }
 
-  /* شريط الرسائل */
+  /* حذف النجمة نهائيا + تحريك من اليسار إلى اليمين + رفع الشريط */
   .ticker{
     left:5.2%;
     right:5.2%;
-    bottom:2.6%;
-    height:6.0%;
-    padding-inline:6.2%;
-  }
-
-  .ticker::before,
-  .ticker::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:44px;
-    height:44px;
-    background:url("icons/ticker-star.png") center/contain no-repeat;
-    z-index:3;
-  }
-
-  .ticker::before{
-    right:1.6%;
-  }
-
-  .ticker::after{
-    left:1.6%;
+    bottom:4.25%;
+    height:4.8%;
+    padding-inline:1.8%;
   }
 
   .ticker-track{
-    animation:tickerMoveDesktop 32s linear infinite;
+    animation:tickerMoveDesktop 28s linear infinite;
   }
 
   .ticker-group{
@@ -545,10 +526,10 @@ body{
 
   @keyframes tickerMoveDesktop{
     from{
-      transform:translateX(36%);
+      transform:translateX(-34%);
     }
     to{
-      transform:translateX(-36%);
+      transform:translateX(34%);
     }
   }
 }
@@ -570,52 +551,50 @@ body{
     background:url("mobile-bg.png?v=1") center/100% 100% no-repeat;
   }
 
+  /* تكبير ومحاذاة شعار المدرسة */
   .school-logo-wrap{
-    top:4.55%;
-    right:19.5%;
-    width:13.2%;
-    height:7.1%;
+    top:4.4%;
+    right:18.7%;
+    width:15%;
+    height:8.1%;
   }
 
   .top-cards{
     top:22.8%;
     left:5.5%;
     right:5.5%;
-    height:13.3%;
+    height:13.5%;
     grid-template-columns:repeat(3,1fr);
     gap:2.4%;
     direction:ltr;
   }
 
-  .next-card{
-    grid-column:1;
-  }
+  .next-card{ grid-column:1; }
+  .current-card{ grid-column:2; }
+  .previous-card{ grid-column:3; }
 
-  .current-card{
-    grid-column:2;
-  }
-
-  .previous-card{
-    grid-column:3;
+  .period-card{
+    padding-top:.6rem;
+    padding-inline:.35rem;
   }
 
   .period-title{
-    top:15%;
     font-size:clamp(13px,3.1vw,18px);
+    margin-bottom:.35rem;
   }
 
   .period-name{
-    top:45%;
     font-size:clamp(25px,7vw,42px);
+    margin-bottom:.45rem;
   }
 
   .period-line{
-    bottom:31%;
+    margin-bottom:.5rem;
   }
 
   .period-time{
-    top:70%;
     font-size:clamp(10px,2.8vw,16px);
+    margin-top:.05rem;
   }
 
   .clock-panel{
@@ -628,8 +607,8 @@ body{
 
   .date-box{
     top:20%;
-    left:9%;
-    width:26%;
+    left:8.5%;
+    width:27%;
     height:58%;
   }
 
@@ -651,8 +630,9 @@ body{
   }
 
   .digital-clock{
-    font-size:clamp(50px,14vw,82px);
+    font-size:clamp(42px,11vw,68px);
     margin-bottom:.2rem;
+    letter-spacing:.5px;
   }
 
   .count-label{
@@ -722,36 +702,17 @@ body{
     font-size:.72em;
   }
 
+  /* حذف النجمة + تحريك من اليسار إلى اليمين + رفع الشريط */
   .ticker{
     left:5.5%;
     right:5.5%;
-    bottom:5.2%;
-    height:4.3%;
-    padding-inline:9%;
-  }
-
-  .ticker::before,
-  .ticker::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:28px;
-    height:28px;
-    background:url("icons/ticker-star.png") center/contain no-repeat;
-    z-index:3;
-  }
-
-  .ticker::before{
-    right:2%;
-  }
-
-  .ticker::after{
-    left:2%;
+    bottom:6.4%;
+    height:4.0%;
+    padding-inline:2%;
   }
 
   .ticker-track{
-    animation:tickerMoveMobile 28s linear infinite;
+    animation:tickerMoveMobile 24s linear infinite;
   }
 
   .ticker-group{
@@ -766,10 +727,10 @@ body{
 
   @keyframes tickerMoveMobile{
     from{
-      transform:translateX(40%);
+      transform:translateX(-40%);
     }
     to{
-      transform:translateX(-40%);
+      transform:translateX(40%);
     }
   }
 }
