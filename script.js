@@ -16,21 +16,22 @@ const settings = {
 };
 
 const defaultPeriods = [
-  {name:"الطابور",start:"19:00",end:"19:15",type:"normal",col:1},
-  {name:"الأولى",start:"19:15",end:"19:55",type:"normal",col:1},
-  {name:"الثانية",start:"19:55",end:"20:35",type:"normal",col:1},
-  {name:"الثالثة",start:"20:35",end:"21:15",type:"normal",col:1},
-  {name:"الرابعة",start:"21:15",end:"21:55",type:"normal",col:1},
+  {name:"الطابور",start:"07:00",end:"07:15",type:"normal",col:1},
+  {name:"الأولى",start:"07:15",end:"07:55",type:"normal",col:1},
+  {name:"الثانية",start:"07:55",end:"08:35",type:"normal",col:1},
+  {name:"الثالثة",start:"08:35",end:"09:15",type:"normal",col:1},
+  {name:"الرابعة",start:"09:15",end:"09:55",type:"normal",col:1},
 
-  {name:"الفسحة",start:"21:55",end:"22:15",type:"break",col:2},
-  {name:"الخامسة",start:"22:15",end:"22:55",type:"normal",col:2},
-  {name:"السادسة",start:"22:55",end:"23:35",type:"normal",col:2},
-  {name:"السابعة",start:"23:35",end:"00:15",type:"normal",col:2},
-  {name:"الصلاة",start:"00:15",end:"00:35",type:"prayer",col:2,optionalPrayer:true},
-  {name:"الثامنة",start:"00:35",end:"01:15",type:"normal",col:2}
+  {name:"الفسحة",start:"09:55",end:"10:15",type:"break",col:2},
+  {name:"الخامسة",start:"10:15",end:"10:55",type:"normal",col:2},
+  {name:"السادسة",start:"10:55",end:"11:35",type:"normal",col:2},
+  {name:"السابعة",start:"11:35",end:"12:15",type:"normal",col:2},
+  {name:"الصلاة",start:"12:15",end:"12:35",type:"prayer",col:2,optionalPrayer:true},
+  {name:"الثامنة",start:"12:35",end:"13:15",type:"normal",col:2}
 ];
 
-const periods = loadPeriods();
+// مؤقتًا للتجربة: استخدام جدول يبدأ 7 صباحًا في الحاسوب والهاتف بدل أي جدول محفوظ محليًا.
+const periods = defaultPeriods;
 
 const messages = [
   "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري",
@@ -368,6 +369,21 @@ function createTimeRange(period){
   separator.className = "time-separator";
   end.className = "time-end";
 
+  wrap.style.setProperty("display","inline-flex","important");
+  wrap.style.setProperty("flex-direction","row","important");
+  wrap.style.setProperty("align-items","center","important");
+  wrap.style.setProperty("justify-content","center","important");
+  wrap.style.setProperty("gap","0.25em","important");
+  wrap.style.setProperty("direction","rtl","important");
+  wrap.style.setProperty("unicode-bidi","isolate","important");
+  wrap.style.setProperty("white-space","nowrap","important");
+
+  start.style.setProperty("direction","ltr","important");
+  start.style.setProperty("unicode-bidi","isolate","important");
+  separator.style.setProperty("direction","rtl","important");
+  end.style.setProperty("direction","ltr","important");
+  end.style.setProperty("unicode-bidi","isolate","important");
+
   start.textContent = formatTime(period.start);
   separator.textContent = "-";
   end.textContent = formatTime(period.end);
@@ -403,7 +419,7 @@ function updateCards(){
     setTimeRange("currentTime", schedule.current);
   }else if(schedule.beforeSchool){
     setText("currentName", "لم يبدأ الدوام");
-    setText("currentTime", "--");
+    setTimeRange("currentTime", schedule.first);
   }else if(schedule.afterSchool){
     setText("currentName", "انتهى الدوام");
     setText("currentTime", "--");
