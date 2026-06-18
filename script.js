@@ -16,21 +16,20 @@ const settings = {
 };
 
 const defaultPeriods = [
-  { name: "الطابور",  start: "12:00", end: "12:15", type: "normal", col: 1 },
-  { name: "الأولى",   start: "12:15", end: "12:55", type: "normal", col: 1 },
-  { name: "الثانية",  start: "12:55", end: "13:35", type: "normal", col: 1 },
-  { name: "الثالثة",  start: "13:35", end: "14:15", type: "normal", col: 1 },
-  { name: "الرابعة",  start: "14:15", end: "14:55", type: "normal", col: 1 },
+  { name: "الطابور",  start: "01:00", end: "01:15", type: "normal", col: 1 },
+  { name: "الأولى",   start: "01:15", end: "01:55", type: "normal", col: 1 },
+  { name: "الثانية",  start: "01:55", end: "02:35", type: "normal", col: 1 },
+  { name: "الثالثة",  start: "02:35", end: "03:15", type: "normal", col: 1 },
+  { name: "الرابعة",  start: "03:15", end: "03:55", type: "normal", col: 1 },
 
-  { name: "الفسحة",   start: "14:55", end: "15:15", type: "break",  col: 2 },
-  { name: "الخامسة",  start: "15:15", end: "15:55", type: "normal", col: 2 },
-  { name: "السادسة",  start: "15:55", end: "16:35", type: "normal", col: 2 },
-  { name: "السابعة",  start: "16:35", end: "17:15", type: "normal", col: 2 },
-  { name: "الصلاة",   start: "17:15", end: "17:35", type: "prayer", col: 2, optionalPrayer: true },
-  { name: "الثامنة",  start: "17:35", end: "18:15", type: "normal", col: 2 }
-]
+  { name: "الفسحة",   start: "03:55", end: "04:15", type: "break",  col: 2 },
+  { name: "الخامسة",  start: "04:15", end: "04:55", type: "normal", col: 2 },
+  { name: "السادسة",  start: "04:55", end: "05:35", type: "normal", col: 2 },
+  { name: "السابعة",  start: "05:35", end: "06:15", type: "normal", col: 2 },
+  { name: "الصلاة",   start: "06:15", end: "06:35", type: "prayer", col: 2, optionalPrayer: true },
+  { name: "الثامنة",  start: "06:35", end: "07:15", type: "normal", col: 2 }
+];
 
-// مؤقتًا للتجربة: استخدام جدول يبدأ 7 مساءً في الحاسوب والهاتف بدل أي جدول محفوظ محليًا.
 const periods = defaultPeriods;
 
 const messages = [
