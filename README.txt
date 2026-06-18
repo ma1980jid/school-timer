@@ -2,7 +2,6 @@
 
 طريقة التشغيل:
 1) افتح index.html?school=alsheikh-saif
-2) لوضع الشاشة التفاعلية افتح classroom.html?school=alsheikh-saif
 
 المطلوب في Supabase:
 - schools.school_slug = alsheikh-saif
@@ -19,8 +18,3 @@ V4 - روابط المدارس المختصرة على Vercel:
 /s/alsheikh-saif
 بدلاً من:
 /index.html?school=alsheikh-saif
-
-ولنسخة الشاشة التفاعلية:
-/classroom/alsheikh-saif
-بدلاً من:
-/classroom.html?school=alsheikh-saif
