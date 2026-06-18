@@ -404,29 +404,49 @@ function setTimeRange(id,period){
   element.replaceChildren(createTimeRange(period));
 }
 
+function cardTime(period){
+  if(!period){
+    return "--";
+  }
+
+  return `${formatTime(period.start)} - ${formatTime(period.end)}`;
+}
+
+function setCardTime(id, period){
+  const element = document.getElementById(id);
+
+  if(!element){
+    return;
+  }
+
+  element.textContent = cardTime(period);
+  element.setAttribute("dir", "ltr");
+}
+
 function updateCards(){
   const schedule = getSchedule();
 
   setText("previousName", schedule.previous ? schedule.previous.name : "--");
-  setTimeRange("previousTime", schedule.previous);
+  setCardTime("previousTime", schedule.previous);
 
   if(schedule.current){
     setText("currentName", schedule.current.name);
-    setTimeRange("currentTime", schedule.current);
+    setCardTime("currentTime", schedule.current);
   }else if(schedule.beforeSchool){
     setText("currentName", "لم يبدأ الدوام");
-    setTimeRange("currentTime", schedule.first);
+    setCardTime("currentTime", schedule.first);
   }else if(schedule.afterSchool){
     setText("currentName", "انتهى الدوام");
-    setText("currentTime", "--");
+    setCardTime("currentTime", null);
   }else{
     setText("currentName", "لا توجد حصة");
-    setText("currentTime", "--");
+    setCardTime("currentTime", null);
   }
 
   setText("nextName", schedule.next ? schedule.next.name : "--");
-  setTimeRange("nextTime", schedule.next);
+  setCardTime("nextTime", schedule.next);
 }
+
 function updateClock(){
   const time = getOmanTimeParts();
 
@@ -670,3 +690,101 @@ tick();
 
 setInterval(tick,1000);
 setInterval(updateVision,5000);
+
+/* إظهار وقت الحصة في المربعات العلوية */
+.period-card{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+}
+
+.period-title,
+.period-name,
+.period-line,
+.period-time{
+  position:static !important;
+  transform:none !important;
+}
+
+.period-title{
+  margin-top:.75rem !important;
+  margin-bottom:.35rem !important;
+}
+
+.period-name{
+  margin-bottom:.55rem !important;
+}
+
+.period-line{
+  margin-bottom:.55rem !important;
+}
+
+.period-time{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  font-size:clamp(18px,1.15vw,28px) !important;
+  font-weight:900 !important;
+  color:#5c5141 !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+  text-align:center !important;
+  z-index:5 !important;
+}
+
+/* تكبير جدول الحصص في الحاسوب */
+@media (min-width:900px){
+
+  .schedule-section{
+    top:38.4% !important;
+    right:2.45% !important;
+    width:48.2% !important;
+    height:45.4% !important;
+  }
+
+  .schedule-grid{
+    gap:1.8% !important;
+    padding:2.1% 2.1% 2.4% !important;
+  }
+
+  .schedule-grid table{
+    border-spacing:0 9px !important;
+  }
+
+  .schedule-grid tr{
+    min-height:52px !important;
+    padding:.38rem .62rem !important;
+    border-radius:16px !important;
+  }
+
+  .schedule-grid td:nth-child(1){
+    font-size:clamp(18px,1.12vw,26px) !important;
+  }
+
+  .schedule-grid td:nth-child(2){
+    font-size:clamp(17px,1.02vw,24px) !important;
+  }
+
+  .schedule-grid td:nth-child(3){
+    font-size:clamp(13px,.82vw,18px) !important;
+  }
+
+  .status-cell{
+    padding:.16rem .32rem !important;
+  }
+
+  .status-cell .duration-text{
+    display:block !important;
+    font-size:clamp(10px,.65vw,15px) !important;
+    margin-top:2px !important;
+  }
+
+  .current-row{
+    transform:scale(1.018) !important;
+    box-shadow:
+      0 0 0 4px rgba(214,163,61,.22),
+      0 10px 20px rgba(0,0,0,.07) !important;
+  }
+}
