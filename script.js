@@ -15,19 +15,18 @@ const settings = {
   activityDay: 1
 };
 
-const defaultPeriods = [
-  {name:"الطابور",start:"07:00",end:"07:15",type:"normal",col:1},
-  {name:"الأولى",start:"07:15",end:"07:55",type:"normal",col:1},
-  {name:"الثانية",start:"07:55",end:"08:35",type:"normal",col:1},
-  {name:"الثالثة",start:"08:35",end:"09:15",type:"normal",col:1},
-  {name:"الرابعة",start:"09:15",end:"09:55",type:"normal",col:1},
-
-  {name:"الفسحة",start:"09:55",end:"10:15",type:"break",col:2},
-  {name:"الخامسة",start:"10:15",end:"10:55",type:"normal",col:2},
-  {name:"السادسة",start:"10:55",end:"11:35",type:"normal",col:2},
-  {name:"السابعة",start:"11:35",end:"12:15",type:"normal",col:2},
-  {name:"الصلاة",start:"12:15",end:"12:35",type:"prayer",col:2,optionalPrayer:true},
-  {name:"الثامنة",start:"12:35",end:"13:15",type:"normal",col:2}
+const defaultSchedule = [
+  { period_name: "الطابور", start_time: "19:00", end_time: "19:15", order_index: 1 },
+  { period_name: "الأولى",  start_time: "19:15", end_time: "19:55", order_index: 2 },
+  { period_name: "الثانية", start_time: "19:55", end_time: "20:35", order_index: 3 },
+  { period_name: "الثالثة", start_time: "20:35", end_time: "21:15", order_index: 4 },
+  { period_name: "الرابعة", start_time: "21:15", end_time: "21:55", order_index: 5 },
+  { period_name: "الفسحة",  start_time: "21:55", end_time: "22:15", order_index: 6 },
+  { period_name: "الخامسة", start_time: "22:15", end_time: "22:55", order_index: 7 },
+  { period_name: "السادسة", start_time: "22:55", end_time: "23:35", order_index: 8 },
+  { period_name: "السابعة", start_time: "23:35", end_time: "00:15", order_index: 9 },
+  { period_name: "الصلاة",  start_time: "00:15", end_time: "00:35", order_index: 10 },
+  { period_name: "الثامنة", start_time: "00:35", end_time: "01:15", order_index: 11 }
 ];
 
 // مؤقتًا للتجربة: استخدام جدول يبدأ 7 صباحًا في الحاسوب والهاتف بدل أي جدول محفوظ محليًا.
@@ -49,6 +48,11 @@ const dayMap = {
   Fri:5,
   Sat:6
 };
+
+function formatTimeRange(start, end) {
+  if (!start || !end) return "--";
+  return `${start} - ${end}`;
+}
 
 function loadPeriods(){
   const stored = readStoredPeriods();
