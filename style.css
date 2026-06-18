@@ -921,15 +921,14 @@ body{
     margin-top:1.35rem !important;
     transform:translateY(8px) !important;
   }
-}
-/* إصلاح ظهور وقت الحصة في المربعات العلوية */
+}/* إصلاح ظهور وقت الحصة في المربعات العلوية */
 #previousTime,
 #currentTime,
 #nextTime,
 .period-time{
   position:absolute !important;
   top:auto !important;
-  bottom:-5% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
+  bottom:0% !important;          /* ينزله للأسفل بدون أن يخرج من المربع */
   left:50% !important;
   transform:translateX(-50%) !important;
   width:90% !important;
@@ -943,8 +942,7 @@ body{
   unicode-bidi:isolate !important;
   white-space:nowrap !important;
   z-index:20 !important;
-}
-/* ================================
+}/* ================================
    تنزيل متبقي الحصة داخل المربع الأخضر
 ================================ */
 .count-label{
