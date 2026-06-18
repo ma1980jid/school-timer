@@ -743,3 +743,15 @@ body{
     }
   }
 }
+
+/* إخفاء نصوص المدرسة والرؤية في واجهة الحاسوب */
+@media (min-width:900px){
+  .middle-cards,
+  .school-name-card,
+  .vision-card,
+  #schoolName,
+  #visionText{
+    display:none !important;
+    visibility:hidden !important;
+  }
+}
