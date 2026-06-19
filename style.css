@@ -447,31 +447,38 @@ body {
     overflow: hidden !important;
   }
 
-  .timer-app {
-    width: 100vw;
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-    background: var(--cream) url("./mobile-bg.png") top center / 100% 100% no-repeat;
+   .timer-app {
+    position: relative !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: var(--cream) url("./mobile-bg.png") top center / 100% 100% no-repeat !important;
   }
 
-  /* شعار المدرسة */
+   /* شعار المدرسة */
   .school-logo-wrap {
-    top: 5.4%;
-    right: 23%;
-    width: 15.2%;
-    height: 7%;
-    z-index: 40;
+    position: absolute !important;
+    top: 5.4% !important;
+    right: 23% !important;
+    width: 15.2% !important;
+    height: 7% !important;
+    z-index: 40 !important;
   }
 
   /* المربعات العلوية */
-  .top-cards {
-    top: 26.4%;
-    left: 4%;
-    right: 4%;
-    height: 11.9%;
-    gap: 2.2%;
-  }
+ .top-cards {
+  position: absolute !important;
+  top: 26.4% !important;
+  left: 4% !important;
+  right: 4% !important;
+  height: 11.9% !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 2.2% !important;
+  z-index: 30 !important;
+}
 
   .period-card {
     position: relative;
@@ -526,11 +533,12 @@ body {
 
   /* لوحة الساعة */
   .clock-panel {
-    top: 39.5%;
-    left: 4%;
-    width: 92%;
-    height: 17.2%;
-  }
+  position: absolute !important;
+  top: 39.5% !important;
+  left: 4% !important;
+  width: 92% !important;
+  height: 17.2% !important;
+}
 
   /* اليوم والتاريخ */
   .date-box {
