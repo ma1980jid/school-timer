@@ -655,3 +655,222 @@ body{
     grid-template-columns:38% 42% 20%;
   }
 }
+
+@media (max-width:768px){
+
+  /* شعار المدرسة بجانب شعار وزارة التعليم */
+  .school-logo-wrap{
+    top: 7%;
+    right: 18%;
+    width: 16%;
+    height: 7.4%;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .school-logo-wrap img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* المربعات العلوية */
+  .top-cards{
+    top: 26.8%;
+    left: 4%;
+    right: 4%;
+    height: 13.8%;
+    gap: 2.2%;
+  }
+
+  .period-card{
+    padding: 1vw 0.8vw 0.8vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* إلغاء الخطوط داخل المربعات العلوية */
+  .period-card::after,
+  .period-line{
+    display: none !important;
+  }
+
+  /* النصوص داخل المربعات فقط */
+  .period-title{
+    font-size: clamp(12px, 3vw, 17px);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .period-name{
+    font-size: clamp(18px, 4.9vw, 32px);
+    line-height: 1.02;
+    margin-top: 0.7vw;
+    max-width: 92%;
+    white-space: normal;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .period-time{
+    margin-top: 0.7vw;
+    font-size: clamp(11px, 2.7vw, 15px);
+    line-height: 1;
+  }
+
+  /* رفع لوحة الساعة */
+  .clock-panel{
+    top: 39%;
+    left: 4%;
+    width: 92%;
+    height: 16.5%;
+  }
+
+  /* اليوم والتاريخ: لليسار + توسيط عمودي وأفقي */
+  .date-box{
+    top: 43%;
+    left: 7%;
+    right: auto;
+    width: 28%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.2rem;
+  }
+
+  .date-box strong{
+    font-size: clamp(16px, 4.2vw, 24px);
+    line-height: 1.1;
+    margin-bottom: 0.4vw;
+  }
+
+  .date-box span{
+    font-size: clamp(11px, 3vw, 15px);
+    line-height: 1.25;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* رفع الساعة الرقمية ومتبقي الحصة */
+  .clock-area{
+    top: 2%;
+    left: 35%;
+    width: 59%;
+  }
+
+  .digital-clock{
+    font-size: clamp(34px, 9vw, 56px);
+    line-height: 0.95;
+  }
+
+  .count-label{
+    margin-top: 0.6vw;
+    padding-top: 0.9vw;
+    font-size: clamp(12px, 3.2vw, 18px);
+  }
+
+  .remaining-time{
+    margin-top: 0.3vw;
+    font-size: clamp(27px, 7.2vw, 44px);
+    line-height: 1;
+  }
+
+  /* رفع المربعين */
+  .middle-cards{
+    top: 57.5%;
+    left: 4%;
+    right: 4%;
+    height: 8.8%;
+    gap: 2.2%;
+  }
+
+  .mini-card{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5vw;
+    font-size: clamp(14px, 4vw, 22px);
+    line-height: 1.18;
+  }
+
+  /* جدول الحصص بشكل أرتب */
+  .schedule-section{
+    top: 67.5%;
+    left: 4%;
+    right: 4%;
+    width: auto;
+    height: 18.3%;
+    padding: 2vw 2.4vw;
+  }
+
+  .schedule-grid{
+    grid-template-columns: 1fr 1fr;
+    gap: 2vw;
+    align-content: start;
+  }
+
+  .schedule-grid table{
+    border-spacing: 0 0.7vw;
+  }
+
+  .schedule-grid tr{
+    min-height: 32px;
+    height: 7.2vw;
+    grid-template-columns: 38% 41% 21%;
+    border-radius: 1.5vw;
+  }
+
+  .schedule-grid td:first-child{
+    font-size: clamp(12px, 3.2vw, 18px);
+  }
+
+  .time-cell{
+    font-size: clamp(10px, 2.8vw, 15px);
+  }
+
+  .status-cell{
+    font-size: clamp(8px, 2.1vw, 11px);
+    line-height: 1;
+  }
+
+  /* شريط الرسائل في منتصف المربع السفلي */
+  .ticker{
+    left: 4%;
+    right: 4%;
+    bottom: 2%;
+    height: 5.3%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .ticker-track{
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .ticker-group{
+    display: flex;
+    align-items: center;
+    gap: 8vw;
+  }
+
+  .ticker-item{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: clamp(12px, 3.4vw, 18px);
+  }
+}
