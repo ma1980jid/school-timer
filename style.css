@@ -466,7 +466,7 @@ body {
 
   /* المربعات العلوية */
   .top-cards {
-    top: 26.6%;
+    top: 20%;
     left: 4%;
     right: 4%;
     height: 11.9%;
@@ -526,7 +526,7 @@ body {
 
   /* لوحة الساعة */
   .clock-panel {
-    top: 30%;
+    top: 35%;
     left: 4%;
     width: 92%;
     height: 17.2%;
