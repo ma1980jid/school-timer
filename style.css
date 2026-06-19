@@ -621,7 +621,7 @@ body{
   /* المربعات العلوية */
   .top-cards{
     position:absolute;
-    top:5%;
+    top:1%;
     left:4%;
     right:4%;
     height:13.8%;
@@ -654,9 +654,9 @@ body{
   }
 
   .period-name{
-    font-size:clamp(18px,4.9vw,32px);
+    font-size:clamp(9px,4.9vw,32px);
     line-height:1.02;
-    margin-top:0.7vw;
+    margin-top:5vw;
     max-width:92%;
     white-space:normal;
     overflow:hidden;
