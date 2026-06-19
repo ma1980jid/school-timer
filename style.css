@@ -420,66 +420,6 @@ body{
   }
 }
 
-/* الهاتف */
-@media (max-width:768px){
-  body{
-    overflow-y:auto;
-    background:var(--cream);
-  }
-
-  .timer-app{
-    width:100%;
-    height:auto;
-    min-height:var(--app-height,100dvh);
-    overflow:visible;
-    background:var(--cream) url("mobile-bg.png") top center/100% auto no-repeat;
-    padding:0 4vw 7vw;
-  }
-
-  .school-logo-wrap{
-    position:absolute;
-    top:6.2vw;
-    right:57vw;
-    width:15vw;
-    height:13vw;
-  }
-
-  .top-cards{
-    position:relative;
-    top:auto;
-    left:auto;
-    right:auto;
-    height:auto;
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:2.2vw;
-    margin-top:52vw;
-    direction:ltr;
-    z-index:30;
-  }
-
-  .period-card{
-    min-height:31vw;
-    border-width:1.5px;
-    border-radius:2.2vw;
-    padding:3.2vw 1vw 2vw;
-    background:rgba(255,255,255,.20);
-  }
-
-  .period-title{
-    font-size:clamp(14px,3.7vw,20px);
-  }
-
-  .period-name{
-    margin-top:2.2vw;
-    font-size:clamp(28px,8vw,48px);
-    line-height:.95;
-  }
-
-  .period-line{
-    width:76%;
-    margin:2.3vw 0 1.6vw;
-  }
 
   .period-time{
     font-size:clamp(13px,3.7vw,19px);
