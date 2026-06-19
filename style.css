@@ -681,7 +681,7 @@ body{
   /* المربعات العلوية */
   .top-cards{
     position:absolute;
-    top:26.8%;
+    top:40%;
     left:4%;
     right:4%;
     height:13.8%;
