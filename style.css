@@ -4,37 +4,64 @@
   padding:0;
 }
 
+:root{
+  --cream:#f8f2e8;
+  --green:#064b35;
+  --gold:#c69732;
+  --red:#c81515;
+  --muted:#756a58;
+  --shadow:0 12px 28px rgba(42,31,15,.12);
+}
+
 html,
 body{
   width:100%;
   min-height:100%;
   font-family:Tahoma, Arial, sans-serif;
-  background:#f8f2e8;
-  color:#064b35;
+  background:var(--cream);
+  color:var(--green);
+  direction:rtl;
 }
 
 html{
-  overflow:hidden;
+  overflow-x:hidden;
 }
 
 body{
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
+/* الأرقام والأوقات تبقى واضحة من اليسار لليمين */
+.period-time,
+.time-cell,
+.digital-clock,
+.remaining-time{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+}
+
+.timer-app{
+  position:relative;
+  width:100vw;
+  height:56.25vw;
+  min-height:720px;
+  overflow:hidden;
+  background:var(--cream) url("desktop-bg.png") center/100% 100% no-repeat;
+}
+
+/* شعار المدرسة بجانب شعار وزارة التعليم في الخلفية */
+.school-logo-wrap{
+  position:absolute;
+  top:5.2%;
+  right:23.5%;
+  width:7.2%;
+  height:9.5%;
+  z-index:50;
   display:flex;
   align-items:center;
   justify-content:center;
-  overflow:hidden;
-}
-
-/* التطبيق العام */
-.timer-app{
-  position:relative;
-  overflow:hidden;
-  background:#f8f2e8;
-}
-
-/* شعار المدرسة */
-.school-logo-wrap{
-  position:absolute;
-  z-index:60;
 }
 
 .school-logo-wrap img{
@@ -44,280 +71,297 @@ body{
   display:block;
 }
 
-/* ضبط عرض الأوقات */
-.period-time,
-.time-cell,
-.time-range,
-.time-start,
-.time-end,
-.time-separator,
-.remaining-time,
-.digital-clock{
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  white-space:nowrap !important;
-}
-
-/* =========================
-   المربعات العلوية
-========================= */
+/* المربعات العلوية */
 .top-cards{
   position:absolute;
+  top:21.2%;
+  left:2.8%;
+  right:2.8%;
+  height:18.2%;
   z-index:30;
   display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:3.8%;
+  direction:ltr;
 }
 
 .period-card{
-  background:rgba(255,255,255,.08);
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
   text-align:center;
   overflow:hidden;
-  padding-inline:1rem;
+  padding:1.05vw 1vw .75vw;
+  background:rgba(255,255,255,.10);
+  border-radius:1.35vw;
 }
+
+.next-card{grid-column:1; border:3px solid rgba(183,139,42,.96); border-top-color:rgba(216,169,61,.9);}
+.current-card{grid-column:2; border:3px solid rgba(200,21,21,.95);}
+.previous-card{grid-column:3; border:3px solid rgba(6,75,53,.96);}
 
 .period-title{
   width:100%;
+  font-size:clamp(20px,1.55vw,34px);
+  line-height:1.1;
   font-weight:900;
-  color:#7a6d56;
-  line-height:1.2;
-  margin-bottom:.35rem;
+  color:var(--muted);
+}
+
+.current-card .period-title{
+  color:var(--red);
 }
 
 .period-name{
   width:100%;
+  margin-top:.35vw;
+  font-size:clamp(34px,3.05vw,62px);
+  line-height:1;
   font-weight:900;
-  line-height:1.05;
-  margin-bottom:.35rem;
+  color:var(--green);
 }
 
-.next-card .period-name,
-.previous-card .period-name{
-  color:#064b35;
-}
-
-.current-card .period-title,
 .current-card .period-name{
-  color:#c81515;
+  color:var(--red);
 }
 
 .period-line{
-  width:70%;
+  width:58%;
   height:2px;
-  background:linear-gradient(to left, transparent, rgba(190,145,45,.95), transparent);
   flex-shrink:0;
-  margin-bottom:.45rem;
+  margin:.45vw 0 .35vw;
+  background:linear-gradient(to left, transparent, rgba(190,145,45,.95), transparent);
 }
 
 .period-time{
   width:100%;
-  text-align:center;
+  font-size:clamp(18px,1.35vw,28px);
+  line-height:1.1;
   font-weight:900;
   color:#5c5141;
-  line-height:1.25;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  white-space:nowrap !important;
-  margin-top:.25rem;
+  margin-top:.15vw;
 }
 
-/* =========================
-   المربع الأخضر
-========================= */
+/* المربع الأخضر */
 .clock-panel{
   position:absolute;
+  top:42.2%;
+  left:2.8%;
+  width:46.5%;
+  height:40.5%;
   z-index:25;
   overflow:hidden;
+  border-radius:1.2vw;
 }
 
 .date-box{
   position:absolute;
+  top:23%;
+  right:9.5%;
+  width:23%;
+  min-height:40%;
+  z-index:5;
   display:flex;
   flex-direction:column;
   align-items:flex-end;
-  justify-content:flex-start;
+  justify-content:center;
   text-align:right;
-  color:#f3df9c;
-  z-index:3;
+  color:#f4df9c;
 }
 
-.date-box strong{
+.date-box strong,
+.date-box span{
   display:block;
+  width:100%;
   font-weight:900;
   color:#f4df9c;
 }
 
+.date-box strong{
+  font-size:clamp(22px,1.9vw,40px);
+  margin-bottom:.6vw;
+}
+
 .date-box span{
-  display:block;
-  font-weight:800;
-  color:#f4df9c;
+  font-size:clamp(16px,1.25vw,26px);
+  line-height:1.35;
 }
 
 .clock-area{
   position:absolute;
+  top:14%;
+  left:31%;
+  width:58%;
+  z-index:6;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
   text-align:center;
-  z-index:3;
 }
 
 .digital-clock{
-  font-weight:900;
-  color:#ffffff;
+  font-size:clamp(54px,5.15vw,110px);
   line-height:.95;
-  text-shadow:0 2px 10px rgba(0,0,0,.22);
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 3px 14px rgba(0,0,0,.28);
 }
 
 .count-label{
-  color:#ffffff;
-  font-weight:900;
-  line-height:1.25;
   position:relative;
-  margin-top:.35rem;
+  margin-top:1.3vw;
+  padding-top:.85vw;
+  color:#fff;
+  font-weight:900;
+  font-size:clamp(20px,1.6vw,34px);
+  line-height:1.2;
 }
 
-.count-label::after{
+.count-label::before{
   content:"";
   position:absolute;
-  left:18%;
-  right:18%;
-  bottom:-.55rem;
+  top:0;
+  left:12%;
+  right:12%;
   height:2px;
   background:linear-gradient(to left, transparent, rgba(212,176,84,.95), transparent);
 }
 
 .remaining-time{
+  margin-top:1.15vw;
+  font-size:clamp(40px,3.6vw,78px);
+  line-height:1;
   font-weight:900;
   color:#d7aa3d;
-  line-height:1;
-  text-shadow:0 2px 8px rgba(0,0,0,.16);
+  text-shadow:0 2px 8px rgba(0,0,0,.18);
 }
 
-/* =========================
-   بطاقتا وسط الهاتف
-========================= */
+/* بطاقتا الهاتف فقط */
 .middle-cards{
-  position:absolute;
-  z-index:30;
+  display:none;
 }
 
-.mini-card{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  font-weight:900;
-  color:#064b35;
-}
-
-/* =========================
-   جدول الحصص
-========================= */
+/* جدول الحصص */
 .schedule-section{
   position:absolute;
+  top:42.2%;
+  right:2.8%;
+  width:50.2%;
+  height:40.5%;
   z-index:35;
   overflow:hidden;
+  padding:2.1vw 2.2vw;
 }
 
 .schedule-grid{
   width:100%;
   height:100%;
   display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2.2%;
+  align-content:center;
   direction:rtl;
 }
 
 .schedule-grid table{
   width:100%;
   border-collapse:separate;
+  border-spacing:0 .42vw;
   table-layout:fixed;
 }
 
-.schedule-grid tbody{
-  display:block;
+.schedule-grid tbody,
+.schedule-grid tr{
   width:100%;
 }
 
 .schedule-grid tr{
+  height:clamp(44px,3.1vw,62px);
   display:grid;
+  grid-template-columns:34% 42% 24%;
   align-items:center;
-  background:rgba(255,255,255,.80);
-  border:1px solid rgba(185,160,112,.30);
-  box-shadow:0 3px 8px rgba(0,0,0,.035);
-  border-radius:14px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(185,160,112,.28);
+  border-radius:1vw;
+  box-shadow:0 5px 16px rgba(50,31,8,.06);
+  overflow:hidden;
 }
 
 .schedule-grid td{
-  padding:0;
-  border:0;
-  background:transparent;
-  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100%;
   font-weight:900;
-  line-height:1.1;
-  overflow:visible;
+  color:var(--green);
+  text-align:center;
+  line-height:1.05;
 }
 
-.schedule-grid td:nth-child(1){
-  color:#064b35;
-  white-space:nowrap;
+.schedule-grid td:first-child{
+  font-size:clamp(18px,1.55vw,31px);
 }
 
-.schedule-grid td:nth-child(2){
+.time-cell{
+  font-size:clamp(15px,1.35vw,26px);
+  font-weight:900;
   color:#111;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  white-space:nowrap;
-}
-
-.schedule-grid td:nth-child(3){
-  color:#0f766e;
 }
 
 .status-cell{
-  display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:rgba(15,118,110,.06);
-  border-radius:999px;
+  font-size:clamp(12px,.9vw,18px);
+  color:#00705f;
+  line-height:1.05;
 }
 
-.status-cell .duration-text{
+.state-text,
+.duration-text{
   display:block;
+  font-weight:900;
+}
+
+.duration-text{
+  font-size:.82em;
+  margin-top:.14vw;
 }
 
 .current-row{
-  background:linear-gradient(90deg, rgba(255,246,222,.98), rgba(255,255,255,.92)) !important;
-  border:2px solid #d6a33d !important;
-  box-shadow:
-    0 0 0 4px rgba(214,163,61,.20),
-    0 8px 18px rgba(0,0,0,.06) !important;
+  border:3px solid #d8a73c !important;
+  background:rgba(255,248,220,.95) !important;
+  box-shadow:0 0 0 3px rgba(216,167,60,.16), 0 9px 22px rgba(108,75,8,.16) !important;
 }
 
 .current-row td,
-.current-row .state-text{
-  color:#c81515 !important;
+.current-row .time-cell,
+.current-row .status-cell{
+  color:#c01818 !important;
 }
 
-.break-row td:nth-child(1),
-.break-row td:nth-child(2){
-  color:#7c3aed !important;
+.break-row td,
+.break-row .time-cell{
+  color:#7c41d9;
 }
 
-.prayer-row td:nth-child(1),
-.prayer-row td:nth-child(2){
-  color:#c26b00 !important;
+.prayer-row td,
+.prayer-row .time-cell{
+  color:#b65b05;
 }
 
-/* =========================
-   شريط الرسائل
-========================= */
+/* شريط الرسائل */
 .ticker{
   position:absolute;
+  left:5.6%;
+  right:5.6%;
+  bottom:3.7%;
+  height:9%;
   z-index:45;
+  overflow:hidden;
   display:flex;
   align-items:center;
-  justify-content:center;
-  overflow:hidden;
   direction:ltr;
 }
 
@@ -325,1346 +369,289 @@ body{
   display:flex;
   align-items:center;
   width:max-content;
-  max-width:none;
+  animation:tickerMove 28s linear infinite;
   will-change:transform;
 }
 
 .ticker-group{
   display:flex;
   align-items:center;
-  justify-content:center;
+  gap:5.5vw;
   flex-shrink:0;
+  padding-inline:3vw;
 }
 
 .ticker-item{
-  white-space:nowrap;
+  font-size:clamp(18px,1.6vw,32px);
   font-weight:900;
-  text-align:center;
+  color:var(--green);
+  white-space:nowrap;
 }
 
-/* =========================================================
-   واجهة الحاسوب
-========================================================= */
-@media (min-width:1025px){
+@keyframes tickerMove{
+  from{ transform:translateX(-50%); }
+  to{ transform:translateX(0); }
+}
 
-  body{
-    width:100vw;
-    min-height:100dvh;
-    height:auto;
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
-    overflow-x:hidden;
-    overflow-y:auto;
-  }
-
+/* شاشات الحاسوب الصغيرة أو العرض العادي: نسمح بالتمرير بدل قص العناصر */
+@media (min-width:769px) and (max-height:900px){
   .timer-app{
-    aspect-ratio:16 / 9;
-    width:100vw;
-    height:calc(100vw * 9 / 16);
-    max-width:100vw;
-    min-height:0;
-    background:url("desktop-bg.png?v=1") center/100% 100% no-repeat;
-    container-type:size;
+    height:56.25vw;
+    min-height:720px;
   }
-
-  /* تكبير ومحاذاة شعار المدرسة */
-.school-logo-wrap{
-  top:2.15%;
-  right:15.1%;
-  width:11.2%;
-  height:12.2%;
 }
-  .top-cards{
-    top:17.6%;
-    left:2.8%;
-    right:2.8%;
-    height:16.7%;
-    grid-template-columns:1fr 1fr 1fr;
-    grid-template-areas:"next current previous";
-    gap:1.9%;
-    direction:ltr;
-  }
 
-  .next-card{ grid-area:next; }
-  .current-card{ grid-area:current; }
-  .previous-card{ grid-area:previous; }
-
-  .period-card{
-    padding-top:1.1rem;
-  }
-
-  .period-title{
-    font-size:clamp(20px,1.2vw,30px);
-    margin-bottom:.6rem;
+/* التابلت والأيباد */
+@media (min-width:769px) and (max-width:1100px){
+  .timer-app{
+    min-height:900px;
   }
 
   .period-name{
-    font-size:clamp(34px,2.45vw,60px);
-    margin-bottom:.9rem;
+    font-size:clamp(28px,3vw,46px);
   }
 
-  .period-line{
-    margin-bottom:.95rem;
-  }
-
-  /* تنظيم الوقت أسفل الخط مع ترك مسافة */
-  .period-time{
-    font-size:clamp(18px,1.12vw,26px);
-    margin-top:.15rem;
-  }
-
-  /* المربع الأخضر */
-  .clock-panel{
-    top:39.0%;
-    left:2.65%;
-    width:45.2%;
-    height:44.2%;
-    border-radius:24px;
-  }
-
-/* اليوم والتاريخ داخل المربع الأخضر */
-.date-box{
-  top:22%;
-  left:13%;
-  width:22%;
-  height:46%;
-  text-align:center !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-  .date-box strong{
-    font-size:clamp(24px,1.55vw,36px);
-    line-height:1.15;
-    margin-bottom:.45rem;
-  }
-
-  .date-box span{
-    font-size:clamp(18px,1.05vw,24px);
-    line-height:1.45;
-  }
-
-  .clock-area{
-    top:8%;
-    right:7%;
-    width:60%;
-    height:48%;
-  }
-
-  /* عرض الساعة مع الثواني */
   .digital-clock{
-    font-size:clamp(54px,3.85vw,82px);
-    margin-bottom:.45rem;
-    letter-spacing:1px;
-  }
-
-.count-label{
-  font-size:clamp(19px,1.18vw,28px);
-  margin-top:.65rem;
-  margin-bottom:1.25rem;
-}
-
-.remaining-time{
-  font-size:clamp(38px,2.7vw,64px);
-  margin-top:.55rem;
-}
-
-  .schedule-section{
-    top:39.0%;
-    right:2.7%;
-    width:47.4%;
-    height:44.0%;
-    border-radius:22px;
-  }
-
-  .schedule-grid{
-    grid-template-columns:1fr 1fr;
-    gap:1.5%;
-    padding:2.0% 2.2% 2.2%;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 7px;
+    font-size:clamp(46px,5vw,80px);
   }
 
   .schedule-grid tr{
-    grid-template-columns:.94fr 1.34fr .66fr;
-    gap:.28rem;
-    min-height:44px;
-    padding:.28rem .48rem;
-  }
-
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(16px,.98vw,22px);
-  }
-
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(15px,.92vw,20px);
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(12px,.72vw,16px);
-  }
-
- .status-cell{
-  padding:.12rem .26rem;
-}
-
-.status-cell .duration-text{
-  display:block;
-  font-size:clamp(10px,.62vw,14px);
-  line-height:1.15;
-  margin-top:2px;
-}
-
-  .current-row{
-    transform:scale(1.012);
-  }
-
-  /* حذف النجمة نهائيا + تحريك من اليسار إلى اليمين + رفع الشريط */
- .ticker{
-  left:5.2%;
-  right:5.2%;
-  bottom:6.1%;
-  height:4.4%;
-  padding-inline:1.8%;
-}
-
-  .ticker-track{
-    animation:tickerMoveDesktop 28s linear infinite;
-  }
-
-  .ticker-group{
-    gap:4.2vw;
-    padding-inline:2.4vw;
-  }
-
-  .ticker-item{
-    color:#064b35;
-    font-size:clamp(18px,1.10vw,28px);
-  }
-
-  @keyframes tickerMoveDesktop{
-    from{
-      transform:translateX(-34%);
-    }
-    to{
-      transform:translateX(34%);
-    }
+    grid-template-columns:34% 42% 24%;
   }
 }
 
-
-/* تثبيت قياسات واجهة الحاسوب داخل إطار 16:9 بعرض كامل مع السماح بالتمرير الرأسي عند الحاجة */
-@media (min-width:1025px){
-  .period-title{ font-size:clamp(20px,1.2cqw,30px); }
-  .period-name{ font-size:clamp(34px,2.45cqw,60px); }
-  .period-time{ font-size:clamp(18px,1.12cqw,26px); }
-
-  .date-box strong{ font-size:clamp(24px,1.55cqw,36px); }
-  .date-box span{ font-size:clamp(18px,1.05cqw,24px); }
-  .digital-clock{ font-size:clamp(54px,3.85cqw,82px); }
-  .count-label{ font-size:clamp(19px,1.18cqw,28px); }
-  .remaining-time{ font-size:clamp(38px,2.7cqw,64px); }
-
-  .schedule-grid td:nth-child(1){ font-size:clamp(18px,1.08cqw,25px); }
-  .schedule-grid td:nth-child(2){ font-size:clamp(17px,1.02cqw,23px); }
-  .schedule-grid td:nth-child(3){ font-size:clamp(13px,.80cqw,18px); }
-  .status-cell .duration-text{ font-size:clamp(10px,.64cqw,14px); }
-
-  .ticker-group{ gap:4.2cqw; padding-inline:2.4cqw; }
-  .ticker-item{ font-size:clamp(18px,1.10cqw,28px); }
-}
-
-/* =========================================================
-   واجهة الهاتف
-========================================================= */
-@media (max-width:1024px){
-
+/* الهاتف */
+@media (max-width:768px){
   body{
-    width:100vw;
-    min-height:100vh;
+    overflow-y:auto;
+    background:var(--cream);
   }
 
   .timer-app{
-    width:100vw;
-    height:var(--app-height,100vh);
-    max-width:768px;
-    background:url("mobile-bg.png?v=1") center/100% 100% no-repeat;
+    width:100%;
+    height:auto;
+    min-height:var(--app-height,100dvh);
+    overflow:visible;
+    background:var(--cream) url("mobile-bg.png") top center/100% auto no-repeat;
+    padding:0 4vw 7vw;
   }
 
-  /* تكبير ومحاذاة شعار المدرسة */
-.school-logo-wrap{
-  top:4.1%;
-  right:16.8%;
-  width:17%;
-  height:8.8%;
-}
+  .school-logo-wrap{
+    position:absolute;
+    top:6.2vw;
+    right:57vw;
+    width:15vw;
+    height:13vw;
+  }
 
   .top-cards{
-    top:22.8%;
-    left:5.5%;
-    right:5.5%;
-    height:13.5%;
-    grid-template-columns:repeat(3,1fr);
-    gap:2.4%;
+    position:relative;
+    top:auto;
+    left:auto;
+    right:auto;
+    height:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:2.2vw;
+    margin-top:52vw;
     direction:ltr;
+    z-index:30;
   }
 
-  .next-card{ grid-column:1; }
-  .current-card{ grid-column:2; }
-  .previous-card{ grid-column:3; }
-
   .period-card{
-    padding-top:.6rem;
-    padding-inline:.35rem;
+    min-height:31vw;
+    border-width:1.5px;
+    border-radius:2.2vw;
+    padding:3.2vw 1vw 2vw;
+    background:rgba(255,255,255,.20);
   }
 
   .period-title{
-    font-size:clamp(13px,3.1vw,18px);
-    margin-bottom:.35rem;
+    font-size:clamp(14px,3.7vw,20px);
   }
 
   .period-name{
-    font-size:clamp(25px,7vw,42px);
-    margin-bottom:.45rem;
+    margin-top:2.2vw;
+    font-size:clamp(28px,8vw,48px);
+    line-height:.95;
   }
 
   .period-line{
-    margin-bottom:.5rem;
+    width:76%;
+    margin:2.3vw 0 1.6vw;
   }
 
   .period-time{
-    font-size:clamp(10px,2.8vw,16px);
-    margin-top:.05rem;
+    font-size:clamp(13px,3.7vw,19px);
+    margin-top:.2vw;
   }
 
   .clock-panel{
-    top:38.0%;
-    left:5.5%;
-    right:5.5%;
-    height:17.2%;
-    border-radius:18px;
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    height:39vw;
+    margin-top:3.3vw;
+    border-radius:2vw;
+    background:#064b35;
+    border:2px solid rgba(204,163,61,.85);
+    box-shadow:var(--shadow);
   }
 
-.date-box{
-  top:20%;
-  left:10.2%;
-  width:27%;
-  height:58%;
-}
+  .date-box{
+    top:22%;
+    right:7%;
+    width:30%;
+    align-items:flex-end;
+    text-align:right;
+  }
 
   .date-box strong{
-    font-size:clamp(18px,5vw,30px);
-    margin-bottom:.25rem;
+    font-size:clamp(18px,5.5vw,28px);
+    margin-bottom:1.6vw;
   }
 
   .date-box span{
-    font-size:clamp(12px,3.5vw,20px);
-    line-height:1.45;
+    font-size:clamp(13px,3.7vw,18px);
   }
 
   .clock-area{
-    top:8%;
-    right:7%;
-    width:60%;
-    height:80%;
+    top:15%;
+    left:4%;
+    width:58%;
   }
 
   .digital-clock{
-    font-size:clamp(42px,11vw,68px);
-    margin-bottom:.2rem;
-    letter-spacing:.5px;
+    font-size:clamp(46px,12vw,70px);
   }
 
   .count-label{
-    font-size:clamp(15px,4vw,24px);
-    margin-bottom:.8rem;
+    margin-top:2.5vw;
+    padding-top:1.8vw;
+    font-size:clamp(16px,4.3vw,24px);
   }
 
   .remaining-time{
-    font-size:clamp(32px,9vw,56px);
+    margin-top:2vw;
+    font-size:clamp(35px,9vw,56px);
   }
 
   .middle-cards{
-    top:56.9%;
-    left:5.5%;
-    right:5.5%;
-    height:7.8%;
+    position:relative;
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:2.5%;
+    gap:2.2vw;
+    margin-top:3vw;
+    z-index:20;
   }
 
   .mini-card{
-    font-size:clamp(16px,4.6vw,26px);
+    min-height:21vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:2vw;
+    background:rgba(255,255,255,.82);
+    border-radius:2vw;
+    box-shadow:var(--shadow);
+    font-weight:900;
+    color:var(--green);
+    font-size:clamp(19px,5.1vw,30px);
     line-height:1.25;
   }
 
   .schedule-section{
-    top:66.4%;
-    left:5.5%;
-    right:5.5%;
-    height:23.0%;
+    position:relative;
+    top:auto;
+    right:auto;
+    width:100%;
+    height:auto;
+    margin-top:3vw;
+    padding:7vw 3.2vw 8vw;
+    overflow:visible;
+    border:2px solid rgba(190,145,45,.55);
+    border-radius:2vw;
+    background:rgba(255,255,255,.40);
   }
 
   .schedule-grid{
+    display:grid;
     grid-template-columns:1fr 1fr;
-    gap:2.5%;
-    padding:2.4% 2.2%;
+    gap:2vw;
+    align-items:start;
   }
 
   .schedule-grid table{
-    border-spacing:0 6px;
+    border-spacing:0 1.25vw;
   }
 
   .schedule-grid tr{
-    grid-template-columns:.95fr 1.25fr .7fr;
-    min-height:34px;
-    padding:.15rem .25rem;
+    height:11.4vw;
+    min-height:45px;
+    grid-template-columns:38% 41% 21%;
+    border-radius:2vw;
   }
 
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(12px,3.1vw,17px);
+  .schedule-grid td:first-child{
+    font-size:clamp(15px,4.15vw,22px);
   }
 
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(11px,2.9vw,16px);
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(10px,2.5vw,14px);
+  .time-cell{
+    font-size:clamp(13px,3.45vw,18px);
   }
 
   .status-cell{
-    padding:.1rem .18rem;
+    font-size:clamp(10px,2.75vw,14px);
   }
 
-  .status-cell .duration-text{
-    font-size:.72em;
-  }
-
-  /* حذف النجمة + تحريك من اليسار إلى اليمين + رفع الشريط */
-.ticker{
-  left:5.5%;
-  right:5.5%;
-  bottom:7.1%;
-  height:4.0%;
-  padding-inline:2%;
-}
-
-  .ticker-track{
-    animation:tickerMoveMobile 24s linear infinite;
+  .ticker{
+    position:relative;
+    left:auto;
+    right:auto;
+    bottom:auto;
+    width:100%;
+    height:11vw;
+    margin-top:4vw;
+    border-radius:2vw;
+    background:#064b35;
+    border:2px solid rgba(204,163,61,.85);
   }
 
   .ticker-group{
-    gap:2rem;
-    padding-inline:1rem;
+    gap:10vw;
   }
 
   .ticker-item{
-    color:#f4e2aa;
-    font-size:clamp(14px,3.8vw,22px);
-  }
-
-  @keyframes tickerMoveMobile{
-    from{
-      transform:translateX(-40%);
-    }
-    to{
-      transform:translateX(40%);
-    }
+    color:#f4df9c;
+    font-size:clamp(16px,4.5vw,24px);
   }
 }
 
-/* إخفاء نصوص المدرسة والرؤية في واجهة الحاسوب */
-@media (min-width:1025px){
-  .middle-cards,
-  .school-name-card,
-  .vision-card,
-  #schoolName,
-  #visionText{
-    display:none !important;
-    visibility:hidden !important;
-  }
-}
-
-/* ================================
-   إظهار وقت الحصة في المربعات العلوية
-================================ */
-.period-card{
-  position:relative !important;
-}
-
-#previousTime,
-#currentTime,
-#nextTime,
-.period-time{
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  position:absolute !important;
-  left:50% !important;
-  top:66% !important;
-  transform:translateX(-50%) !important;
-  width:90% !important;
-  text-align:center !important;
-  font-size:clamp(18px,1.15vw,27px) !important;
-  font-weight:900 !important;
-  color:#5c5141 !important;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  white-space:nowrap !important;
-  z-index:20 !important;
-}
-
-#previousName,
-#currentName,
-#nextName,
-.period-name{
-  top:38% !important;
-}
-
-/* ================================
-   تكبير جدول الحصص ومربعات الحصص
-================================ */
-@media (min-width:1025px){
-
-  .schedule-section{
-    top:37.8% !important;
-    right:2.35% !important;
-    width:48.8% !important;
-    height:46.8% !important;
-  }
-
-  .schedule-grid{
-    gap:1.8% !important;
-    padding:2.1% 2.1% 2.5% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 10px !important;
-  }
-
-  .schedule-grid tr{
-    min-height:58px !important;
-    padding:.46rem .70rem !important;
-    border-radius:18px !important;
-  }
-
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(19px,1.20vw,28px) !important;
-  }
-
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(18px,1.08vw,26px) !important;
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(14px,.88vw,20px) !important;
-  }
-
-  .status-cell{
-    padding:.18rem .38rem !important;
-  }
-
-  .status-cell .duration-text{
-    display:block !important;
-    font-size:clamp(11px,.72vw,16px) !important;
-    margin-top:3px !important;
-  }
-
-  .current-row{
-    transform:scale(1.02) !important;
-  }
-
-  /* ================================
-     إزاحة متبقي الحصة للأسفل
-  ================================ */
-  .digital-clock{
-    margin-bottom:1.05rem !important;
-  }
-
-  .count-label{
-    margin-top:.85rem !important;
-    margin-bottom:1.45rem !important;
-  }
-
-  .remaining-time{
-    margin-top:.95rem !important;
-  }
-}
-
-/* ================================
-   التعديل الأخير
-================================ */
-
-/* 1) تنزيل وقت الحصص في المربعات العلوية للأسفل */
-#previousTime,
-#currentTime,
-#nextTime,
-.period-time{
-  top:73% !important;
-}
-
-/* 2) تصغير مربعات جدول الحصص قليلًا حتى لا تتداخل مع شريط الرسائل */
-@media (min-width:1025px){
-
-  .schedule-section{
-    top:38.0% !important;
-    height:43.8% !important;
-  }
-
-  .schedule-grid{
-    padding:1.9% 2.1% 2.0% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 7px !important;
-  }
-
-  .schedule-grid tr{
-    min-height:50px !important;
-    padding:.34rem .60rem !important;
-    border-radius:15px !important;
-  }
-
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(18px,1.08vw,25px) !important;
-  }
-
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(17px,1.02vw,23px) !important;
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(13px,.80vw,18px) !important;
-  }
-
-  .status-cell .duration-text{
-    font-size:clamp(10px,.64vw,14px) !important;
-  }
-
-  /* 3) تنزيل متبقي الحصة للأسفل */
-  .remaining-time{
-    margin-top:1.35rem !important;
-    transform:translateY(8px) !important;
-  }
-#previousTime,
-#currentTime,
-#nextTime,
-.period-time{
-  position:absolute !important;
-  top:auto !important;
-  bottom:-3% !important;
-  left:50% !important;
-  transform:translateX(-50%) !important;
-
-  width:90% !important;
-  display:flex !important;
-  justify-content:center !important;
-  align-items:center !important;
-
-  text-align:center !important;
-  font-weight:900 !important;
-  color:#5c5141 !important;
-  white-space:nowrap !important;
-  z-index:20 !important;
-
-  direction:rtl !important;
-  unicode-bidi:plaintext !important;
-}
-  /* ================================
-   تنزيل متبقي الحصة داخل المربع الأخضر
-================================ */
-.count-label{
-  margin-top:1.45rem !important;
-  transform:translateY(10px) !important;
-}
-
-}
-
-/* =========================================
-   إصلاح واجهة الهاتف فقط
-   لا يؤثر على واجهة الحاسوب
-========================================= */
-@media (max-width:1024px){
-
-  html,
-  body{
-    width:100% !important;
-    min-height:100% !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    background:#f8f2e8 !important;
-  }
-
-  body{
-    display:flex !important;
-    align-items:flex-start !important;
-    justify-content:center !important;
-  }
-
+@media (max-width:420px){
   .timer-app{
-    width:100vw !important;
-    max-width:430px !important;
-    height:auto !important;
-    min-height:auto !important;
-    aspect-ratio:768 / 1536 !important;
-    background:url("mobile-bg.png?v=1") center/100% 100% no-repeat !important;
-    position:relative !important;
-    overflow:hidden !important;
-  }
-
-  /* شعار المدرسة */
-  .school-logo-wrap{
-    top:4.35% !important;
-    right:18.8% !important;
-    width:15.5% !important;
-    height:8.2% !important;
-  }
-
-  /* المربعات العلوية */
-  .top-cards{
-    position:absolute !important;
-    top:22.8% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:13.3% !important;
-    display:grid !important;
-    grid-template-columns:repeat(3,1fr) !important;
-    gap:2.4% !important;
-    direction:ltr !important;
-    z-index:30 !important;
-  }
-
-  .next-card{ grid-column:1 !important; }
-  .current-card{ grid-column:2 !important; }
-  .previous-card{ grid-column:3 !important; }
-
-  .period-card{
-    position:relative !important;
-    overflow:hidden !important;
-    padding:0 !important;
-    display:block !important;
-    background:transparent !important;
-  }
-
-  .period-title{
-    position:absolute !important;
-    top:15% !important;
-    left:50% !important;
-    transform:translateX(-50%) !important;
-    width:92% !important;
-    font-size:clamp(13px,3.1vw,18px) !important;
-    line-height:1.1 !important;
-    text-align:center !important;
-  }
-
-  .period-name{
-    position:absolute !important;
-    top:40% !important;
-    left:50% !important;
-    transform:translateX(-50%) !important;
-    width:92% !important;
-    font-size:clamp(24px,6.7vw,40px) !important;
-    line-height:1.05 !important;
-    text-align:center !important;
-  }
-
-  .period-line{
-    position:absolute !important;
-    left:18% !important;
-    right:18% !important;
-    bottom:31% !important;
-    height:2px !important;
-  }
-
-  #previousTime,
-  #currentTime,
-  #nextTime,
-  .period-time{
-    position:absolute !important;
-    top:auto !important;
-    bottom:8% !important;
-    left:50% !important;
-    transform:translateX(-50%) !important;
-    width:90% !important;
-    display:block !important;
-    visibility:visible !important;
-    opacity:1 !important;
-    font-size:clamp(10px,2.6vw,14px) !important;
-    font-weight:900 !important;
-    color:#5c5141 !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-    z-index:20 !important;
-  }
-
-  /* المربع الأخضر */
-  .clock-panel{
-    position:absolute !important;
-    top:38.0% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:17.2% !important;
-    border-radius:18px !important;
-    overflow:hidden !important;
-    z-index:25 !important;
-  }
-
-  .date-box{
-    position:absolute !important;
-    top:20% !important;
-    left:10% !important;
-    width:27% !important;
-    height:58% !important;
-    text-align:center !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-  }
-
-  .date-box strong{
-    font-size:clamp(18px,5vw,30px) !important;
-    margin-bottom:.25rem !important;
-  }
-
-  .date-box span{
-    font-size:clamp(12px,3.5vw,20px) !important;
-    line-height:1.45 !important;
-  }
-
-  .clock-area{
-    position:absolute !important;
-    top:8% !important;
-    right:7% !important;
-    width:60% !important;
-    height:80% !important;
-    text-align:center !important;
-  }
-
-  .digital-clock{
-    font-size:clamp(42px,11vw,68px) !important;
-    margin-bottom:.35rem !important;
-    line-height:1 !important;
-  }
-
-  .count-label{
-    font-size:clamp(15px,4vw,24px) !important;
-    margin-top:.4rem !important;
-    margin-bottom:.85rem !important;
-    transform:none !important;
-  }
-
-  .remaining-time{
-    font-size:clamp(32px,9vw,56px) !important;
-    margin-top:.35rem !important;
-    transform:none !important;
-  }
-
-  /* بطاقتا المدرسة والرؤية */
-  .middle-cards{
-    position:absolute !important;
-    top:56.9% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:7.8% !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.5% !important;
-    z-index:30 !important;
-  }
-
-  .mini-card{
-    font-size:clamp(16px,4.6vw,26px) !important;
-    line-height:1.25 !important;
-    text-align:center !important;
-  }
-
-  /* جدول الحصص */
-  .schedule-section{
-    position:absolute !important;
-    top:66.4% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:23.0% !important;
-    overflow:hidden !important;
-    z-index:35 !important;
-  }
-
-  .schedule-grid{
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.5% !important;
-    padding:2.4% 2.2% !important;
-    height:100% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 6px !important;
-  }
-
-  .schedule-grid tr{
-    display:grid !important;
-    grid-template-columns:.95fr 1.25fr .7fr !important;
-    min-height:34px !important;
-    padding:.15rem .25rem !important;
-    border-radius:12px !important;
-  }
-
-  .schedule-grid td:nth-child(1){
-    font-size:clamp(12px,3.1vw,17px) !important;
-  }
-
-  .schedule-grid td:nth-child(2){
-    font-size:clamp(11px,2.9vw,16px) !important;
-  }
-
-  .schedule-grid td:nth-child(3){
-    font-size:clamp(10px,2.5vw,14px) !important;
-  }
-
-  .status-cell{
-    padding:.1rem .18rem !important;
-  }
-
-  .status-cell .duration-text{
-    display:block !important;
-    font-size:.72em !important;
-  }
-
-  /* شريط الرسائل */
-  .ticker{
-    position:absolute !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    bottom:5.2% !important;
-    height:4.3% !important;
-    padding-inline:2% !important;
-    overflow:hidden !important;
-    z-index:45 !important;
-  }
-
-  .ticker-track{
-    animation:tickerMoveMobile 24s linear infinite !important;
-  }
-
-  .ticker-group{
-    gap:2rem !important;
-    padding-inline:1rem !important;
-  }
-
-  .ticker-item{
-    font-size:clamp(14px,3.8vw,22px) !important;
-    color:#f4e2aa !important;
-    white-space:nowrap !important;
-  }
-
-  @keyframes tickerMoveMobile{
-    from{
-      transform:translateX(-40%);
-    }
-    to{
-      transform:translateX(40%);
-    }
-  }
-}
-.remaining-time{
-  margin-top:1.9rem !important;
-  transform:translateY(18px) !important;
-}
-
-/* =========================================================
-   إصلاحات فاصلة للتجاوب - لا تغيّر تخطيط الحاسوب المستقر
-   الهاتف: حتى 600px، الآيباد: 601px إلى 1024px، الحاسوب: أكبر من 1024px
-========================================================= */
-@media (max-width:600px){
-  html,
-  body{
-    overflow:hidden !important;
-  }
-
-  .timer-app{
-    width:100vw !important;
-    height:var(--app-height,100vh) !important;
-    max-width:none !important;
-    background:url("mobile-bg.png?v=1") center/100% 100% no-repeat !important;
-  }
-
-  .school-logo-wrap{
-    top:4.1% !important;
-    right:16.8% !important;
-    width:17% !important;
-    height:8.8% !important;
+    padding-inline:3.5vw;
   }
 
   .top-cards{
-    top:22.2% !important;
-    left:5.3% !important;
-    right:5.3% !important;
-    height:13.6% !important;
-    display:grid !important;
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:2.1% !important;
+    gap:1.8vw;
   }
 
   .period-card{
-    min-width:0 !important;
-    padding:.42rem .22rem .32rem !important;
-    justify-content:flex-start !important;
-  }
-
-  .period-title{
-    font-size:clamp(10px,3vw,13px) !important;
-    margin-bottom:.22rem !important;
+    min-height:32vw;
   }
 
   .period-name{
-    position:static !important;
-    font-size:clamp(18px,5.7vw,26px) !important;
-    margin-bottom:.2rem !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
-  }
-
-  .period-line{
-    width:68% !important;
-    margin-bottom:.2rem !important;
-  }
-
-  #previousTime,
-  #currentTime,
-  #nextTime,
-  .period-time{
-    position:static !important;
-    transform:none !important;
-    width:100% !important;
-    font-size:clamp(9px,2.5vw,12px) !important;
-    margin-top:0 !important;
-  }
-
-  .clock-panel{
-    top:37.4% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:17.4% !important;
-    display:grid !important;
-    grid-template-columns:32% 1fr !important;
-    align-items:center !important;
-    padding:1.3% 3.2% !important;
-    overflow:hidden !important;
-  }
-
-  .date-box{
-    position:static !important;
-    width:100% !important;
-    height:auto !important;
-    align-items:center !important;
-    justify-content:center !important;
-    text-align:center !important;
-  }
-
-  .date-box strong{
-    font-size:clamp(14px,4vw,19px) !important;
-    margin-bottom:.16rem !important;
-  }
-
-  .date-box span{
-    font-size:clamp(9px,2.7vw,12px) !important;
-    line-height:1.35 !important;
-  }
-
-  .clock-area{
-    position:static !important;
-    width:100% !important;
-    height:auto !important;
-    text-align:center !important;
-  }
-
-  .digital-clock{
-    font-size:clamp(34px,9.5vw,46px) !important;
-    margin:0 0 .18rem !important;
-  }
-
-  .count-label{
-    font-size:clamp(12px,3.4vw,16px) !important;
-    margin:.14rem 0 .56rem !important;
-  }
-
-  .count-label::after{
-    bottom:-.32rem !important;
-  }
-
-  .remaining-time{
-    font-size:clamp(28px,7.8vw,38px) !important;
-    margin:0 !important;
-    transform:none !important;
-  }
-
-  .middle-cards{
-    top:56.3% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:7.5% !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.3% !important;
-  }
-
-  .mini-card{
-    font-size:clamp(13px,3.75vw,18px) !important;
-    line-height:1.2 !important;
-    overflow:hidden !important;
-  }
-
-  .schedule-section{
-    top:65.4% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:24.2% !important;
-    overflow:hidden !important;
+    font-size:clamp(24px,7.3vw,38px);
   }
 
   .schedule-grid{
-    height:100% !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.1% !important;
-    padding:1.5% 1.5% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 3px !important;
+    gap:1.7vw;
   }
 
   .schedule-grid tr{
-    grid-template-columns:.88fr 1.35fr .58fr !important;
-    min-height:27px !important;
-    padding:.1rem .16rem !important;
-    border-radius:9px !important;
-    gap:.1rem !important;
-  }
-
-  .schedule-grid td:nth-child(1){ font-size:clamp(9px,2.6vw,12px) !important; }
-  .schedule-grid td:nth-child(2){ font-size:clamp(8px,2.35vw,11px) !important; }
-  .schedule-grid td:nth-child(3){ font-size:clamp(8px,2.1vw,10px) !important; }
-
-  .status-cell{
-    padding:.04rem .08rem !important;
-  }
-
-  .status-cell .duration-text{
-    display:none !important;
-  }
-
-  .ticker{
-    left:5.5% !important;
-    right:5.5% !important;
-    bottom:5.05% !important;
-    height:4.2% !important;
-    overflow:hidden !important;
-  }
-
-  .ticker-item{
-    font-size:clamp(12px,3.35vw,15px) !important;
-  }
-}
-
-@media (min-width:601px) and (max-width:1024px){
-  html,
-  body{
-    overflow:hidden !important;
-  }
-
-  .timer-app{
-    width:100vw !important;
-    height:var(--app-height,100vh) !important;
-    max-width:none !important;
-    background:url("mobile-bg.png?v=1") center/100% 100% no-repeat !important;
-  }
-
-  .school-logo-wrap{
-    top:4.1% !important;
-    right:16.8% !important;
-    width:17% !important;
-    height:8.8% !important;
-  }
-
-  .top-cards{
-    top:22.5% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:13.8% !important;
-    display:grid !important;
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:2.4% !important;
-  }
-
-  .period-card{
-    min-width:0 !important;
-    padding:.72rem .48rem .44rem !important;
-    justify-content:flex-start !important;
-  }
-
-  .period-title{
-    font-size:clamp(15px,2.35vw,22px) !important;
-    margin-bottom:.34rem !important;
-  }
-
-  .period-name{
-    position:static !important;
-    font-size:clamp(28px,5.4vw,46px) !important;
-    margin-bottom:.32rem !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
-  }
-
-  .period-line{
-    margin-bottom:.32rem !important;
-  }
-
-  #previousTime,
-  #currentTime,
-  #nextTime,
-  .period-time{
-    position:static !important;
-    transform:none !important;
-    width:100% !important;
-    font-size:clamp(12px,1.95vw,18px) !important;
-    margin-top:0 !important;
-  }
-
-  .clock-panel{
-    top:37.8% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:17.5% !important;
-    display:grid !important;
-    grid-template-columns:31% 1fr !important;
-    align-items:center !important;
-    padding:1.5% 4% !important;
-    overflow:hidden !important;
-  }
-
-  .date-box,
-  .clock-area{
-    position:static !important;
-    width:100% !important;
-    height:auto !important;
-  }
-
-  .date-box{
-    align-items:center !important;
-    justify-content:center !important;
-    text-align:center !important;
-  }
-
-  .date-box strong{
-    font-size:clamp(20px,3.4vw,30px) !important;
-    margin-bottom:.24rem !important;
-  }
-
-  .date-box span{
-    font-size:clamp(13px,2.25vw,19px) !important;
-    line-height:1.38 !important;
-  }
-
-  .clock-area{
-    text-align:center !important;
-  }
-
-  .digital-clock{
-    font-size:clamp(50px,8.6vw,72px) !important;
-    margin:0 0 .25rem !important;
-  }
-
-  .count-label{
-    font-size:clamp(17px,2.9vw,24px) !important;
-    margin:.22rem 0 .85rem !important;
-  }
-
-  .count-label::after{
-    bottom:-.48rem !important;
-  }
-
-  .remaining-time{
-    font-size:clamp(40px,6.6vw,58px) !important;
-    margin:0 !important;
-    transform:none !important;
-  }
-
-  .middle-cards{
-    top:56.5% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:7.6% !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.5% !important;
-  }
-
-  .mini-card{
-    font-size:clamp(18px,3.2vw,27px) !important;
-    line-height:1.2 !important;
-    overflow:hidden !important;
-  }
-
-  .schedule-section{
-    top:65.8% !important;
-    left:5.5% !important;
-    right:5.5% !important;
-    height:23.8% !important;
-    overflow:hidden !important;
-  }
-
-  .schedule-grid{
-    height:100% !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:2.3% !important;
-    padding:1.7% 1.9% !important;
-  }
-
-  .schedule-grid table{
-    border-spacing:0 5px !important;
-  }
-
-  .schedule-grid tr{
-    grid-template-columns:.95fr 1.28fr .66fr !important;
-    min-height:clamp(32px,4.2vh,42px) !important;
-    padding:.16rem .28rem !important;
-    border-radius:12px !important;
-    gap:.18rem !important;
-  }
-
-  .schedule-grid td:nth-child(1){ font-size:clamp(12px,2.25vw,17px) !important; }
-  .schedule-grid td:nth-child(2){ font-size:clamp(11px,2vw,16px) !important; }
-  .schedule-grid td:nth-child(3){ font-size:clamp(10px,1.75vw,14px) !important; }
-
-  .status-cell{
-    padding:.08rem .16rem !important;
-  }
-
-  .status-cell .duration-text{
-    font-size:.7em !important;
-  }
-
-  .ticker{
-    left:5.5% !important;
-    right:5.5% !important;
-    bottom:5.2% !important;
-    height:4.2% !important;
-    overflow:hidden !important;
-  }
-
-  .ticker-item{
-    font-size:clamp(15px,2.8vw,22px) !important;
+    height:12.2vw;
+    grid-template-columns:38% 42% 20%;
   }
 }
