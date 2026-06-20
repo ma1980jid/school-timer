@@ -17,19 +17,20 @@ const settings = {
 
 /* جدول تجريبي يبدأ الساعة 1 صباحًا */
 const defaultPeriods = [
-{name:"الطابور",start:"12:30",end:"12:45",type:"normal",col:1},
-{name:"الأولى",start:"12:45",end:"13:25",type:"normal",col:1},
-{name:"الثانية",start:"13:25",end:"14:05",type:"normal",col:1},
-{name:"الثالثة",start:"14:05",end:"14:45",type:"normal",col:1},
-{name:"الرابعة",start:"14:45",end:"15:25",type:"normal",col:1},
+{name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+{name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+{name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+{name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+{name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
 
-{name:"الفسحة",start:"15:25",end:"15:45",type:"break",col:2},
-{name:"الخامسة",start:"15:45",end:"16:25",type:"normal",col:2},
-{name:"السادسة",start:"16:25",end:"17:05",type:"normal",col:2},
-{name:"السابعة",start:"17:05",end:"17:45",type:"normal",col:2},
-{name:"الصلاة",start:"17:45",end:"18:05",type:"prayer",col:2,optionalPrayer:true},
-{name:"الثامنة",start:"18:05",end:"18:45",type:"normal",col:2}
+{name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
+{name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
+{name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
+{name:"السابعة",start:"02:35",end:"03:15",type:"normal",col:2},
+{name:"الصلاة",start:"03:15",end:"03:35",type:"prayer",col:2,optionalPrayer:true},
+{name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
 ];
+
 
 const periods = defaultPeriods;
 
