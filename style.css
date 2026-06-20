@@ -527,7 +527,7 @@ body {
 
   .period-time {
     font-size: clamp(9px, 2.8vw, 13px);
-    line-height: 1;
+    line-height: 3;
     margin-top: 2vw;
   }
 
