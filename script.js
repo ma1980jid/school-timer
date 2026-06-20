@@ -12,23 +12,25 @@ const settings = {
   showPrayer: true,
 
   // الأيام: 0 الأحد، 1 الاثنين، 2 الثلاثاء، 3 الأربعاء، 4 الخميس، 5 الجمعة، 6 السبت
-  activityDay: 1
+  activityDay: 0
 };
 
 /* جدول تجريبي يبدأ الساعة 1 صباحًا */
 const defaultPeriods = [
-{name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
-{name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
-{name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
-{name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
-{name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
+  {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+  {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+  {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+  {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+  {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
 
-{name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
-{name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
-{name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
-{name:"السابعة",start:"02:35",end:"03:15",type:"normal",col:2},
-{name:"الصلاة",start:"03:15",end:"03:35",type:"prayer",col:2,optionalPrayer:true},
-{name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
+  {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1,activityOnly:true},
+
+  {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+  {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
+  {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
+  {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
+  {name:"الصلاة",start:"03:35",end:"03:55",type:"prayer",col:2,optionalPrayer:true},
+  {name:"الثامنة",start:"03:55",end:"04:35",type:"normal",col:2}
 ];
 
 
