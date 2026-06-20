@@ -513,7 +513,7 @@ body {
   .period-name {
     font-size: clamp(14px, 3.6vw, 24px);
     line-height: .98;
-    margin-top: 1.5vw;
+    margin-top: 3vw;
     max-width: 98%;
     white-space: normal;
     overflow: hidden;
