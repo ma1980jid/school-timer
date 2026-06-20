@@ -455,14 +455,17 @@ justify-content: center;
 
 .timer-app {
 position: relative !important;
-width: min(100vw, calc(100dvh * 768 / 1792)) !important;
-height: min(100dvh, calc(100vw * 1792 / 768)) !important;
+width: 100vw !important;
+height: 100dvh !important;
+max-width: 100vw !important;
+max-height: 100dvh !important;
 min-height: 0 !important;
-margin: 0 auto !important;
+margin: 0 !important;
 overflow: hidden !important;
 padding: 0 !important;
 background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !important;
 }
+
 
 .school-logo-wrap {
 position: absolute !important;
