@@ -13,6 +13,7 @@
   --shadow: 0 6px 16px rgba(45, 31, 12, .10);
 }
 
+/* الأساس */
 html,
 body {
   width: 100%;
@@ -28,6 +29,7 @@ body {
   overflow-y: auto;
 }
 
+/* الأرقام من اليسار لليمين */
 .period-time,
 .time-cell,
 .digital-clock,
@@ -37,6 +39,7 @@ body {
   white-space: nowrap !important;
 }
 
+/* الحاوية الرئيسية */
 .timer-app {
   position: relative;
   width: 100vw;
@@ -48,6 +51,7 @@ body {
   color: var(--green);
 }
 
+/* الحاسوب */
 @media (min-width: 769px) {
   html,
   body {
@@ -61,6 +65,7 @@ body {
   }
 }
 
+/* شعار المدرسة */
 .school-logo-wrap {
   position: absolute;
   top: 4.2%;
@@ -80,6 +85,7 @@ body {
   display: block;
 }
 
+/* المربعات العلوية */
 .top-cards {
   position: absolute;
   top: 20.65%;
@@ -106,6 +112,7 @@ body {
   padding: .45vw .8vw;
 }
 
+/* ترتيب البطاقات */
 .next-card {
   grid-column: 1;
 }
@@ -118,6 +125,7 @@ body {
   grid-column: 3;
 }
 
+/* عنوان البطاقة */
 .period-title {
   font-size: clamp(17px, 1.35vw, 29px);
   font-weight: 900;
@@ -129,6 +137,7 @@ body {
   color: var(--red);
 }
 
+/* اسم الحصة */
 .period-name {
   margin-top: .35vw;
   font-size: clamp(30px, 2.55vw, 55px);
@@ -141,10 +150,12 @@ body {
   color: var(--red);
 }
 
+/* الخط داخل البطاقة */
 .period-line {
   display: none !important;
 }
 
+/* وقت الحصة */
 .period-time {
   margin-top: .5vw;
   font-size: clamp(16px, 1.18vw, 25px);
@@ -153,6 +164,7 @@ body {
   color: #5e5548;
 }
 
+/* لوحة الساعة */
 .clock-panel {
   position: absolute;
   top: 41.9%;
@@ -171,6 +183,7 @@ body {
   display: none !important;
 }
 
+/* اليوم والتاريخ */
 .date-box {
   position: absolute;
   top: 50%;
@@ -205,6 +218,7 @@ body {
   color: #f4df9c;
 }
 
+/* الساعة الرقمية */
 .clock-area {
   position: absolute;
   top: 6.2%;
@@ -225,6 +239,7 @@ body {
   text-shadow: 0 3px 14px rgba(0, 0, 0, .28);
 }
 
+/* عنوان المتبقي */
 .count-label {
   position: relative;
   margin-top: .75vw;
@@ -245,6 +260,7 @@ body {
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
+/* الوقت المتبقي */
 .remaining-time {
   margin-top: .45vw;
   font-size: clamp(42px, 3.6vw, 78px);
@@ -254,10 +270,12 @@ body {
   text-shadow: 0 2px 8px rgba(0, 0, 0, .22);
 }
 
+/* المربعان */
 .middle-cards {
   display: none;
 }
 
+/* جدول الحصص */
 .schedule-section {
   position: absolute;
   top: 39.9%;
@@ -340,6 +358,7 @@ body {
   margin-top: 2px;
 }
 
+/* الصف الحالي */
 .current-row {
   border: 3px solid #d5a33a !important;
   background: rgba(255, 248, 221, .96) !important;
@@ -354,6 +373,7 @@ body {
   color: var(--red) !important;
 }
 
+/* الفسحة والصلاة */
 .break-row td,
 .break-row .time-cell {
   color: #7041d4;
@@ -364,6 +384,7 @@ body {
   color: #b55f06;
 }
 
+/* شريط الرسائل */
 .ticker {
   position: absolute;
   left: 5.6%;
@@ -413,254 +434,425 @@ body {
   }
 }
 
+/* =========================
+   الهاتف
+========================= */
 @media (max-width: 768px) {
-  html,
-  body {
-    width: 100%;
-    height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden !important;
-  }
 
-  .timer-app {
-    position: relative !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    background: var(--cream) url("./mobile-bg.png") top center / 100% 100% no-repeat !important;
-  }
+html,
+body {
+width: 100%;
+height: 100dvh;
+min-height: 100dvh;
+overflow: hidden !important;
+}
 
-  .school-logo-wrap {
-    position: absolute !important;
-    top: 5.4% !important;
-    right: 23% !important;
-    width: 15.2% !important;
-    height: 7% !important;
-    z-index: 40 !important;
-  }
+body {
+display: flex;
+align-items: center;
+justify-content: center;
+}
 
-  .top-cards {
-    position: absolute !important;
-    top: 26.4% !important;
-    left: 4% !important;
-    right: 4% !important;
-    height: 11.9% !important;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 2.2% !important;
-    z-index: 30 !important;
-  }
+.timer-app {
+position: relative !important;
+width: 100vw !important;
+height: 100dvh !important;
+max-width: 100vw !important;
+max-height: 100dvh !important;
+min-height: 0 !important;
+margin: 0 !important;
+overflow: hidden !important;
+padding: 0 !important;
+background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !important;
+}
 
-  .period-card {
-    position: relative;
-    padding: .6vw .5vw;
-    background: transparent !important;
-    border-radius: 2.1vw;
-    box-shadow: none !important;
-    justify-content: center;
-  }
 
-  .period-card::after {
-    content: "";
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    top: 46%;
-    height: 5px;
-    background: rgba(248, 242, 232, .98);
-    z-index: 0;
-  }
+.school-logo-wrap {
+position: absolute !important;
+top: 8.2% !important;
+right: 20.8% !important;
+width: 9.2% !important;
+height: 4.8% !important;
+z-index: 30 !important;
+display: flex !important;
+align-items: center !important;
+justify-content: center !important;
+overflow: hidden !important;
+}
 
-  .period-card > * {
-    position: relative;
-    z-index: 1;
-  }
+.school-logo-wrap img {
+width: 100% !important;
+height: 100% !important;
+object-fit: contain !important;
+display: block !important;
+}
 
-  .period-title {
-    font-size: clamp(11px, 2.85vw, 16px);
-    line-height: 1.02;
-  }
+.top-cards {
+position: absolute !important;
+top: 19.65% !important;
+left: 7.3% !important;
+right: 7.3% !important;
+height: 11.25% !important;
+display: grid !important;
+grid-template-columns: repeat(3, 1fr) !important;
+gap: 4.2% !important;
+direction: ltr !important;
+z-index: 10 !important;
+}
 
-  .period-name {
-    font-size: clamp(14px, 3.55vw, 24px);
-    line-height: .98;
-    margin-top: .3vw;
-    max-width: 98%;
-    white-space: normal;
-    overflow: hidden;
-    text-align: center;
-  }
+.next-card {
+grid-column: 1 !important;
+}
 
-  .current-card .period-name {
-    font-size: clamp(13px, 3.35vw, 23px);
-    line-height: .95;
-  }
+.current-card {
+grid-column: 2 !important;
+}
 
-  .period-time {
-    font-size: clamp(9px, 2.35vw, 13px);
-    line-height: 1;
-    margin-top: .35vw;
-  }
+.previous-card {
+grid-column: 3 !important;
+}
 
-  .clock-panel {
-    position: absolute !important;
-    top: 39.5% !important;
-    left: 4% !important;
-    width: 92% !important;
-    height: 17.2% !important;
-  }
+.period-card {
+position: relative !important;
+width: 100% !important;
+height: 100% !important;
+text-align: center !important;
+overflow: hidden !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+padding: 0 !important;
+}
 
-  .date-box {
-    top: 36%;
-    right: auto;
-    left: 6%;
-    width: 31%;
-    transform: translateY(-50%);
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+.period-line,
+.period-card::after {
+display: none !important;
+}
 
-  .date-box strong {
-    font-size: clamp(16px, 4.4vw, 24px);
-    line-height: 1.1;
-    margin-bottom: .35vw;
-  }
+.period-title {
+position: absolute !important;
+top: 24% !important;
+left: 50% !important;
+transform: translateX(-50%) !important;
+width: 100% !important;
+text-align: center !important;
+font-size: clamp(10px, 2.35vw, 15px) !important;
+font-weight: 900 !important;
+color: #64748b !important;
+line-height: 1.2 !important;
+margin: 0 !important;
+}
 
-  .date-box span {
-    font-size: clamp(11px, 3vw, 15px);
-    line-height: 1.25;
-  }
+.period-name {
+position: absolute !important;
+top: 50% !important;
+left: 50% !important;
+transform: translate(-50%, -50%) !important;
+width: 100% !important;
+text-align: center !important;
+font-size: clamp(21px, 5.1vw, 32px) !important;
+font-weight: 900 !important;
+color: #064b35 !important;
+line-height: 1.15 !important;
+margin: 0 !important;
+white-space: normal !important;
+overflow: hidden !important;
+}
 
-  .clock-area {
-    top: 2%;
-    left: 37%;
-    width: 58%;
-  }
+.period-time {
+position: absolute !important;
+top: 72% !important;
+left: 50% !important;
+transform: translateX(-50%) !important;
+width: 100% !important;
+text-align: center !important;
+font-size: clamp(10px, 2.55vw, 16px) !important;
+font-weight: 900 !important;
+color: #111 !important;
+line-height: 1.2 !important;
+margin: 0 !important;
+}
 
-  .digital-clock {
-    font-size: clamp(34px, 8.8vw, 56px);
-    line-height: .95;
-  }
+.current-card .period-title,
+.current-card .period-name {
+color: #c91414 !important;
+}
 
-  .count-label {
-    font-size: clamp(12px, 3.15vw, 18px);
-    margin-top: 1vw;
-    padding-top: 1vw;
-  }
+.current-card .period-name {
+font-size: clamp(25px, 5.7vw, 38px) !important;
+}
 
-  .remaining-time {
-    font-size: clamp(26px, 7.1vw, 44px);
-    margin-top: .5vw;
-  }
+.clock-panel {
+position: absolute !important;
+top: 33.65% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+width: auto !important;
+height: 15.75% !important;
+color: #fff !important;
+z-index: 10 !important;
+overflow: hidden !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
 
-  .middle-cards {
-    position: absolute;
-    top: 57.7%;
-    left: 4%;
-    right: 4%;
-    height: 9%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2.2%;
-    z-index: 8;
-  }
+.clock-area {
+position: absolute !important;
+top: 6% !important;
+right: 4% !important;
+left: auto !important;
+width: 58% !important;
+height: 88% !important;
+text-align: center !important;
+}
 
-  .mini-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 1.4vw;
-    background: rgba(255, 255, 255, .76);
-    border-radius: 2.1vw;
-    box-shadow: 0 4px 12px rgba(45, 31, 12, .08);
-    font-weight: 900;
-    color: var(--green);
-    font-size: clamp(13px, 3.9vw, 22px);
-    line-height: 1.16;
-    overflow: hidden;
-  }
+.digital-clock {
+position: absolute !important;
+top: 0 !important;
+left: 0 !important;
+right: 0 !important;
+font-family: "Courier New", monospace !important;
+font-size: clamp(40px, 9.6vw, 70px) !important;
+font-weight: 900 !important;
+line-height: 1 !important;
+color: #fff !important;
+text-shadow: 0 4px 8px rgba(0, 0, 0, .35) !important;
+}
 
-  .schedule-section {
-    top: 67.4%;
-    left: 4%;
-    right: 4%;
-    width: auto;
-    height: 20.4%;
-    padding: 2.2vw 2.5vw;
-    background: transparent !important;
-  }
+.count-label {
+position: absolute !important;
+top: 39% !important;
+left: 0 !important;
+right: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+font-size: clamp(13px, 3.1vw, 20px) !important;
+font-weight: 900 !important;
+line-height: 1.2 !important;
+text-align: center !important;
+}
 
-  .schedule-grid {
-    height: 100%;
-    grid-template-columns: 1fr 1fr;
-    gap: 2vw;
-    align-content: center;
-  }
+.count-label::before {
+display: none !important;
+}
 
-  .schedule-grid table {
-    border-spacing: 0 .7vw;
-  }
+.remaining-time {
+position: absolute !important;
+top: 60% !important;
+left: 0 !important;
+right: 0 !important;
+margin: 0 !important;
+font-family: "Courier New", monospace !important;
+font-size: clamp(31px, 7.2vw, 54px) !important;
+font-weight: 900 !important;
+line-height: 1 !important;
+color: #d6a93c !important;
+text-align: center !important;
+}
 
-  .schedule-grid tr {
-    height: 7.2vw;
-    min-height: 31px;
-    grid-template-columns: 38% 41% 21%;
-    border-radius: 1.7vw;
-    background: rgba(255, 255, 255, .88);
-    box-shadow: 0 3px 10px rgba(45, 31, 12, .07);
-  }
+.date-box {
+position: absolute !important;
+top: 17% !important;
+left: 0% !important;
+right: auto !important;
+width: 35% !important;
+height: 66% !important;
+transform: none !important;
+display: flex !important;
+flex-direction: column !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 8% !important;
+text-align: center !important;
+font-size: clamp(12px, 3vw, 18px) !important;
+font-weight: 900 !important;
+color: #f7e6b0 !important;
+line-height: 1.2 !important;
+}
 
-  .schedule-grid td:first-child {
-    font-size: clamp(12px, 3.15vw, 18px);
-  }
+.date-box strong {
+font-size: clamp(17px, 4vw, 26px) !important;
+margin: 0 !important;
+color: #f7e6b0 !important;
+}
 
-  .time-cell {
-    font-size: clamp(10px, 2.85vw, 15px);
-  }
+.date-box span {
+font-size: clamp(12px, 3vw, 18px) !important;
+line-height: 1.2 !important;
+color: #f7e6b0 !important;
+}
 
-  .status-cell {
-    font-size: clamp(8px, 2.15vw, 11px);
-    line-height: 1;
-  }
+.middle-cards {
+position: absolute !important;
+top: 52.65% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+height: 7.55% !important;
+display: grid !important;
+grid-template-columns: 1fr 1fr !important;
+gap: 4.2% !important;
+direction: rtl !important;
+z-index: 10 !important;
+}
 
-  .ticker {
-    left: 4%;
-    right: 4%;
-    bottom: 1.5%;
-    height: 5.4%;
-    border-radius: 2vw;
-    background: transparent !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+.mini-card {
+position: relative !important;
+width: 100% !important;
+height: 100% !important;
+overflow: hidden !important;
+text-align: center !important;
+background: transparent !important;
+box-shadow: none !important;
+}
 
-  .ticker-track {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    animation-duration: 24s;
-  }
+.school-name-card p,
+.vision-card p {
+position: absolute !important;
+top: 50% !important;
+left: 50% !important;
+transform: translate(-50%, -50%) !important;
+width: 86% !important;
+max-height: 72% !important;
+text-align: center !important;
+font-weight: 900 !important;
+line-height: 1.25 !important;
+overflow: hidden !important;
+margin: 0 !important;
+}
 
-  .ticker-group {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 8vw;
-  }
+.school-name-card p {
+color: #064b35 !important;
+font-size: clamp(13px, 3.1vw, 19px) !important;
+}
 
-  .ticker-item {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    font-size: clamp(12px, 3.35vw, 18px);
-    color: #f4df9c;
-  }
+.vision-card p {
+color: #8a6418 !important;
+font-size: clamp(12px, 2.85vw, 17px) !important;
+}
+
+.schedule-section {
+position: absolute !important;
+top: 62.75% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+width: auto !important;
+height: 27.8% !important;
+z-index: 10 !important;
+overflow: hidden !important;
+padding: 0 !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.schedule-grid {
+width: 100% !important;
+height: 100% !important;
+display: grid !important;
+grid-template-columns: 1fr 1fr !important;
+gap: 2.6% !important;
+padding: 18px 10px 12px !important;
+align-content: stretch !important;
+}
+
+.schedule-grid table {
+width: 100% !important;
+height: 100% !important;
+border-collapse: collapse !important;
+table-layout: fixed !important;
+}
+
+.schedule-grid tr {
+display: table-row !important;
+height: auto !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.schedule-grid td {
+display: table-cell !important;
+padding: 5px 2px !important;
+border-bottom: 1px solid rgba(6, 75, 53, .18) !important;
+text-align: center !important;
+vertical-align: middle !important;
+font-size: clamp(8px, 2.1vw, 13px) !important;
+font-weight: 900 !important;
+background: rgba(255, 255, 255, .28) !important;
+line-height: 1.1 !important;
+}
+
+.schedule-grid td:nth-child(1) {
+width: 36% !important;
+color: #064b35 !important;
+}
+
+.schedule-grid td:nth-child(2) {
+width: 42% !important;
+color: #111 !important;
+font-size: clamp(9px, 2.4vw, 15px) !important;
+}
+
+.schedule-grid td:nth-child(3) {
+width: 22% !important;
+color: #0f766e !important;
+}
+
+.current-row td {
+color: #c91414 !important;
+background: rgba(255, 225, 225, .65) !important;
+font-size: clamp(10px, 2.6vw, 16px) !important;
+}
+
+.break-row td {
+color: #7c3aed !important;
+}
+
+.prayer-row td {
+color: #b45309 !important;
+}
+
+.activity-row td {
+color: #0369a1 !important;
+}
+
+.ticker {
+position: absolute !important;
+bottom: 2.1% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+height: 3.1% !important;
+z-index: 10 !important;
+display: flex !important;
+align-items: center !important;
+overflow: hidden !important;
+direction: ltr !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.ticker-track {
+display: flex !important;
+align-items: center !important;
+width: max-content !important;
+white-space: nowrap !important;
+will-change: transform !important;
+animation: tickerMove 55s linear infinite !important;
+}
+
+.ticker-group {
+display: flex !important;
+align-items: center !important;
+white-space: nowrap !important;
+padding-inline: 100px !important;
+}
+
+.ticker-item {
+font-size: clamp(14px, 3.5vw, 22px) !important;
+font-weight: 900 !important;
+color: #f7e6b0 !important;
+padding-inline: 80px !important;
+}
 }
