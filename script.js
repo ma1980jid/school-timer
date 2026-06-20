@@ -17,7 +17,6 @@ const settings = {
 
 /* جدول تجريبي يبدأ الساعة 1 صباحًا */
 const defaultPeriods = [
-const defaultPeriods = [
 {name:"الطابور",start:"12:30",end:"12:45",type:"normal",col:1},
 {name:"الأولى",start:"12:45",end:"13:25",type:"normal",col:1},
 {name:"الثانية",start:"13:25",end:"14:05",type:"normal",col:1},
