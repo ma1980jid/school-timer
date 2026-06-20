@@ -469,10 +469,10 @@ background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !im
 
 .school-logo-wrap {
 position: absolute !important;
-top: 15% !important;
-right: 10% !important;
-width: 5% !important;
-height: 3% !important;
+top: 2% !important;
+right: 15% !important;
+width: 20% !important;
+height: 13% !important;
 z-index: 30 !important;
 display: flex !important;
 align-items: center !important;
