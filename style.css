@@ -531,16 +531,18 @@ display: none !important;
 
 .period-title {
 position: absolute !important;
-top: 24% !important;
+top: 14% !important;
 left: 50% !important;
 transform: translateX(-50%) !important;
-width: 100% !important;
+width: 92% !important;
 text-align: center !important;
 font-size: clamp(10px, 2.35vw, 15px) !important;
 font-weight: 900 !important;
 color: #64748b !important;
-line-height: 1.2 !important;
+line-height: 1.1 !important;
 margin: 0 !important;
+ white-space: nowrap !important;
+  overflow: hidden !important;
 }
 
 .period-name {
@@ -548,12 +550,12 @@ position: absolute !important;
 top: 50% !important;
 left: 50% !important;
 transform: translate(-50%, -50%) !important;
-width: 100% !important;
+width: 92% !important;
 text-align: center !important;
 font-size: clamp(21px, 5.1vw, 32px) !important;
 font-weight: 900 !important;
 color: #064b35 !important;
-line-height: 1.15 !important;
+line-height: 1.05 !important;
 margin: 0 !important;
 white-space: normal !important;
 overflow: hidden !important;
@@ -566,7 +568,7 @@ left: 50% !important;
 transform: translateX(-50%) !important;
 width: 100% !important;
 text-align: center !important;
-font-size: clamp(10px, 2.55vw, 16px) !important;
+font-size: clamp(12px, 3vw, 18px) !important;
 font-weight: 900 !important;
 color: #111 !important;
 line-height: 1.2 !important;
@@ -578,6 +580,11 @@ margin: 0 !important;
 color: #c91414 !important;
 }
 
+  .current-card .period-name {
+  font-size: clamp(18px, 4.2vw, 29px) !important;
+  line-height: 1.05 !important;
+}
+  
 .current-card .period-name {
 font-size: clamp(25px, 5.7vw, 38px) !important;
 }
