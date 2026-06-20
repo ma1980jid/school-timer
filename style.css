@@ -470,7 +470,7 @@ body {
   /* المربعات العلوية */
  .top-cards {
   position: absolute !important;
-  top: 23% !important;
+  top: 22% !important;
   left: 4% !important;
   right: 4% !important;
   height: 11.9% !important;
@@ -528,7 +528,7 @@ body {
   .period-time {
     font-size: clamp(9px, 2.8vw, 13px);
     line-height: 1;
-    margin-top: .3vw;
+    margin-top: 2vw;
   }
 
   /* لوحة الساعة */
