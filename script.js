@@ -4,7 +4,36 @@ const settings = {
   timeZone: "Asia/Muscat",
 activeSchedule: "normalWithPrayer",
 activityDay: 6,
+activityPosition: "afterAssembly",
 showPrayer: true,
+
+function applyUrlSettings(){
+const params = new URLSearchParams(window.location.search);
+
+const schedule = params.get("schedule");
+const activityDay = params.get("activityDay");
+const activityPosition = params.get("activityPosition");
+const activityEnabled = params.get("activityEnabled");
+
+if(schedule){
+settings.activeSchedule = schedule;
+}
+
+if(activityDay !== null && activityDay !== ""){
+settings.activityDay = Number(activityDay);
+}
+
+if(activityPosition){
+settings.activityPosition = activityPosition;
+}
+
+if(activityEnabled !== null){
+settings.activityEnabled = activityEnabled === "1";
+}
+}
+
+applyUrlSettings();
+
   
   visionMessages: [
     "رؤيتنا: تعليم ملهم لمستقبل مشرق",
@@ -281,21 +310,32 @@ function getOmanDay(date = new Date()){
 }
 
 function getActivePeriods(){
-  const selectedSchedule =
-    scheduleSets[settings.activeSchedule] ||
-    scheduleSets.normalWithPrayer;
+const selectedSchedule =
+scheduleSets[settings.activeSchedule] ||
+scheduleSets.normalWithPrayer;
 
-  const today = getOmanDay();
+const today = getOmanDay();
 
-  if(
-    selectedSchedule.activity &&
-    today === settings.activityDay
-  ){
-    return selectedSchedule.activity;
-  }
-
-  return selectedSchedule.default;
+if(settings.activityEnabled && today === settings.activityDay){
+if(settings.activityPosition === "afterBreak" && selectedSchedule.activityAfterBreak){
+return selectedSchedule.activityAfterBreak;
 }
+
+```
+if(settings.activityPosition === "afterAssembly" && selectedSchedule.activityAfterAssembly){
+  return selectedSchedule.activityAfterAssembly;
+}
+
+if(selectedSchedule.activity){
+  return selectedSchedule.activity;
+}
+```
+
+}
+
+return selectedSchedule.default;
+}
+
 
 function getVisiblePeriods(){
   const activePeriods = getActivePeriods();
