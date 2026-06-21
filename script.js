@@ -2,7 +2,10 @@ const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
   schoolLogo: "icons/school_logo.png",
   timeZone: "Asia/Muscat",
-
+activeSchedule: "normalWithPrayer",
+activityDay: 6,
+showPrayer: true,
+  
   visionMessages: [
     "رؤيتنا: تعليم ملهم لمستقبل مشرق",
     "رسالتنا: بيئة مدرسية آمنة ومحفزة للتعلم",
@@ -16,25 +19,106 @@ const settings = {
 };
 
 /* جدول تجريبي يبدأ الساعة 1 صباحًا */
-const defaultPeriods = [
-  {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
-  {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
-  {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
-  {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
-  {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
+const scheduleSets = {
+  normalWithPrayer: {
+    name: "التوقيت الأساسي مع الصلاة",
 
-  {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1,activityOnly:true},
+    default: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+      {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+      {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+      {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
 
-  {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
-  {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
-  {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
-  {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
-  {name:"الصلاة",start:"03:35",end:"03:55",type:"prayer",col:2,optionalPrayer:true},
-  {name:"الثامنة",start:"03:55",end:"04:35",type:"normal",col:2}
-];
+      {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
+      {name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
+      {name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
+      {name:"السابعة",start:"02:35",end:"03:15",type:"normal",col:2},
+      {name:"الصلاة",start:"03:15",end:"03:35",type:"prayer",col:2},
+      {name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
+    ],
 
+    activity: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+      {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+      {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+      {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
+      {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1},
 
-const periods = defaultPeriods;
+      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
+      {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
+      {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
+      {name:"الصلاة",start:"03:35",end:"03:55",type:"prayer",col:2},
+      {name:"الثامنة",start:"03:55",end:"04:35",type:"normal",col:2}
+    ]
+  },
+
+  normalWithoutPrayer: {
+    name: "التوقيت الأساسي بدون الصلاة",
+
+    default: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+      {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+      {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+      {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
+
+      {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
+      {name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
+      {name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
+      {name:"السابعة",start:"02:35",end:"03:15",type:"normal",col:2},
+      {name:"الثامنة",start:"03:15",end:"03:55",type:"normal",col:2}
+    ],
+
+    activity: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
+      {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
+      {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
+      {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
+      {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1},
+
+      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
+      {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
+      {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
+      {name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
+    ]
+  },
+
+  ramadan: {
+    name: "توقيت رمضان",
+
+    default: [
+      {name:"الطابور",start:"22:00",end:"22:10",type:"normal",col:1},
+      {name:"الأولى",start:"22:10",end:"22:45",type:"normal",col:1},
+      {name:"الثانية",start:"22:45",end:"23:20",type:"normal",col:1},
+      {name:"الثالثة",start:"23:20",end:"23:55",type:"normal",col:1},
+      {name:"الرابعة",start:"23:55",end:"00:30",type:"normal",col:1},
+
+      {name:"الفسحة",start:"00:30",end:"00:45",type:"break",col:2},
+      {name:"الخامسة",start:"00:45",end:"01:20",type:"normal",col:2},
+      {name:"السادسة",start:"01:20",end:"01:55",type:"normal",col:2},
+      {name:"السابعة",start:"01:55",end:"02:30",type:"normal",col:2}
+    ]
+  },
+
+  exam: {
+    name: "توقيت الاختبارات",
+
+    default: [
+      {name:"الطابور",start:"22:00",end:"22:10",type:"normal",col:1},
+      {name:"الفترة الأولى",start:"22:10",end:"23:40",type:"normal",col:1},
+      {name:"استراحة",start:"23:40",end:"00:00",type:"break",col:1},
+
+      {name:"الفترة الثانية",start:"00:00",end:"01:30",type:"normal",col:2},
+      {name:"انصراف",start:"01:30",end:"01:40",type:"normal",col:2}
+    ]
+  }
+};
+
 
 const messages = [
   "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري",
@@ -196,15 +280,28 @@ function getOmanDay(date = new Date()){
   return dayMap[dayName] ?? new Date().getDay();
 }
 
-function getVisiblePeriods(){
+function getActivePeriods(){
+  const selectedSchedule =
+    scheduleSets[settings.activeSchedule] ||
+    scheduleSets.normalWithPrayer;
+
   const today = getOmanDay();
 
-  return periods.filter(period => {
-    if(period.optionalPrayer && !settings.showPrayer){
-      return false;
-    }
+  if(
+    selectedSchedule.activity &&
+    today === settings.activityDay
+  ){
+    return selectedSchedule.activity;
+  }
 
-    if(period.activityOnly && today !== settings.activityDay){
+  return selectedSchedule.default;
+}
+
+function getVisiblePeriods(){
+  const activePeriods = getActivePeriods();
+
+  return activePeriods.filter(period => {
+    if(period.optionalPrayer && !settings.showPrayer){
       return false;
     }
 
