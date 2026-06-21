@@ -1,84 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة تحكم المدرسة</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة مدير المدرسة</title>
+
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    body{
+      font-family:Tahoma,Arial,sans-serif;
+      background:#f8f2e8;
+      color:#064b35;
+      padding:24px;
+      line-height:1.8;
+    }
+
+    .page{
+      max-width:900px;
+      margin:auto;
+      background:#fff;
+      border-radius:18px;
+      padding:24px;
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+    }
+
+    h1{
+      font-size:26px;
+      margin-bottom:18px;
+      color:#064b35;
+      text-align:center;
+    }
+
+    .field{
+      margin-bottom:18px;
+    }
+
+    label{
+      display:block;
+      font-weight:900;
+      margin-bottom:6px;
+    }
+
+    select,
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d6c7a8;
+      border-radius:10px;
+      font-size:17px;
+      font-weight:700;
+      background:#fffdf8;
+      color:#064b35;
+    }
+
+    .links{
+      margin-top:28px;
+      padding-top:18px;
+      border-top:2px solid #efe3c8;
+    }
+
+    .link-box{
+      margin-top:12px;
+      padding:14px;
+      background:#f8f2e8;
+      border-radius:12px;
+      word-break:break-all;
+      direction:ltr;
+      text-align:left;
+      font-size:15px;
+      color:#111;
+    }
+
+    button{
+      margin-top:10px;
+      width:100%;
+      padding:13px;
+      border:0;
+      border-radius:10px;
+      background:#064b35;
+      color:#fff;
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .note{
+      margin-top:18px;
+      color:#7a5c1c;
+      font-weight:700;
+      text-align:center;
+    }
+  </style>
+
 </head>
 
 <body>
-  <main class="app">
+  <main class="page">
+    <h1>لوحة مدير المدرسة</h1>
 
-    <section class="schedule-card">
-      <div class="section-title">
-        <h2>لوحة تحكم المدرسة</h2>
-        <span id="dashboardSchoolName">جاري التحميل...</span>
-      </div>
+```
+<div class="field">
+  <label for="schedule">اختيار التوقيت النشط</label>
+  <select id="schedule">
+    <option value="normalWithPrayer">التوقيت الأساسي مع الصلاة</option>
+    <option value="normalWithoutPrayer">التوقيت الأساسي بدون الصلاة</option>
+    <option value="ramadan">توقيت رمضان</option>
+    <option value="exam">توقيت الاختبارات</option>
+  </select>
+</div>
 
-      <div id="dashboardStatus" class="alert-bar hidden"></div>
+<div class="field">
+  <label for="activityDay">اختيار يوم النشاط</label>
+  <select id="activityDay">
+    <option value="0">الأحد</option>
+    <option value="1">الاثنين</option>
+    <option value="2">الثلاثاء</option>
+    <option value="3">الأربعاء</option>
+    <option value="4">الخميس</option>
+    <option value="5">الجمعة</option>
+    <option value="6">السبت</option>
+  </select>
+</div>
 
-      <div class="message-card">
-        <span>رابط المعلمين / الهاتف / التابلت</span>
-        <strong id="teacherLink">--</strong>
-        <div>
-          <button class="admin-btn" onclick="copyTeacherLink()">نسخ</button>
-          <button class="admin-btn" onclick="openTeacherLink()">فتح</button>
-        </div>
-      </div>
+<div class="field">
+  <label for="activityPosition">موضع حصة النشاط</label>
+  <select id="activityPosition">
+    <option value="afterAssembly">بعد الطابور</option>
+    <option value="afterBreak">بعد الفسحة</option>
+  </select>
+</div>
 
-    </section>
+<div class="field">
+  <label for="activityEnabled">تفعيل حصة النشاط</label>
+  <select id="activityEnabled">
+    <option value="1">مفعلة</option>
+    <option value="0">غير مفعلة</option>
+  </select>
+</div>
 
-    <section class="schedule-card">
-      <div class="section-title">
-        <h2>إعدادات التصميم</h2>
-        <span>الألوان والخلفية فقط</span>
-      </div>
+<button onclick="generateLinks()">توليد روابط المعلمين</button>
 
-      <div style="display:grid; gap:12px;">
-        <label>اللون الرئيسي</label>
-        <input id="primaryColorInput" type="color" />
+<section class="links">
+  <h2>رابط شاشة الحاسوب</h2>
+  <div id="desktopLink" class="link-box">اضغط توليد الروابط</div>
 
-        <label>اللون الثانوي</label>
-        <input id="secondaryColorInput" type="color" />
+  <h2 style="margin-top:18px;">رابط الهاتف والآيباد</h2>
+  <div id="mobileLink" class="link-box">اضغط توليد الروابط</div>
+</section>
 
-        <label>لون الخلفية</label>
-        <input id="backgroundColorInput" type="color" />
-
-        <input id="themeStyleInput" type="text" placeholder="نمط التصميم: omani / modern / classic" />
-
-        <button class="admin-btn" onclick="saveDesignSettings()">حفظ إعدادات التصميم</button>
-      </div>
-    </section>
-
-    <section class="schedule-card">
-      <div class="section-title">
-        <h2>اختيار التوقيت النشط</h2>
-        <span>اختر توقيتًا واحدًا فقط</span>
-      </div>
-
-      <div id="dashboardSchedules" class="schedule-list"></div>
-    </section>
-
-    <section class="schedule-card">
-      <div class="section-title">
-        <h2>إدارة الرسائل التربوية</h2>
-        <span>خاصة بهذه المدرسة</span>
-      </div>
-
-      <div style="display:grid; gap:10px; margin-bottom:18px;">
-        <input id="messageText" type="text" placeholder="اكتب الرسالة التربوية" />
-        <input id="messageType" type="text" placeholder="نوع الرسالة: تربوية / تحفيزية / تعليمية" />
-        <button class="admin-btn" onclick="addMessage()">إضافة رسالة</button>
-      </div>
-
-      <div id="dashboardMessages" class="schedule-list"></div>
-    </section>
+<p class="note">
+  بعد توليد الرابط انسخه وأرسله للمعلمين حسب نوع الجهاز.
+</p>
+```
 
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="dashboard.js"></script>
+  <script>
+    function generateLinks(){
+      const schedule = document.getElementById("schedule").value;
+      const activityDay = document.getElementById("activityDay").value;
+      const activityPosition = document.getElementById("activityPosition").value;
+      const activityEnabled = document.getElementById("activityEnabled").value;
+
+      const base = "https://ma1980jid.github.io/school-timer/";
+
+      const params =
+        "?schedule=" + encodeURIComponent(schedule) +
+        "&activityDay=" + encodeURIComponent(activityDay) +
+        "&activityPosition=" + encodeURIComponent(activityPosition) +
+        "&activityEnabled=" + encodeURIComponent(activityEnabled);
+
+      const desktop =
+        base + params + "&view=desktop&v=" + Date.now();
+
+      const mobile =
+        base + params + "&view=mobile&v=" + Date.now();
+
+      document.getElementById("desktopLink").textContent = desktop;
+      document.getElementById("mobileLink").textContent = mobile;
+    }
+  </script>
+
 </body>
 </html>
