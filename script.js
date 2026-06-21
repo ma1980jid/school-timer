@@ -12,7 +12,7 @@ const settings = {
   showPrayer: true,
 
   // الأيام: 0 الأحد، 1 الاثنين، 2 الثلاثاء، 3 الأربعاء، 4 الخميس، 5 الجمعة، 6 السبت
-  activityDay: 6
+  activityDay: 0
 };
 
 /* جدول تجريبي يبدأ الساعة 1 صباحًا */
@@ -23,7 +23,7 @@ const defaultPeriods = [
   {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
   {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
 
-  {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1},
+  {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1,activityOnly:true},
 
   {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
   {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
