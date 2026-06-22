@@ -1,191 +1,380 @@
 <!doctype html>
-
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>لوحة مدير المدرسة</title>
-
   <style>
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
-
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
     body{
       font-family:Tahoma,Arial,sans-serif;
       background:#f8f2e8;
       color:#064b35;
-      padding:24px;
-      line-height:1.8;
+      display:grid;
+      place-items:center;
+      padding:10px;
+      line-height:1.5;
     }
-
     .page{
-      max-width:900px;
-      margin:auto;
-      background:#fff;
-      border-radius:18px;
-      padding:24px;
-      box-shadow:0 8px 24px rgba(0,0,0,.08);
+      width:min(100%,1040px);
+      height:calc(100dvh - 20px);
+      background:#fffdf8;
+      border:1px solid rgba(201,154,52,.35);
+      border-radius:22px;
+      box-shadow:0 12px 35px rgba(0,0,0,.10);
+      padding:16px;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:12px;
+      overflow:hidden;
     }
-
-    h1{
-      font-size:26px;
-      margin-bottom:18px;
+    .header{
+      text-align:center;
+      border-bottom:1px solid #eadcc0;
+      padding-bottom:8px;
+    }
+    h1{font-size:clamp(20px,2.6vw,30px);font-weight:900;color:#064b35}
+    .subtitle{font-size:clamp(12px,1.4vw,15px);font-weight:700;color:#8a6a23;margin-top:3px}
+    .content{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      min-height:0;
+      overflow:hidden;
+    }
+    .card{
+      background:#fff;
+      border:1px solid #eadcc0;
+      border-radius:18px;
+      padding:14px;
+      overflow:hidden;
+    }
+    .card-title{
+      font-size:clamp(16px,2vw,22px);
+      font-weight:900;
       color:#064b35;
+      margin-bottom:10px;
       text-align:center;
     }
-
-    .field{
-      margin-bottom:18px;
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
-
+    .field{min-width:0}
     label{
       display:block;
+      font-size:clamp(12px,1.4vw,15px);
       font-weight:900;
-      margin-bottom:6px;
-    }
-
-    select,
-    input{
-      width:100%;
-      padding:12px;
-      border:1px solid #d6c7a8;
-      border-radius:10px;
-      font-size:17px;
-      font-weight:700;
-      background:#fffdf8;
+      margin-bottom:4px;
       color:#064b35;
     }
-
-    .links{
-      margin-top:28px;
-      padding-top:18px;
-      border-top:2px solid #efe3c8;
-    }
-
-    .link-box{
-      margin-top:12px;
-      padding:14px;
-      background:#f8f2e8;
-      border-radius:12px;
-      word-break:break-all;
-      direction:ltr;
-      text-align:left;
-      font-size:15px;
-      color:#111;
-    }
-
-    button{
-      margin-top:10px;
+    select{
       width:100%;
-      padding:13px;
-      border:0;
+      height:42px;
+      padding:0 10px;
+      border:1px solid #cdbb93;
       border-radius:10px;
+      font-size:clamp(12px,1.6vw,15px);
+      font-weight:800;
+      background:#fffdf8;
+      color:#064b35;
+      outline:none;
+    }
+    select:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      background:#eee8dc;
+    }
+    .designs{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin-top:12px;
+    }
+    .design-option{
+      border:2px solid #eadcc0;
+      border-radius:14px;
+      padding:8px;
+      text-align:center;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+      background:#fffdf8;
+      min-height:58px;
+      display:grid;
+      place-items:center;
+    }
+    .design-option.active{border-color:#064b35;background:#eef7f0}
+    .design-option.omani{color:#064b35}
+    .design-option.snow{color:#586474;background:#f7fbff}
+    .design-option.gold{color:#8a5a00;background:#fff8e3}
+    .design-option.night{color:#fff;background:#14323f}
+    .actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+    button{
+      border:0;
+      border-radius:12px;
+      padding:12px;
       background:#064b35;
       color:#fff;
-      font-size:18px;
+      font-size:clamp(13px,1.7vw,17px);
       font-weight:900;
       cursor:pointer;
     }
-
-    .note{
-      margin-top:18px;
-      color:#7a5c1c;
-      font-weight:700;
+    button.secondary{background:#c99a34;color:#1f1600}
+    .links-list{display:grid;gap:10px}
+    .link-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      background:#f8f2e8;
+      border-radius:14px;
+      padding:10px;
+      border:1px solid #eadcc0;
+    }
+    .link-title{
+      grid-column:1 / -1;
+      font-weight:900;
+      color:#064b35;
+      font-size:clamp(13px,1.5vw,16px);
+    }
+    .link-box{
+      direction:ltr;
+      text-align:left;
+      word-break:break-all;
+      font-size:clamp(10px,1.15vw,13px);
+      color:#111;
+      background:#fff;
+      border-radius:10px;
+      padding:9px;
+      min-height:38px;
+      display:flex;
+      align-items:center;
+    }
+    .copy-btn{
+      width:92px;
+      padding:9px;
+      font-size:13px;
+      border-radius:10px;
+      background:#064b35;
+      color:#fff;
+      white-space:nowrap;
+    }
+    .footer-note{
       text-align:center;
+      font-size:clamp(11px,1.3vw,14px);
+      color:#7a5c1c;
+      font-weight:800;
+      border-top:1px solid #eadcc0;
+      padding-top:8px;
+    }
+    .toast{
+      position:fixed;
+      bottom:14px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#064b35;
+      color:#fff;
+      padding:10px 18px;
+      border-radius:999px;
+      font-weight:900;
+      opacity:0;
+      pointer-events:none;
+      transition:.25s;
+      z-index:50;
+    }
+    .toast.show{opacity:1}
+    @media (max-width:760px){
+      body{padding:6px}
+      .page{height:calc(100dvh - 12px);padding:10px;border-radius:16px;gap:8px}
+      .content{grid-template-columns:1fr;gap:8px}
+      .card{padding:10px;border-radius:14px}
+      .form-grid{grid-template-columns:1fr 1fr;gap:7px}
+      select{height:34px;padding:0 7px}
+      .designs{grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
+      .design-option{min-height:42px;font-size:10px;padding:5px;border-radius:10px}
+      .actions{margin-top:8px}
+      button{padding:9px}
+      .links-list{gap:7px}
+      .link-row{gap:5px;padding:7px;border-radius:10px}
+      .copy-btn{width:64px;padding:7px;font-size:11px}
+      .link-box{padding:7px;min-height:30px}
     }
   </style>
-
 </head>
-
 <body>
   <main class="page">
-    <h1>لوحة مدير المدرسة</h1>
+    <header class="header">
+      <h1>لوحة مدير المدرسة</h1>
+      <p class="subtitle">اختيار التوقيت والتصميم وتوليد روابط العرض للمعلمين</p>
+    </header>
 
-```
-<div class="field">
-  <label for="schedule">اختيار التوقيت النشط</label>
-  <select id="schedule">
-    <option value="normalWithPrayer">التوقيت الأساسي مع الصلاة</option>
-    <option value="normalWithoutPrayer">التوقيت الأساسي بدون الصلاة</option>
-    <option value="ramadan">توقيت رمضان</option>
-    <option value="exam">توقيت الاختبارات</option>
-  </select>
-</div>
+    <section class="content">
+      <div class="card">
+        <h2 class="card-title">إعدادات العرض</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label for="schedule">التوقيت النشط</label>
+            <select id="schedule">
+              <option value="normalWithPrayer">الأساسي مع الصلاة</option>
+              <option value="normalWithoutPrayer">الأساسي بدون الصلاة</option>
+              <option value="ramadan">توقيت رمضان</option>
+              <option value="exam">توقيت الاختبارات</option>
+            </select>
+          </div>
 
-<div class="field">
-  <label for="activityDay">اختيار يوم النشاط</label>
-  <select id="activityDay">
-    <option value="0">الأحد</option>
-    <option value="1">الاثنين</option>
-    <option value="2">الثلاثاء</option>
-    <option value="3">الأربعاء</option>
-    <option value="4">الخميس</option>
-    <option value="5">الجمعة</option>
-    <option value="6">السبت</option>
-  </select>
-</div>
+          <div class="field">
+            <label for="activityEnabled">تفعيل حصة النشاط</label>
+            <select id="activityEnabled">
+              <option value="1">مفعلة</option>
+              <option value="0">غير مفعلة</option>
+            </select>
+          </div>
 
-<div class="field">
-  <label for="activityPosition">موضع حصة النشاط</label>
-  <select id="activityPosition">
-    <option value="afterAssembly">بعد الطابور</option>
-    <option value="afterBreak">بعد الفسحة</option>
-  </select>
-</div>
+          <div class="field">
+            <label for="activityDay">يوم النشاط</label>
+            <select id="activityDay">
+              <option value="0">الأحد</option>
+              <option value="1">الاثنين</option>
+              <option value="2">الثلاثاء</option>
+              <option value="3">الأربعاء</option>
+              <option value="4">الخميس</option>
+              <option value="5">الجمعة</option>
+              <option value="6">السبت</option>
+            </select>
+          </div>
 
-<div class="field">
-  <label for="activityEnabled">تفعيل حصة النشاط</label>
-  <select id="activityEnabled">
-    <option value="1">مفعلة</option>
-    <option value="0">غير مفعلة</option>
-  </select>
-</div>
+          <div class="field">
+            <label for="activityPosition">موضع حصة النشاط</label>
+            <select id="activityPosition">
+              <option value="afterAssembly">بعد الطابور</option>
+              <option value="afterBreak">بعد الفسحة</option>
+            </select>
+          </div>
+        </div>
 
-<button onclick="generateLinks()">توليد روابط المعلمين</button>
+        <h2 class="card-title" style="margin-top:12px">اختيار التصميم</h2>
+        <div class="designs" id="designs">
+          <div class="design-option omani active" data-theme="omani">العماني</div>
+          <div class="design-option snow" data-theme="snow">الأبيض</div>
+          <div class="design-option gold" data-theme="gold">الذهبي</div>
+          <div class="design-option night" data-theme="night">الليلي</div>
+        </div>
 
-<section class="links">
-  <h2>رابط شاشة الحاسوب</h2>
-  <div id="desktopLink" class="link-box">اضغط توليد الروابط</div>
+        <div class="actions">
+          <button type="button" onclick="generateLinks()">توليد روابط المعلمين</button>
+        </div>
+      </div>
 
-  <h2 style="margin-top:18px;">رابط الهاتف والآيباد</h2>
-  <div id="mobileLink" class="link-box">اضغط توليد الروابط</div>
-</section>
+      <div class="card">
+        <h2 class="card-title">روابط المعلمين</h2>
+        <div class="links-list">
+          <div class="link-row">
+            <div class="link-title">رابط شاشة الحاسوب</div>
+            <div id="desktopLink" class="link-box">اضغط توليد روابط المعلمين</div>
+            <button class="copy-btn" type="button" onclick="copyLink('desktopLink')">نسخ</button>
+          </div>
 
-<p class="note">
-  بعد توليد الرابط انسخه وأرسله للمعلمين حسب نوع الجهاز.
-</p>
-```
+          <div class="link-row">
+            <div class="link-title">رابط الهاتف والآيباد</div>
+            <div id="mobileLink" class="link-box">اضغط توليد روابط المعلمين</div>
+            <button class="copy-btn" type="button" onclick="copyLink('mobileLink')">نسخ</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <p class="footer-note">عند تعطيل حصة النشاط يتم إيقاف اختيار يوم النشاط وموضع الحصة تلقائيًا.</p>
   </main>
 
+  <div id="toast" class="toast">تم النسخ</div>
+
   <script>
-    function generateLinks(){
-      const schedule = document.getElementById("schedule").value;
-      const activityDay = document.getElementById("activityDay").value;
-      const activityPosition = document.getElementById("activityPosition").value;
-      const activityEnabled = document.getElementById("activityEnabled").value;
+    let selectedTheme = "omani";
 
-      const base = "https://ma1980jid.github.io/school-timer/";
+    const schedule = document.getElementById("schedule");
+    const activityEnabled = document.getElementById("activityEnabled");
+    const activityDay = document.getElementById("activityDay");
+    const activityPosition = document.getElementById("activityPosition");
+    const designOptions = document.querySelectorAll(".design-option");
 
-      const params =
-        "?schedule=" + encodeURIComponent(schedule) +
-        "&activityDay=" + encodeURIComponent(activityDay) +
-        "&activityPosition=" + encodeURIComponent(activityPosition) +
-        "&activityEnabled=" + encodeURIComponent(activityEnabled);
-
-      const desktop =
-        base + params + "&view=desktop&v=" + Date.now();
-
-      const mobile =
-        base + params + "&view=mobile&v=" + Date.now();
-
-      document.getElementById("desktopLink").textContent = desktop;
-      document.getElementById("mobileLink").textContent = mobile;
+    function updateActivityControls(){
+      const enabled = activityEnabled.value === "1";
+      activityDay.disabled = !enabled;
+      activityPosition.disabled = !enabled;
     }
-  </script>
 
+    function setTheme(theme){
+      selectedTheme = theme;
+      designOptions.forEach(option => {
+        option.classList.toggle("active", option.dataset.theme === theme);
+      });
+      generateLinks();
+    }
+
+    designOptions.forEach(option => {
+      option.addEventListener("click", () => setTheme(option.dataset.theme));
+    });
+
+    [schedule, activityEnabled, activityDay, activityPosition].forEach(input => {
+      input.addEventListener("change", () => {
+        updateActivityControls();
+        generateLinks();
+      });
+    });
+
+    function buildLink(view){
+      const base = "https://ma1980jid.github.io/school-timer/";
+      const params = new URLSearchParams();
+
+      params.set("schedule", schedule.value);
+      params.set("activityEnabled", activityEnabled.value);
+      params.set("activityDay", activityDay.value);
+      params.set("activityPosition", activityPosition.value);
+      params.set("theme", selectedTheme);
+      params.set("view", view);
+      params.set("v", Date.now());
+
+      return `${base}?${params.toString()}`;
+    }
+
+    function generateLinks(){
+      document.getElementById("desktopLink").textContent = buildLink("desktop");
+      document.getElementById("mobileLink").textContent = buildLink("mobile");
+    }
+
+    async function copyLink(id){
+      const text = document.getElementById(id).textContent.trim();
+      if(!text || text.includes("اضغط")){
+        generateLinks();
+      }
+
+      const finalText = document.getElementById(id).textContent.trim();
+
+      try{
+        await navigator.clipboard.writeText(finalText);
+      }catch(error){
+        const temp = document.createElement("textarea");
+        temp.value = finalText;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+      }
+
+      showToast();
+    }
+
+    function showToast(){
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
+    updateActivityControls();
+    generateLinks();
+  </script>
 </body>
 </html>
