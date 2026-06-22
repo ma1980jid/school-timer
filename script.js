@@ -2,63 +2,62 @@ const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
   schoolLogo: "icons/school_logo.png",
   timeZone: "Asia/Muscat",
-activeSchedule: "normalWithPrayer",
-activityDay: 6,
-activityPosition: "afterAssembly",
-showPrayer: true,
-
-function applyUrlSettings(){
-const params = new URLSearchParams(window.location.search);
-
-const schedule = params.get("schedule");
-const activityDay = params.get("activityDay");
-const activityPosition = params.get("activityPosition");
-const activityEnabled = params.get("activityEnabled");
-
-if(schedule){
-settings.activeSchedule = schedule;
-}
-
-if(activityDay !== null && activityDay !== ""){
-settings.activityDay = Number(activityDay);
-}
-
-if(activityPosition){
-settings.activityPosition = activityPosition;
-}
-
-if(activityEnabled !== null){
-settings.activityEnabled = activityEnabled === "1";
-}
-}
-
-applyUrlSettings();
-
-  
+  activeSchedule: "normalWithPrayer",
+  activityDay: 6,
+  activityPosition: "afterAssembly",
+  activityEnabled: true,
+  designTheme: "omani",
+  showPrayer: true,
   visionMessages: [
     "رؤيتنا: تعليم ملهم لمستقبل مشرق",
     "رسالتنا: بيئة مدرسية آمنة ومحفزة للتعلم",
     "قيمنا: الانضباط، الإبداع، المسؤولية"
-  ],
-
-  showPrayer: true,
-
-  // الأيام: 0 الأحد، 1 الاثنين، 2 الثلاثاء، 3 الأربعاء، 4 الخميس، 5 الجمعة، 6 السبت
-  activityDay: 0
+  ]
 };
 
-/* جدول تجريبي يبدأ الساعة 1 صباحًا */
+function applyUrlSettings(){
+  const params = new URLSearchParams(window.location.search);
+
+  const schedule = params.get("schedule");
+  const activityDay = params.get("activityDay");
+  const activityPosition = params.get("activityPosition");
+  const activityEnabled = params.get("activityEnabled");
+  const theme = params.get("theme");
+
+  if(schedule){
+    settings.activeSchedule = schedule;
+  }
+
+  if(activityDay !== null && activityDay !== ""){
+    settings.activityDay = Number(activityDay);
+  }
+
+  if(activityPosition){
+    settings.activityPosition = activityPosition;
+  }
+
+  if(activityEnabled !== null){
+    settings.activityEnabled = activityEnabled === "1";
+  }
+
+  if(theme){
+    settings.designTheme = theme;
+  }
+}
+
+applyUrlSettings();
+
+document.documentElement.setAttribute("data-theme", settings.designTheme);
+
 const scheduleSets = {
   normalWithPrayer: {
     name: "التوقيت الأساسي مع الصلاة",
-
     default: [
       {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
       {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
       {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
       {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
       {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
-
       {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
       {name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
       {name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
@@ -66,16 +65,28 @@ const scheduleSets = {
       {name:"الصلاة",start:"03:15",end:"03:35",type:"prayer",col:2},
       {name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
     ],
-
-    activity: [
+    activityAfterAssembly: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"النشاط",start:"22:15",end:"22:35",type:"activity",col:1},
+      {name:"الأولى",start:"22:35",end:"23:15",type:"normal",col:1},
+      {name:"الثانية",start:"23:15",end:"23:55",type:"normal",col:1},
+      {name:"الثالثة",start:"23:55",end:"00:35",type:"normal",col:1},
+      {name:"الرابعة",start:"00:35",end:"01:15",type:"normal",col:1},
+      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
+      {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
+      {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
+      {name:"الصلاة",start:"03:35",end:"03:55",type:"prayer",col:2},
+      {name:"الثامنة",start:"03:55",end:"04:35",type:"normal",col:2}
+    ],
+    activityAfterBreak: [
       {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
       {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
       {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
       {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
       {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
-      {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1},
-
-      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
+      {name:"النشاط",start:"01:15",end:"01:35",type:"activity",col:2},
       {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
       {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
       {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
@@ -86,30 +97,39 @@ const scheduleSets = {
 
   normalWithoutPrayer: {
     name: "التوقيت الأساسي بدون الصلاة",
-
     default: [
       {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
       {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
       {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
       {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
       {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
-
       {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
       {name:"الخامسة",start:"01:15",end:"01:55",type:"normal",col:2},
       {name:"السادسة",start:"01:55",end:"02:35",type:"normal",col:2},
       {name:"السابعة",start:"02:35",end:"03:15",type:"normal",col:2},
       {name:"الثامنة",start:"03:15",end:"03:55",type:"normal",col:2}
     ],
-
-    activity: [
+    activityAfterAssembly: [
+      {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
+      {name:"النشاط",start:"22:15",end:"22:35",type:"activity",col:1},
+      {name:"الأولى",start:"22:35",end:"23:15",type:"normal",col:1},
+      {name:"الثانية",start:"23:15",end:"23:55",type:"normal",col:1},
+      {name:"الثالثة",start:"23:55",end:"00:35",type:"normal",col:1},
+      {name:"الرابعة",start:"00:35",end:"01:15",type:"normal",col:1},
+      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
+      {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
+      {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
+      {name:"الثامنة",start:"03:35",end:"04:15",type:"normal",col:2}
+    ],
+    activityAfterBreak: [
       {name:"الطابور",start:"22:00",end:"22:15",type:"normal",col:1},
       {name:"الأولى",start:"22:15",end:"22:55",type:"normal",col:1},
       {name:"الثانية",start:"22:55",end:"23:35",type:"normal",col:1},
       {name:"الثالثة",start:"23:35",end:"00:15",type:"normal",col:1},
       {name:"الرابعة",start:"00:15",end:"00:55",type:"normal",col:1},
-      {name:"النشاط",start:"00:55",end:"01:15",type:"activity",col:1},
-
-      {name:"الفسحة",start:"01:15",end:"01:35",type:"break",col:2},
+      {name:"الفسحة",start:"00:55",end:"01:15",type:"break",col:2},
+      {name:"النشاط",start:"01:15",end:"01:35",type:"activity",col:2},
       {name:"الخامسة",start:"01:35",end:"02:15",type:"normal",col:2},
       {name:"السادسة",start:"02:15",end:"02:55",type:"normal",col:2},
       {name:"السابعة",start:"02:55",end:"03:35",type:"normal",col:2},
@@ -119,14 +139,12 @@ const scheduleSets = {
 
   ramadan: {
     name: "توقيت رمضان",
-
     default: [
       {name:"الطابور",start:"22:00",end:"22:10",type:"normal",col:1},
       {name:"الأولى",start:"22:10",end:"22:45",type:"normal",col:1},
       {name:"الثانية",start:"22:45",end:"23:20",type:"normal",col:1},
       {name:"الثالثة",start:"23:20",end:"23:55",type:"normal",col:1},
       {name:"الرابعة",start:"23:55",end:"00:30",type:"normal",col:1},
-
       {name:"الفسحة",start:"00:30",end:"00:45",type:"break",col:2},
       {name:"الخامسة",start:"00:45",end:"01:20",type:"normal",col:2},
       {name:"السادسة",start:"01:20",end:"01:55",type:"normal",col:2},
@@ -136,18 +154,15 @@ const scheduleSets = {
 
   exam: {
     name: "توقيت الاختبارات",
-
     default: [
       {name:"الطابور",start:"22:00",end:"22:10",type:"normal",col:1},
       {name:"الفترة الأولى",start:"22:10",end:"23:40",type:"normal",col:1},
       {name:"استراحة",start:"23:40",end:"00:00",type:"break",col:1},
-
       {name:"الفترة الثانية",start:"00:00",end:"01:30",type:"normal",col:2},
       {name:"انصراف",start:"01:30",end:"01:40",type:"normal",col:2}
     ]
   }
 };
-
 
 const messages = [
   "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري",
@@ -169,17 +184,12 @@ const dayMap = {
 function updateViewportHeight(){
   const viewport = window.visualViewport;
   const height = viewport ? viewport.height : window.innerHeight;
-
   document.documentElement.style.setProperty("--app-height", `${height}px`);
 }
 
 updateViewportHeight();
-
 window.addEventListener("resize", updateViewportHeight, { passive: true });
-
-window.addEventListener("orientationchange", () => {
-  setTimeout(updateViewportHeight, 250);
-}, { passive: true });
+window.addEventListener("orientationchange", () => setTimeout(updateViewportHeight, 250), { passive: true });
 
 if(window.visualViewport){
   window.visualViewport.addEventListener("resize", updateViewportHeight, { passive: true });
@@ -192,7 +202,6 @@ function el(id){
 
 function setText(id, value){
   const element = el(id);
-
   if(element){
     element.textContent = value;
   }
@@ -221,13 +230,11 @@ function periodRange(period){
     return "--";
   }
 
-  // عرض الوقت من اليمين إلى اليسار بصريًا
   return `${formatTime(period.end)} - ${formatTime(period.start)}`;
 }
 
 function setTimeRange(id, period){
   const element = el(id);
-
   if(!element){
     return;
   }
@@ -280,7 +287,6 @@ function getOmanTimeParts(date = new Date()){
   }).formatToParts(date);
 
   const values = {};
-
   parts.forEach(part => {
     if(part.type !== "literal"){
       values[part.type] = part.value;
@@ -288,7 +294,6 @@ function getOmanTimeParts(date = new Date()){
   });
 
   let hour = Number(values.hour);
-
   if(hour === 24){
     hour = 0;
   }
@@ -310,54 +315,30 @@ function getOmanDay(date = new Date()){
 }
 
 function getActivePeriods(){
-const selectedSchedule =
-scheduleSets[settings.activeSchedule] ||
-scheduleSets.normalWithPrayer;
+  const selectedSchedule = scheduleSets[settings.activeSchedule] || scheduleSets.normalWithPrayer;
+  const today = getOmanDay();
 
-const today = getOmanDay();
-
-if(settings.activityEnabled && today === settings.activityDay){
-if(settings.activityPosition === "afterBreak" && selectedSchedule.activityAfterBreak){
-return selectedSchedule.activityAfterBreak;
-}
-
-```
-if(settings.activityPosition === "afterAssembly" && selectedSchedule.activityAfterAssembly){
-  return selectedSchedule.activityAfterAssembly;
-}
-
-if(selectedSchedule.activity){
-  return selectedSchedule.activity;
-}
-```
-
-}
-
-return selectedSchedule.default;
-}
-
-
-function getVisiblePeriods(){
-  const activePeriods = getActivePeriods();
-
-  return activePeriods.filter(period => {
-    if(period.optionalPrayer && !settings.showPrayer){
-      return false;
+  if(settings.activityEnabled && today === settings.activityDay){
+    if(settings.activityPosition === "afterBreak" && selectedSchedule.activityAfterBreak){
+      return selectedSchedule.activityAfterBreak;
     }
 
-    return true;
-  });
+    if(settings.activityPosition === "afterAssembly" && selectedSchedule.activityAfterAssembly){
+      return selectedSchedule.activityAfterAssembly;
+    }
+  }
+
+  return selectedSchedule.default;
+}
+
+function getVisiblePeriods(){
+  return getActivePeriods();
 }
 
 function getSchedule(){
   const now = new Date();
   const time = getOmanTimeParts(now);
-
-  const rawCurrentMinutes =
-    time.hour * 60 +
-    time.minute +
-    time.second / 60;
-
+  const rawCurrentMinutes = time.hour * 60 + time.minute + time.second / 60;
   const visibleList = getVisiblePeriods();
   const firstVisible = visibleList[0] || null;
 
@@ -382,9 +363,7 @@ function getSchedule(){
   const ordered = [...list].sort((a, b) => a.startMinutes - b.startMinutes);
   const first = ordered[0];
   const last = ordered[ordered.length - 1];
-
   let currentMinutes = rawCurrentMinutes;
-
   const crossesMidnight = last.endMinutes >= 1440;
   const lastEndAfterMidnight = last.endMinutes - 1440;
 
@@ -392,19 +371,9 @@ function getSchedule(){
     currentMinutes += 1440;
   }
 
-  const current = ordered.find(period =>
-    currentMinutes >= period.startMinutes &&
-    currentMinutes < period.endMinutes
-  ) || null;
-
-  const previous = [...ordered].reverse().find(period =>
-    currentMinutes >= period.endMinutes
-  ) || null;
-
-  const next = ordered.find(period =>
-    currentMinutes < period.startMinutes
-  ) || null;
-
+  const current = ordered.find(period => currentMinutes >= period.startMinutes && currentMinutes < period.endMinutes) || null;
+  const previous = [...ordered].reverse().find(period => currentMinutes >= period.endMinutes) || null;
+  const next = ordered.find(period => currentMinutes < period.startMinutes) || null;
   const beforeSchool = currentMinutes < first.startMinutes;
   const afterSchool = currentMinutes >= last.endMinutes;
 
@@ -449,7 +418,6 @@ function updateCards(){
 
 function updateClock(){
   const time = getOmanTimeParts();
-
   setText("digitalClock", `${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}`);
 }
 
@@ -497,27 +465,21 @@ function updateRemaining(){
   const schedule = getSchedule();
 
   if(schedule.current){
-    const remainingSeconds =
-      (schedule.current.endMinutes - schedule.currentMinutes) * 60;
-
+    const remainingSeconds = (schedule.current.endMinutes - schedule.currentMinutes) * 60;
     setText("countLabel", "متبقي من الحصة الحالية");
     setText("remainingTime", formatCountdown(remainingSeconds));
     return;
   }
 
   if(schedule.beforeSchool && schedule.first){
-    const remainingSeconds =
-      (schedule.first.startMinutes - schedule.currentMinutes) * 60;
-
+    const remainingSeconds = (schedule.first.startMinutes - schedule.currentMinutes) * 60;
     setText("countLabel", "متبقي على بداية الدوام");
     setText("remainingTime", formatCountdown(remainingSeconds));
     return;
   }
 
   if(schedule.next){
-    const remainingSeconds =
-      (schedule.next.startMinutes - schedule.currentMinutes) * 60;
-
+    const remainingSeconds = (schedule.next.startMinutes - schedule.currentMinutes) * 60;
     setText("countLabel", "متبقي على الحصة القادمة");
     setText("remainingTime", formatCountdown(remainingSeconds));
     return;
@@ -529,7 +491,6 @@ function updateRemaining(){
 
 function createCell(text, className){
   const cell = document.createElement("td");
-
   cell.textContent = text;
 
   if(className){
@@ -547,10 +508,8 @@ function createStatusCell(state, period){
   cell.className = "status-cell";
   stateText.className = "state-text";
   durationText.className = "duration-text";
-
   stateText.textContent = state;
   durationText.textContent = formatDuration(period);
-
   cell.append(stateText, durationText);
 
   return cell;
@@ -558,7 +517,6 @@ function createStatusCell(state, period){
 
 function createTimeCell(period){
   const cell = document.createElement("td");
-
   cell.className = "time-cell";
   cell.textContent = periodRange(period);
   cell.setAttribute("dir", "ltr");
@@ -611,7 +569,6 @@ function renderTable(){
     const rows = schedule.list
       .filter(period => period.col === 1)
       .map(period => createRow(period, schedule));
-
     column1.replaceChildren(...rows);
   }
 
@@ -619,7 +576,6 @@ function renderTable(){
     const rows = schedule.list
       .filter(period => period.col === 2)
       .map(period => createRow(period, schedule));
-
     column2.replaceChildren(...rows);
   }
 }
@@ -632,21 +588,17 @@ function updateVision(){
   }
 
   setText("visionText", settings.visionMessages[visionIndex]);
-
   visionIndex = (visionIndex + 1) % settings.visionMessages.length;
 }
 
 function createTickerGroup(){
   const group = document.createElement("div");
-
   group.className = "ticker-group";
 
   messages.forEach(message => {
     const item = document.createElement("span");
-
     item.className = "ticker-item";
     item.textContent = message;
-
     group.appendChild(item);
   });
 
@@ -655,7 +607,6 @@ function createTickerGroup(){
 
 function updateTicker(){
   const ticker = el("tickerTrack");
-
   if(!ticker){
     return;
   }
@@ -665,7 +616,6 @@ function updateTicker(){
 
 function init(){
   const logo = el("schoolLogo");
-
   if(logo){
     logo.src = settings.schoolLogo;
   }
