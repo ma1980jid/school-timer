@@ -469,15 +469,15 @@ background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !im
 
 .school-logo-wrap {
 position: absolute !important;
-top: 8.2% !important;
-right: 20.8% !important;
-width: 9.2% !important;
-height: 4.8% !important;
+top: 1% !important;
+right: 17% !important;
+width: 17% !important;
+height: 10% !important;
 z-index: 30 !important;
 display: flex !important;
 align-items: center !important;
 justify-content: center !important;
-overflow: hidden !important;
+overflow: visible !important;
 }
 
 .school-logo-wrap img {
@@ -530,54 +530,60 @@ display: none !important;
 }
 
 .period-title {
-position: absolute !important;
-top: 24% !important;
-left: 50% !important;
-transform: translateX(-50%) !important;
-width: 100% !important;
-text-align: center !important;
-font-size: clamp(10px, 2.35vw, 15px) !important;
-font-weight: 900 !important;
-color: #64748b !important;
-line-height: 1.2 !important;
-margin: 0 !important;
+  position: absolute !important;
+  top: 10% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 92% !important;
+  text-align: center !important;
+  font-size: clamp(10px, 2.35vw, 15px) !important;
+  font-weight: 900 !important;
+  color: #64748b !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
 }
 
 .period-name {
-position: absolute !important;
-top: 50% !important;
-left: 50% !important;
-transform: translate(-50%, -50%) !important;
-width: 100% !important;
-text-align: center !important;
-font-size: clamp(21px, 5.1vw, 32px) !important;
-font-weight: 900 !important;
-color: #064b35 !important;
-line-height: 1.15 !important;
-margin: 0 !important;
-white-space: normal !important;
-overflow: hidden !important;
+  position: absolute !important;
+  top: 44% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 92% !important;
+  text-align: center !important;
+  font-size: clamp(21px, 5.1vw, 32px) !important;
+  font-weight: 900 !important;
+  color: #064b35 !important;
+  line-height: 1.05 !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  overflow: hidden !important;
 }
 
 .period-time {
-position: absolute !important;
-top: 72% !important;
-left: 50% !important;
-transform: translateX(-50%) !important;
-width: 100% !important;
-text-align: center !important;
-font-size: clamp(10px, 2.55vw, 16px) !important;
-font-weight: 900 !important;
-color: #111 !important;
-line-height: 1.2 !important;
-margin: 0 !important;
+  position: absolute !important;
+  top: 78% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: clamp(12px, 3vw, 18px) !important;
+  font-weight: 900 !important;
+  color: #111 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
 }
-
 .current-card .period-title,
 .current-card .period-name {
 color: #c91414 !important;
 }
 
+  .current-card .period-name {
+  font-size: clamp(18px, 4.2vw, 29px) !important;
+  line-height: 1.05 !important;
+}
+  
 .current-card .period-name {
 font-size: clamp(25px, 5.7vw, 38px) !important;
 }
@@ -608,16 +614,16 @@ text-align: center !important;
 }
 
 .digital-clock {
-position: absolute !important;
-top: 0 !important;
-left: 0 !important;
-right: 0 !important;
-font-family: "Courier New", monospace !important;
-font-size: clamp(40px, 9.6vw, 70px) !important;
-font-weight: 900 !important;
-line-height: 1 !important;
-color: #fff !important;
-text-shadow: 0 4px 8px rgba(0, 0, 0, .35) !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  font-family: "Courier New", monospace !important;
+  font-size: clamp(32px, 7.4vw, 54px) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  color: #fff !important;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, .35) !important;
 }
 
 .count-label {

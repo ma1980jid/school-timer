@@ -6,90 +6,30 @@
   <meta name="theme-color" content="#f8f2e8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
   <title>مؤقّت الحصص</title>
-
-  <link rel="stylesheet" href="style.css?v=phone-new-1">
+  <link rel="stylesheet" href="style.css?v=cards-clock-01">
 </head>
-
 <body>
   <main class="timer-app">
-
-    <!-- شعار المدرسة -->
     <div class="school-logo-wrap">
       <img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة">
     </div>
-
-    <!-- المربعات العلوية -->
- <section class="top-cards">
-  <div class="period-card next-card">
-    <div class="period-title">الحصة القادمة</div>
-    <div id="nextName" class="period-name">--</div>
-    <div class="period-line"></div>
-    <div id="nextTime" class="period-time">--</div>
-  </div>
-
-  <div class="period-card current-card">
-    <div class="period-title">الحصة الحالية</div>
-    <div id="currentName" class="period-name">--</div>
-    <div class="period-line"></div>
-    <div id="currentTime" class="period-time">--</div>
-  </div>
-
-  <div class="period-card previous-card">
-    <div class="period-title">الحصة السابقة</div>
-    <div id="previousName" class="period-name">--</div>
-    <div class="period-line"></div>
-    <div id="previousTime" class="period-time">--</div>
-  </div>
-</section>
-
-    <!-- المربع الأخضر -->
+    <section class="top-cards">
+      <div class="period-card next-card"><div class="period-title">الحصة القادمة</div><div id="nextName" class="period-name">--</div><div class="period-line"></div><div id="nextTime" class="period-time">--</div></div>
+      <div class="period-card current-card"><div class="period-title">الحصة الحالية</div><div id="currentName" class="period-name">--</div><div class="period-line"></div><div id="currentTime" class="period-time">--</div></div>
+      <div class="period-card previous-card"><div class="period-title">الحصة السابقة</div><div id="previousName" class="period-name">--</div><div class="period-line"></div><div id="previousTime" class="period-time">--</div></div>
+    </section>
     <section class="clock-panel">
-      <div class="date-box">
-        <strong id="weekday">--</strong>
-        <span id="gregorianDate">--</span>
-        <span id="hijriDate">--</span>
-      </div>
-
-      <div class="clock-area">
-        <div id="digitalClock" class="digital-clock">--:--</div>
-        <div id="countLabel" class="count-label">متبقي من الحصة الحالية</div>
-        <div id="remainingTime" class="remaining-time">--:--</div>
-      </div>
+      <div class="date-box"><strong id="weekday">--</strong><span id="gregorianDate">--</span><span id="hijriDate">--</span></div>
+      <div class="clock-area"><div id="digitalClock" class="digital-clock">--:--</div><div id="countLabel" class="count-label">متبقي من الحصة الحالية</div><div id="remainingTime" class="remaining-time">--:--</div></div>
     </section>
-
-    <!-- بطاقتا الهاتف فقط -->
     <section class="middle-cards">
-      <div class="mini-card school-name-card">
-        <p id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</p>
-      </div>
-
-      <div class="mini-card vision-card">
-        <p id="visionText">رؤيتنا: تعليم ملهم لمستقبل مشرق</p>
-      </div>
+      <div class="mini-card school-name-card"><p id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</p></div>
+      <div class="mini-card vision-card"><p id="visionText">رؤيتنا: تعليم ملهم لمستقبل مشرق</p></div>
     </section>
-
-    <!-- جدول الحصص -->
-    <section class="schedule-section">
-      <div class="schedule-grid">
-        <table>
-          <tbody id="scheduleCol1"></tbody>
-        </table>
-
-        <table>
-          <tbody id="scheduleCol2"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- شريط الرسائل -->
-    <footer class="ticker">
-      <div id="tickerTrack" class="ticker-track"></div>
-    </footer>
-
+    <section class="schedule-section"><div class="schedule-grid"><table><tbody id="scheduleCol1"></tbody></table><table><tbody id="scheduleCol2"></tbody></table></div></section>
+    <footer class="ticker"><div id="tickerTrack" class="ticker-track"></div></footer>
   </main>
-
-  <script src="script.js?v=523" defer></script>
+  <script src="script.js?v=manager-duration-02" defer></script>
 </body>
 </html>
