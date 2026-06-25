@@ -1,4 +1,3 @@
-```js
 const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
   schoolLogo: "icons/school_logo.png",
