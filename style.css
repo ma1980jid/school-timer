@@ -846,7 +846,12 @@ width: max-content !important;
 min-width: max-content !important;
 white-space: nowrap !important;
 will-change: transform !important;
-animation: mobileTickerMove 18s linear infinite !important;
+animation: mobileTickerMove 16s linear infinite !important;
+}
+
+/* إخفاء النسخة الثانية حتى لا تتداخل العبارات */
+.ticker-group:nth-child(2) {
+display: none !important;
 }
 
 .ticker-group {
@@ -854,8 +859,8 @@ display: flex !important;
 align-items: center !important;
 flex-shrink: 0 !important;
 white-space: nowrap !important;
-gap: 85px !important;
-padding-inline: 45px !important;
+gap: 95px !important;
+padding-inline: 0 !important;
 }
 
 .ticker-item {
@@ -873,11 +878,11 @@ min-width: max-content !important;
 
 @keyframes mobileTickerMove {
 0% {
-transform: translateX(-35%);
+transform: translateX(-100%);
 }
 
 100% {
-transform: translateX(35%);
+transform: translateX(100vw);
 }
 }
 
