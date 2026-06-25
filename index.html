@@ -26,6 +26,21 @@
       .ticker-item{display:inline-flex!important;align-items:center!important;white-space:nowrap!important;font-size:clamp(15px,3.8vw,24px)!important;font-weight:900!important;color:#f7e6b0!important;line-height:1!important}
     }
 
+    @media (min-width: 769px){
+      .schedule-section{top:25.2%!important;left:45.2%!important;right:3.6%!important;bottom:14.9%!important;height:auto!important;overflow:hidden!important;padding:0!important;display:flex!important;align-items:stretch!important;background:rgba(255,255,255,.34)!important;border-radius:22px!important}
+      .schedule-grid{width:100%!important;height:100%!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:1.8%!important;padding:.7% .7%!important;box-sizing:border-box!important;align-items:stretch!important;background:transparent!important}
+      .schedule-grid table{display:block!important;width:100%!important;height:100%!important;border-collapse:collapse!important;border-spacing:0!important;table-layout:fixed!important;background:transparent!important;overflow:visible!important}
+      .schedule-grid tbody{display:flex!important;flex-direction:column!important;justify-content:space-between!important;width:100%!important;height:100%!important;gap:0!important;background:transparent!important}
+      .schedule-grid tr{display:grid!important;grid-template-columns:39% 43% 18%!important;align-items:center!important;justify-items:center!important;height:15.2%!important;min-height:0!important;background:rgba(255,255,255,.95)!important;border:1px solid rgba(168,136,88,.24)!important;border-radius:14px!important;overflow:hidden!important;box-shadow:0 2px 7px rgba(30,25,15,.055)!important}
+      .schedule-grid td{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;width:100%!important;height:100%!important;min-width:0!important;padding:0 6px!important;line-height:1.12!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;background:transparent!important;border:0!important;color:#064b35!important;font-weight:900!important;box-sizing:border-box!important}
+      .schedule-grid td:nth-child(1){font-size:clamp(18px,1.72vw,30px)!important;justify-content:flex-start!important;text-align:right!important;padding-inline-start:12px!important;color:#064b35!important}
+      .schedule-grid td:nth-child(2),.time-cell{font-size:clamp(15px,1.28vw,22px)!important;direction:ltr!important;justify-content:center!important;color:#083d35!important;font-weight:900!important;letter-spacing:.15px!important}
+      .schedule-grid td:nth-child(3),.status-cell{font-size:clamp(12px,.86vw,16px)!important;justify-content:center!important;color:#0f766e!important;font-weight:900!important;padding-inline:4px!important}
+      .schedule-grid tr.current-row{border-color:rgba(213,163,58,.55)!important;background:rgba(255,248,229,.98)!important;box-shadow:0 0 0 2px rgba(213,163,58,.14) inset!important}
+      .schedule-grid tr.break-row td:nth-child(1),.schedule-grid tr.break-row .time-cell{color:#6f42c1!important}
+      .schedule-grid tr.prayer-row td:nth-child(1),.schedule-grid tr.prayer-row .time-cell{color:#b55f06!important}
+    }
+
     @keyframes mobileTickerMove{
       from{transform:translateX(-35%)}
       to{transform:translateX(0)}
