@@ -1,3 +1,4 @@
+```js
 const settings = {
   schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
   schoolLogo: "icons/school_logo.png",
@@ -40,6 +41,58 @@ function applyUrlSettings() {
 
 applyUrlSettings();
 document.documentElement.setAttribute("data-theme", settings.designTheme);
+
+settings.schoolSlug = new URLSearchParams(location.search).get("school") || window.SCHOOL_TIMER_SLUG || "alsheikh-saif";
+
+let supabaseClient = null;
+
+function initSupabaseClient() {
+  const url = window.SCHOOL_TIMER_SUPABASE_URL;
+  const key = window.SCHOOL_TIMER_SUPABASE_ANON_KEY;
+
+  if (window.supabase && url && key) {
+    supabaseClient = window.supabase.createClient(url, key);
+  }
+}
+
+async function loadRemoteSettings() {
+  if (!supabaseClient) return;
+
+  try {
+    const { data: schoolData } = await supabaseClient
+      .from("schools")
+      .select("school_name")
+      .eq("school_slug", settings.schoolSlug)
+      .maybeSingle();
+
+    if (schoolData && schoolData.school_name) {
+      settings.schoolName = schoolData.school_name;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("school_timer_settings")
+      .select("active_schedule, activity_enabled, activity_day, activity_position, theme")
+      .eq("school_slug", settings.schoolSlug)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("تعذر جلب إعدادات المؤقت:", error.message);
+      return;
+    }
+
+    if (!data) return;
+
+    settings.activeSchedule = data.active_schedule || settings.activeSchedule;
+    settings.activityEnabled = !!data.activity_enabled;
+    settings.activityDay = data.activity_day === null || data.activity_day === undefined ? null : Number(data.activity_day);
+    settings.activityPosition = data.activity_position || settings.activityPosition;
+    settings.designTheme = data.theme || settings.designTheme;
+
+    document.documentElement.setAttribute("data-theme", settings.designTheme);
+  } catch (error) {
+    console.warn("خطأ في الاتصال بـ Supabase:", error);
+  }
+}
 
 const rawSchedules = {
   oneShift_scheduleFirst: [
@@ -850,8 +903,16 @@ function tick() {
   renderTable();
 }
 
-init();
-tick();
+async function startApp() {
+  initSupabaseClient();
+  await loadRemoteSettings();
 
-setInterval(tick, 1000);
-setInterval(updateVision, 5000);
+  init();
+  tick();
+
+  setInterval(tick, 1000);
+  setInterval(updateVision, 5000);
+}
+
+startApp();
+```
