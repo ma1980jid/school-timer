@@ -10,15 +10,16 @@
   <link rel="stylesheet" href="style.css?v=cards-clock-02">
   <style>
     @media (max-width: 768px){
-      .schedule-section{top:60.8%!important;height:31.8%!important;left:7.2%!important;right:7.2%!important;overflow:hidden!important}
-      .schedule-grid{height:100%!important;padding:8px 8px 6px!important;gap:2.2%!important;align-content:stretch!important}
-      .schedule-grid table{width:100%!important;height:100%!important;table-layout:fixed!important;border-collapse:collapse!important}
-      .schedule-grid tr{height:auto!important}
-      .schedule-grid td{padding:2px 1px!important;line-height:1!important;font-size:clamp(7px,1.85vw,12px)!important;vertical-align:middle!important}
-      .schedule-grid td:nth-child(1){width:35%!important;font-size:clamp(7px,1.9vw,12px)!important}
-      .schedule-grid td:nth-child(2),.time-cell{width:43%!important;font-size:clamp(8px,2.05vw,13px)!important}
-      .schedule-grid td:nth-child(3),.status-cell{width:22%!important;font-size:clamp(7px,1.75vw,11px)!important}
-      .current-row td{font-size:clamp(8px,2vw,13px)!important}
+      .schedule-section{top:60.4%!important;height:32.5%!important;left:7.2%!important;right:7.2%!important;overflow:hidden!important;padding:0!important}
+      .schedule-grid{height:100%!important;padding:7px 8px 5px!important;gap:2.2%!important;align-content:stretch!important;display:grid!important;grid-template-columns:1fr 1fr!important}
+      .schedule-grid table{display:block!important;width:100%!important;height:100%!important;border-collapse:collapse!important;table-layout:auto!important}
+      .schedule-grid tbody{display:grid!important;grid-template-rows:repeat(6,1fr)!important;height:100%!important;width:100%!important}
+      .schedule-grid tr{display:grid!important;grid-template-columns:35% 43% 22%!important;align-items:center!important;height:auto!important;min-height:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+      .schedule-grid td{display:flex!important;align-items:center!important;justify-content:center!important;width:auto!important;height:100%!important;padding:0 1px!important;line-height:1!important;font-size:clamp(6.5px,1.72vw,11px)!important;vertical-align:middle!important;overflow:hidden!important;white-space:nowrap!important;background:rgba(255,255,255,.18)!important}
+      .schedule-grid td:nth-child(1){font-size:clamp(6.5px,1.75vw,11px)!important}
+      .schedule-grid td:nth-child(2),.time-cell{font-size:clamp(7px,1.86vw,12px)!important}
+      .schedule-grid td:nth-child(3),.status-cell{font-size:clamp(6.2px,1.55vw,10px)!important}
+      .current-row td{font-size:clamp(7px,1.85vw,12px)!important}
       .ticker{bottom:1.5%!important;height:3%!important}
     }
   </style>
