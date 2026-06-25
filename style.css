@@ -843,22 +843,39 @@ box-shadow: none !important;
 display: flex !important;
 align-items: center !important;
 width: max-content !important;
+min-width: max-content !important;
 white-space: nowrap !important;
 will-change: transform !important;
-animation: tickerMove 55s linear infinite !important;
+animation: mobileTickerMove 22s linear infinite !important;
 }
 
 .ticker-group {
 display: flex !important;
 align-items: center !important;
+flex-shrink: 0 !important;
 white-space: nowrap !important;
-padding-inline: 100px !important;
+gap: 70px !important;
+padding-inline: 35px !important;
 }
 
 .ticker-item {
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
 font-size: clamp(14px, 3.5vw, 22px) !important;
 font-weight: 900 !important;
 color: #f7e6b0 !important;
-padding-inline: 80px !important;
+white-space: nowrap !important;
+line-height: 1 !important;
+padding-inline: 0 !important;
+}
+
+@keyframes mobileTickerMove {
+from {
+transform: translateX(-50%);
+}
+
+to {
+transform: translateX(0);
 }
 }
