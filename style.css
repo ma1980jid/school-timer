@@ -846,7 +846,7 @@ width: max-content !important;
 min-width: max-content !important;
 white-space: nowrap !important;
 will-change: transform !important;
-animation: mobileTickerMove 22s linear infinite !important;
+animation: mobileTickerMove 38s linear infinite !important;
 }
 
 .ticker-group {
@@ -854,8 +854,8 @@ display: flex !important;
 align-items: center !important;
 flex-shrink: 0 !important;
 white-space: nowrap !important;
-gap: 70px !important;
-padding-inline: 35px !important;
+gap: 120px !important;
+padding-inline: 80px !important;
 }
 
 .ticker-item {
@@ -868,6 +868,7 @@ color: #f7e6b0 !important;
 white-space: nowrap !important;
 line-height: 1 !important;
 padding-inline: 0 !important;
+min-width: max-content !important;
 }
 
 @keyframes mobileTickerMove {
