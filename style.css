@@ -1,3 +1,4 @@
+```css
 * {
   box-sizing: border-box;
   margin: 0;
@@ -574,6 +575,7 @@ display: none !important;
   line-height: 1.2 !important;
   margin: 0 !important;
 }
+
 .current-card .period-title,
 .current-card .period-name {
 color: #c91414 !important;
@@ -862,3 +864,4 @@ color: #f7e6b0 !important;
 padding-inline: 80px !important;
 }
 }
+```
