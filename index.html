@@ -20,14 +20,14 @@
       .schedule-grid td:nth-child(2),.time-cell{font-size:clamp(9px,2.38vw,15px)!important;justify-content:center!important;padding-inline:2px!important;direction:ltr!important;color:#111!important;overflow:visible!important}
       .schedule-grid td:nth-child(3),.status-cell{font-size:clamp(8.5px,2.15vw,13px)!important;justify-content:center!important;padding-inline:7px!important;color:#0f766e!important;overflow:visible!important;min-width:34px!important}
       .current-row td{font-size:clamp(9px,2.38vw,15px)!important;background:transparent!important}
-      .ticker{bottom:1.5%!important;height:3%!important;left:7.2%!important;right:7.2%!important;overflow:hidden!important;direction:ltr!important;display:flex!important;align-items:center!important}
-      .ticker-track{display:flex!important;align-items:center!important;width:max-content!important;min-width:max-content!important;white-space:nowrap!important;will-change:transform!important;animation:mobileTickerMove 24s linear infinite!important}
-      .ticker-group{display:flex!important;align-items:center!important;flex-shrink:0!important;white-space:nowrap!important;gap:12vw!important;padding-inline:6vw!important}
-      .ticker-item{display:inline-flex!important;align-items:center!important;white-space:nowrap!important;font-size:clamp(14px,3.4vw,22px)!important;font-weight:900!important;color:#f7e6b0!important}
+      .ticker{bottom:1.45%!important;height:4%!important;left:7.2%!important;right:7.2%!important;overflow:hidden!important;direction:ltr!important;display:flex!important;align-items:center!important;justify-content:flex-start!important}
+      .ticker-track{display:flex!important;align-items:center!important;width:max-content!important;min-width:max-content!important;white-space:nowrap!important;will-change:transform!important;animation:mobileTickerMove 12s linear infinite!important;transform:translateX(-35%)}
+      .ticker-group{display:flex!important;align-items:center!important;flex-shrink:0!important;white-space:nowrap!important;gap:6vw!important;padding-inline:2vw!important}
+      .ticker-item{display:inline-flex!important;align-items:center!important;white-space:nowrap!important;font-size:clamp(15px,3.8vw,24px)!important;font-weight:900!important;color:#f7e6b0!important;line-height:1!important}
     }
 
     @keyframes mobileTickerMove{
-      from{transform:translateX(-50%)}
+      from{transform:translateX(-35%)}
       to{transform:translateX(0)}
     }
   </style>
