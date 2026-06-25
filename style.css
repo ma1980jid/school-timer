@@ -434,4 +434,431 @@ body {
   }
 }
 
+/* =========================
+   الهاتف
+========================= */
+@media (max-width: 768px) {
 
+html,
+body {
+width: 100%;
+height: 100dvh;
+min-height: 100dvh;
+overflow: hidden !important;
+}
+
+body {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.timer-app {
+position: relative !important;
+width: 100vw !important;
+height: 100dvh !important;
+max-width: 100vw !important;
+max-height: 100dvh !important;
+min-height: 0 !important;
+margin: 0 !important;
+overflow: hidden !important;
+padding: 0 !important;
+background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !important;
+}
+
+
+.school-logo-wrap {
+position: absolute !important;
+top: 1% !important;
+right: 17% !important;
+width: 17% !important;
+height: 10% !important;
+z-index: 30 !important;
+display: flex !important;
+align-items: center !important;
+justify-content: center !important;
+overflow: visible !important;
+}
+
+.school-logo-wrap img {
+width: 100% !important;
+height: 100% !important;
+object-fit: contain !important;
+display: block !important;
+}
+
+.top-cards {
+position: absolute !important;
+top: 19.65% !important;
+left: 7.3% !important;
+right: 7.3% !important;
+height: 11.25% !important;
+display: grid !important;
+grid-template-columns: repeat(3, 1fr) !important;
+gap: 4.2% !important;
+direction: ltr !important;
+z-index: 10 !important;
+}
+
+.next-card {
+grid-column: 1 !important;
+}
+
+.current-card {
+grid-column: 2 !important;
+}
+
+.previous-card {
+grid-column: 3 !important;
+}
+
+.period-card {
+position: relative !important;
+width: 100% !important;
+height: 100% !important;
+text-align: center !important;
+overflow: hidden !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+padding: 0 !important;
+}
+
+.period-line,
+.period-card::after {
+display: none !important;
+}
+
+.period-title {
+  position: absolute !important;
+  top: 10% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 92% !important;
+  text-align: center !important;
+  font-size: clamp(10px, 2.35vw, 15px) !important;
+  font-weight: 900 !important;
+  color: #64748b !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.period-name {
+  position: absolute !important;
+  top: 44% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 92% !important;
+  text-align: center !important;
+  font-size: clamp(21px, 5.1vw, 32px) !important;
+  font-weight: 900 !important;
+  color: #064b35 !important;
+  line-height: 1.05 !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+}
+
+.period-time {
+  position: absolute !important;
+  top: 78% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: clamp(12px, 3vw, 18px) !important;
+  font-weight: 900 !important;
+  color: #111 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+.current-card .period-title,
+.current-card .period-name {
+color: #c91414 !important;
+}
+
+  .current-card .period-name {
+  font-size: clamp(18px, 4.2vw, 29px) !important;
+  line-height: 1.05 !important;
+}
+  
+.current-card .period-name {
+font-size: clamp(25px, 5.7vw, 38px) !important;
+}
+
+.clock-panel {
+position: absolute !important;
+top: 33.65% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+width: auto !important;
+height: 15.75% !important;
+color: #fff !important;
+z-index: 10 !important;
+overflow: hidden !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.clock-area {
+position: absolute !important;
+top: 6% !important;
+right: 4% !important;
+left: auto !important;
+width: 58% !important;
+height: 88% !important;
+text-align: center !important;
+}
+
+.digital-clock {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  font-family: "Courier New", monospace !important;
+  font-size: clamp(32px, 7.4vw, 54px) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  color: #fff !important;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, .35) !important;
+}
+
+.count-label {
+position: absolute !important;
+top: 39% !important;
+left: 0 !important;
+right: 0 !important;
+margin: 0 !important;
+padding: 0 !important;
+font-size: clamp(13px, 3.1vw, 20px) !important;
+font-weight: 900 !important;
+line-height: 1.2 !important;
+text-align: center !important;
+}
+
+.count-label::before {
+display: none !important;
+}
+
+.remaining-time {
+position: absolute !important;
+top: 60% !important;
+left: 0 !important;
+right: 0 !important;
+margin: 0 !important;
+font-family: "Courier New", monospace !important;
+font-size: clamp(31px, 7.2vw, 54px) !important;
+font-weight: 900 !important;
+line-height: 1 !important;
+color: #d6a93c !important;
+text-align: center !important;
+}
+
+.date-box {
+position: absolute !important;
+top: 17% !important;
+left: 0% !important;
+right: auto !important;
+width: 35% !important;
+height: 66% !important;
+transform: none !important;
+display: flex !important;
+flex-direction: column !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 8% !important;
+text-align: center !important;
+font-size: clamp(12px, 3vw, 18px) !important;
+font-weight: 900 !important;
+color: #f7e6b0 !important;
+line-height: 1.2 !important;
+}
+
+.date-box strong {
+font-size: clamp(17px, 4vw, 26px) !important;
+margin: 0 !important;
+color: #f7e6b0 !important;
+}
+
+.date-box span {
+font-size: clamp(12px, 3vw, 18px) !important;
+line-height: 1.2 !important;
+color: #f7e6b0 !important;
+}
+
+.middle-cards {
+position: absolute !important;
+top: 52.65% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+height: 7.55% !important;
+display: grid !important;
+grid-template-columns: 1fr 1fr !important;
+gap: 4.2% !important;
+direction: rtl !important;
+z-index: 10 !important;
+}
+
+.mini-card {
+position: relative !important;
+width: 100% !important;
+height: 100% !important;
+overflow: hidden !important;
+text-align: center !important;
+background: transparent !important;
+box-shadow: none !important;
+}
+
+.school-name-card p,
+.vision-card p {
+position: absolute !important;
+top: 50% !important;
+left: 50% !important;
+transform: translate(-50%, -50%) !important;
+width: 86% !important;
+max-height: 72% !important;
+text-align: center !important;
+font-weight: 900 !important;
+line-height: 1.25 !important;
+overflow: hidden !important;
+margin: 0 !important;
+}
+
+.school-name-card p {
+color: #064b35 !important;
+font-size: clamp(13px, 3.1vw, 19px) !important;
+}
+
+.vision-card p {
+color: #8a6418 !important;
+font-size: clamp(12px, 2.85vw, 17px) !important;
+}
+
+.schedule-section {
+position: absolute !important;
+top: 62.75% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+width: auto !important;
+height: 27.8% !important;
+z-index: 10 !important;
+overflow: hidden !important;
+padding: 0 !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.schedule-grid {
+width: 100% !important;
+height: 100% !important;
+display: grid !important;
+grid-template-columns: 1fr 1fr !important;
+gap: 2.6% !important;
+padding: 18px 10px 12px !important;
+align-content: stretch !important;
+}
+
+.schedule-grid table {
+width: 100% !important;
+height: 100% !important;
+border-collapse: collapse !important;
+table-layout: fixed !important;
+}
+
+.schedule-grid tr {
+display: table-row !important;
+height: auto !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.schedule-grid td {
+display: table-cell !important;
+padding: 5px 2px !important;
+border-bottom: 1px solid rgba(6, 75, 53, .18) !important;
+text-align: center !important;
+vertical-align: middle !important;
+font-size: clamp(8px, 2.1vw, 13px) !important;
+font-weight: 900 !important;
+background: rgba(255, 255, 255, .28) !important;
+line-height: 1.1 !important;
+}
+
+.schedule-grid td:nth-child(1) {
+width: 36% !important;
+color: #064b35 !important;
+}
+
+.schedule-grid td:nth-child(2) {
+width: 42% !important;
+color: #111 !important;
+font-size: clamp(9px, 2.4vw, 15px) !important;
+}
+
+.schedule-grid td:nth-child(3) {
+width: 22% !important;
+color: #0f766e !important;
+}
+
+.current-row td {
+color: #c91414 !important;
+background: rgba(255, 225, 225, .65) !important;
+font-size: clamp(10px, 2.6vw, 16px) !important;
+}
+
+.break-row td {
+color: #7c3aed !important;
+}
+
+.prayer-row td {
+color: #b45309 !important;
+}
+
+.activity-row td {
+color: #0369a1 !important;
+}
+
+.ticker {
+position: absolute !important;
+bottom: 2.1% !important;
+left: 7.2% !important;
+right: 7.2% !important;
+height: 3.1% !important;
+z-index: 10 !important;
+display: flex !important;
+align-items: center !important;
+overflow: hidden !important;
+direction: ltr !important;
+background: transparent !important;
+border: 0 !important;
+box-shadow: none !important;
+}
+
+.ticker-track {
+display: flex !important;
+align-items: center !important;
+width: max-content !important;
+white-space: nowrap !important;
+will-change: transform !important;
+animation: tickerMove 55s linear infinite !important;
+}
+
+.ticker-group {
+display: flex !important;
+align-items: center !important;
+white-space: nowrap !important;
+padding-inline: 100px !important;
+}
+
+.ticker-item {
+font-size: clamp(14px, 3.5vw, 22px) !important;
+font-weight: 900 !important;
+color: #f7e6b0 !important;
+padding-inline: 80px !important;
+}
+}
