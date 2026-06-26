@@ -47,7 +47,7 @@ body {
   min-height: 720px;
   margin: 0;
   overflow: hidden;
-  background: var(--cream) url("./desktop-bg.png") center / 100% 100% no-repeat;
+  background: var(--cream) url("./desktop-bg.webp") center / 100% 100% no-repeat;
   color: var(--green);
 }
 
@@ -463,7 +463,7 @@ min-height: 0 !important;
 margin: 0 !important;
 overflow: hidden !important;
 padding: 0 !important;
-background: var(--cream) url("./mobile-bg.png") center / 100% 100% no-repeat !important;
+background: var(--cream) url("./mobile-bg.webp") center / 100% 100% no-repeat !important;
 }
 
 

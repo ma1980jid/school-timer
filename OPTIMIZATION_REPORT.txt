@@ -1,0 +1,24 @@
+نسخة محسنة من school-timer
+
+أهم التعديلات:
+1. ضغط الخلفيات وتحويلها إلى WebP:
+   - desktop-bg.webp
+   - mobile-bg.webp
+2. تصغير وضغط شعار المدرسة مع بقاء PNG شفاف.
+3. تعديل style.css لاستخدام خلفيات WebP الأخف.
+4. إزالة تكرار تحميل ticker-messages.js من supabase-config.js.
+5. تحسين ticker-messages.js: تخزين محلي، تحديث كل 10 دقائق، منع التشغيل المكرر.
+6. تحسين script.js: إيقاف إعادة رسم جدول الحصص كل ثانية إذا لم يتغير.
+7. نقل الملفات القديمة غير المستخدمة إلى مجلد _archive_unused للمراجعة بدل تحميلها في التطبيق.
+
+الملفات الأساسية للتشغيل:
+index.html
+style.css
+script.js
+supabase-config.js
+ticker-messages.js
+dashboard-v2.html
+dashboard-messages.js
+desktop-bg.webp
+mobile-bg.webp
+icons/school_logo.png

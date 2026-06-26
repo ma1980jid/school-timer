@@ -823,8 +823,15 @@ function createRow(p, s) {
   return row;
 }
 
+let lastTableSignature = "";
+
 function renderTable() {
   const s = getSchedule();
+  const stateFor = p => s.current === p ? "جارية" : (s.currentMinutes >= p.endMinutes ? "انتهت" : "قادمة");
+  const signature = s.list.map(p => `${p.name}|${p.start}|${p.end}|${p.type}|${stateFor(p)}`).join("||");
+  if (signature === lastTableSignature) return;
+  lastTableSignature = signature;
+
   const col1 = el("scheduleCol1");
   const col2 = el("scheduleCol2");
 
@@ -891,7 +898,6 @@ function init() {
   setText("schoolName", settings.schoolName);
 
   updateVision();
-  updateTicker();
 }
 
 function tick() {
