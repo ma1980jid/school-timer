@@ -14,7 +14,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
   document.head.appendChild(fixesScript);
 
   const titleLayoutScript = document.createElement('script');
-  titleLayoutScript.src = 'dashboard-title-layout-fix.js?v=title-layout-04';
+  titleLayoutScript.src = 'dashboard-title-layout-fix.js?v=title-layout-05';
   titleLayoutScript.defer = true;
   document.head.appendChild(titleLayoutScript);
 }
