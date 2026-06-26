@@ -29,7 +29,7 @@
     const params = new URLSearchParams({
       school: getSchoolSlug(),
       view,
-      v: '12'
+      v: '13'
     });
 
     return `${origin}${basePath}?${params.toString()}`;
@@ -279,7 +279,7 @@
     if (document.getElementById('scheduledAnnouncementsAdminScript')) return;
     const script = document.createElement('script');
     script.id = 'scheduledAnnouncementsAdminScript';
-    script.src = 'scheduled-announcements-admin.js?v=scheduled-02';
+    script.src = 'scheduled-announcements-admin.js?v=scheduled-03';
     script.defer = true;
     document.head.appendChild(script);
   }
