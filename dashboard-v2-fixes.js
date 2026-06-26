@@ -23,13 +23,92 @@
     return window.schoolTimerDashboardFixesClient;
   }
 
+  function ensureDashboardSchoolNameStyles(){
+    if (document.getElementById('dashboardSchoolNameStyles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'dashboardSchoolNameStyles';
+    style.textContent = `
+      .dashboard-school-name{
+        display:block;
+        width:100%;
+        margin:-6px auto 12px;
+        padding:0 16px 10px;
+        text-align:center;
+        color:#f7e6b0;
+        font-family:Tahoma,Arial,sans-serif;
+        font-size:clamp(17px,2.15vw,25px);
+        font-weight:900;
+        line-height:1.7;
+        letter-spacing:0;
+        text-shadow:0 1px 2px rgba(0,0,0,.22);
+      }
+      @media(max-width:768px){
+        .dashboard-school-name{
+          margin:-3px auto 10px;
+          padding:0 10px 8px;
+          font-size:clamp(15px,4vw,20px);
+          line-height:1.6;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function findDashboardTitle(){
+    return [...document.querySelectorAll('h1,h2')].find((title) =>
+      title.textContent.replace(/\s+/g, ' ').trim().includes('إدارة مؤقت الحصص')
+    ) || document.querySelector('h1');
+  }
+
+  function setDashboardSchoolName(name){
+    const schoolName = String(name || '').trim() || 'مدرسة الشيخ سيف بن حمد الأغبري';
+    ensureDashboardSchoolNameStyles();
+
+    const title = findDashboardTitle();
+    if (!title) return false;
+
+    let subtitle = document.getElementById('dashboardSchoolName');
+    if (!subtitle) {
+      subtitle = document.createElement('div');
+      subtitle.id = 'dashboardSchoolName';
+      subtitle.className = 'dashboard-school-name';
+      title.insertAdjacentElement('afterend', subtitle);
+    }
+
+    if (subtitle.textContent !== schoolName) {
+      subtitle.textContent = schoolName;
+    }
+
+    return true;
+  }
+
+  async function loadDashboardSchoolName(){
+    if (!setDashboardSchoolName('مدرسة الشيخ سيف بن حمد الأغبري')) return;
+
+    const client = getClient();
+    if (!client) return;
+
+    try {
+      const { data, error } = await client
+        .from('schools')
+        .select('school_name')
+        .eq('school_slug', getSchoolSlug())
+        .maybeSingle();
+
+      if (!error && data && data.school_name) {
+        setDashboardSchoolName(data.school_name);
+      }
+    } catch (error) {}
+  }
+
   function buildViewUrl(view){
     const origin = location.origin;
     const basePath = location.pathname.replace(/dashboard-v2\.html$/, 'index.html');
     const params = new URLSearchParams({
       school: getSchoolSlug(),
       view,
-      v: '13'
+      v: '14'
     });
 
     return `${origin}${basePath}?${params.toString()}`;
@@ -91,6 +170,7 @@
         button.textContent = originalText;
         isSavingSettings = false;
         refreshLinks();
+        loadDashboardSchoolName();
       }, 1800);
     }, true);
   }
@@ -285,10 +365,13 @@
   }
 
   function start(){
+    loadDashboardSchoolName();
     refreshLinks();
     protectSaveButton();
     addMiddleCardsButton();
     loadScheduledAnnouncementsModule();
+    setTimeout(loadDashboardSchoolName, 400);
+    setTimeout(loadDashboardSchoolName, 1200);
     setTimeout(refreshLinks, 300);
     setTimeout(refreshLinks, 1000);
     setTimeout(protectSaveButton, 1000);
