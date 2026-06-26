@@ -85,7 +85,7 @@
     position: static !important;
     top: auto !important;
     left: auto !important;
-    transform: none !important;
+    transform: translateY(1.15em) !important;
     width: 88% !important;
     height: 100% !important;
     max-height: none !important;
