@@ -72,6 +72,31 @@
     min-width: 110px;
   }
 
+  .school-name-card,
+  .vision-card,
+  .mini-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .school-name-card p,
+  .vision-card p {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 88% !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    line-height: 1.22 !important;
+  }
+
   .schedule-grid tr.current-row td {
     background: linear-gradient(180deg, rgba(255, 248, 221, .98), rgba(255, 232, 181, .92)) !important;
     color: #b91c1c !important;
