@@ -13,38 +13,61 @@
         overflow:hidden!important;
       }
 
+      .dashboard-title-host-fixed h1,
+      .dashboard-title-host-fixed h2{
+        position:absolute!important;
+        top:50%!important;
+        right:34px!important;
+        left:auto!important;
+        width:50%!important;
+        margin:0!important;
+        padding:0!important;
+        transform:translateY(-50%)!important;
+        text-align:right!important;
+        white-space:nowrap!important;
+        line-height:1!important;
+        z-index:4!important;
+      }
+
       .dashboard-title-host-fixed .dashboard-school-name,
       .dashboard-title-host-fixed #dashboardSchoolName{
         position:absolute!important;
-        left:0!important;
-        right:0!important;
-        top:62%!important;
-        width:100%!important;
+        top:50%!important;
+        left:128px!important;
+        right:auto!important;
+        width:38%!important;
         height:auto!important;
         min-height:0!important;
         margin:0!important;
-        padding:0 12px!important;
+        padding:0!important;
+        transform:translateY(-50%)!important;
         line-height:1.25!important;
-        text-align:center!important;
+        text-align:left!important;
         pointer-events:none!important;
         z-index:3!important;
         color:#f7e6b0!important;
-        font-size:clamp(15px,1.8vw,22px)!important;
+        font-size:clamp(15px,1.55vw,22px)!important;
         font-weight:900!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+        text-overflow:ellipsis!important;
         text-shadow:0 1px 2px rgba(0,0,0,.24)!important;
       }
 
-      .dashboard-title-host-fixed h1,
-      .dashboard-title-host-fixed h2{
-        margin-bottom:0!important;
-      }
-
       @media(max-width:768px){
+        .dashboard-title-host-fixed h1,
+        .dashboard-title-host-fixed h2{
+          right:12px!important;
+          width:48%!important;
+          font-size:clamp(20px,6vw,31px)!important;
+        }
+
         .dashboard-title-host-fixed .dashboard-school-name,
         .dashboard-title-host-fixed #dashboardSchoolName{
-          top:64%!important;
-          font-size:clamp(13px,3.5vw,18px)!important;
-          padding:0 8px!important;
+          left:92px!important;
+          width:38%!important;
+          font-size:clamp(12px,3.2vw,16px)!important;
+          line-height:1.2!important;
         }
       }
     `;
