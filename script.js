@@ -44,6 +44,38 @@ document.documentElement.setAttribute("data-theme", settings.designTheme);
 settings.schoolSlug = new URLSearchParams(location.search).get("school") || window.SCHOOL_TIMER_SLUG || "alsheikh-saif";
 
 let supabaseClient = null;
+const settingsCacheKey = "school_timer_settings_" + settings.schoolSlug;
+
+function applyRemoteSettingsData(data) {
+  if (!data) return;
+
+  if (data.school_name) {
+    settings.schoolName = data.school_name;
+  }
+
+  settings.activeSchedule = data.active_schedule || settings.activeSchedule;
+  settings.activityEnabled = !!data.activity_enabled;
+  settings.activityDay = data.activity_day === null || data.activity_day === undefined ? null : Number(data.activity_day);
+  settings.activityPosition = data.activity_position || settings.activityPosition;
+  settings.designTheme = data.theme || settings.designTheme;
+
+  document.documentElement.setAttribute("data-theme", settings.designTheme);
+}
+
+function loadCachedSettings() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(settingsCacheKey) || "null");
+    if (cached && cached.data) {
+      applyRemoteSettingsData(cached.data);
+    }
+  } catch (error) {}
+}
+
+function saveCachedSettings(data) {
+  try {
+    localStorage.setItem(settingsCacheKey, JSON.stringify({ savedAt: Date.now(), data }));
+  } catch (error) {}
+}
 
 function initSupabaseClient() {
   const url = window.SCHOOL_TIMER_SUPABASE_URL;
@@ -55,41 +87,38 @@ function initSupabaseClient() {
 }
 
 async function loadRemoteSettings() {
-  if (!supabaseClient) return;
+  if (!supabaseClient) return false;
 
   try {
-    const { data: schoolData } = await supabaseClient
-      .from("schools")
-      .select("school_name")
-      .eq("school_slug", settings.schoolSlug)
-      .maybeSingle();
+    const [schoolResult, settingsResult] = await Promise.all([
+      supabaseClient
+        .from("schools")
+        .select("school_name")
+        .eq("school_slug", settings.schoolSlug)
+        .maybeSingle(),
+      supabaseClient
+        .from("school_timer_settings")
+        .select("active_schedule, activity_enabled, activity_day, activity_position, theme")
+        .eq("school_slug", settings.schoolSlug)
+        .maybeSingle()
+    ]);
 
-    if (schoolData && schoolData.school_name) {
-      settings.schoolName = schoolData.school_name;
+    if (settingsResult.error) {
+      console.warn("تعذر جلب إعدادات المؤقت:", settingsResult.error.message);
+      return false;
     }
 
-    const { data, error } = await supabaseClient
-      .from("school_timer_settings")
-      .select("active_schedule, activity_enabled, activity_day, activity_position, theme")
-      .eq("school_slug", settings.schoolSlug)
-      .maybeSingle();
+    const merged = {
+      ...(settingsResult.data || {}),
+      school_name: schoolResult.data && schoolResult.data.school_name ? schoolResult.data.school_name : settings.schoolName
+    };
 
-    if (error) {
-      console.warn("تعذر جلب إعدادات المؤقت:", error.message);
-      return;
-    }
-
-    if (!data) return;
-
-    settings.activeSchedule = data.active_schedule || settings.activeSchedule;
-    settings.activityEnabled = !!data.activity_enabled;
-    settings.activityDay = data.activity_day === null || data.activity_day === undefined ? null : Number(data.activity_day);
-    settings.activityPosition = data.activity_position || settings.activityPosition;
-    settings.designTheme = data.theme || settings.designTheme;
-
-    document.documentElement.setAttribute("data-theme", settings.designTheme);
+    applyRemoteSettingsData(merged);
+    saveCachedSettings(merged);
+    return true;
   } catch (error) {
     console.warn("خطأ في الاتصال بـ Supabase:", error);
+    return false;
   }
 }
 
@@ -901,13 +930,25 @@ function tick() {
   renderTable(s);
 }
 
-async function startApp() {
+async function refreshRemoteSettingsAfterStart() {
+  const changed = await loadRemoteSettings();
+  if (!changed) return;
+
+  setText("schoolName", settings.schoolName);
+  lastTableSignature = "";
+  updateDate(new Date(), true);
+  tick();
+}
+
+function startApp() {
   initSupabaseClient();
-  await loadRemoteSettings();
+  loadCachedSettings();
 
   init();
+  updateDate(new Date(), true);
   tick();
 
+  setTimeout(refreshRemoteSettingsAfterStart, 800);
   setInterval(tick, 1000);
   setInterval(updateVision, 5000);
 }
