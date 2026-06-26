@@ -75,6 +75,35 @@
     return String(text || '').trim();
   }
 
+  function escapeHtml(value){
+    return String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  }
+
+  function legacyToSlotTexts(item){
+    if (item.tickerText || item.rightText || item.leftText) {
+      return {
+        tickerText: item.tickerText || '',
+        rightText: item.rightText || '',
+        leftText: item.leftText || ''
+      };
+    }
+
+    const title = clean(item.title);
+    const text = clean(item.text);
+    const legacyText = title && text ? `${title}: ${text}` : (text || title);
+    const target = clean(item.target) || 'ticker';
+
+    return {
+      tickerText: target === 'ticker' || target === 'all' ? legacyText : '',
+      rightText: target === 'right' || target === 'all' ? legacyText : '',
+      leftText: target === 'left' || target === 'all' ? legacyText : ''
+    };
+  }
+
   function ensureStyles(){
     if (document.getElementById('scheduledAnnouncementsStyles')) return;
     const style = document.createElement('style');
@@ -86,12 +115,14 @@
       .scheduled-row-title{font-weight:900;color:#0f172a}
       .scheduled-row-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
       .scheduled-row label{display:block;font-size:13px;color:#64748b;font-weight:900;margin-bottom:4px;text-align:right}
-      .scheduled-row input,.scheduled-row select,.scheduled-row textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;background:white;color:#0f172a;font-family:Tahoma,Arial,sans-serif;font-size:14px;font-weight:900;padding:8px;outline:none}
-      .scheduled-row textarea{min-height:70px;resize:vertical;line-height:1.55}
-      .scheduled-row input:focus,.scheduled-row select:focus,.scheduled-row textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+      .scheduled-row input,.scheduled-row textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;background:white;color:#0f172a;font-family:Tahoma,Arial,sans-serif;font-size:14px;font-weight:900;padding:8px;outline:none}
+      .scheduled-row textarea{min-height:58px;resize:vertical;line-height:1.55}
+      .scheduled-row input:focus,.scheduled-row textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
       .scheduled-note{margin:0;color:#64748b;font-weight:900;line-height:1.8}
       .scheduled-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
       .scheduled-chip{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;background:#ecfeff;color:#0f766e;font-size:12px;font-weight:900}
+      .scheduled-slot{border:1px dashed #cbd5e1;border-radius:14px;padding:8px;background:white}
+      .scheduled-slot label{color:#0f766e}
       @media(max-width:640px){.scheduled-row-grid{grid-template-columns:1fr}.scheduled-actions{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
@@ -104,6 +135,7 @@
     const start = item.start || todayKey();
     const end = item.end || item.start || addDays(start, 0);
     const id = item.id || String(Date.now()) + Math.random().toString(16).slice(2);
+    const slots = legacyToSlotTexts(item);
 
     row.dataset.id = id;
     row.innerHTML = `
@@ -117,15 +149,6 @@
           <input class="scheduledTitle" value="${escapeHtml(item.title || '')}" placeholder="مثال: اليوم الوطني">
         </div>
         <div>
-          <label>مكان الظهور</label>
-          <select class="scheduledTarget">
-            <option value="ticker">شريط الرسائل</option>
-            <option value="right">الصندوق الأيمن</option>
-            <option value="left">الصندوق الأيسر</option>
-            <option value="all">الكل</option>
-          </select>
-        </div>
-        <div>
           <label>تاريخ البداية</label>
           <input class="scheduledStart" type="date" value="${escapeHtml(start)}">
         </div>
@@ -133,31 +156,32 @@
           <label>تاريخ النهاية</label>
           <input class="scheduledEnd" type="date" value="${escapeHtml(end)}">
         </div>
+        <div class="scheduled-row-grid">
+          <label class="scheduled-chip"><input class="scheduledAnnual" type="checkbox" style="width:auto;margin-inline-end:6px"> يتكرر سنويًا</label>
+          <label class="scheduled-chip"><input class="scheduledActive" type="checkbox" style="width:auto;margin-inline-end:6px" checked> مفعل</label>
+        </div>
       </div>
-      <div>
-        <label>نص الإعلان</label>
-        <textarea class="scheduledText" placeholder="اكتب نص الإعلان أو التنبيه هنا">${escapeHtml(item.text || '')}</textarea>
+      <div class="scheduled-slot">
+        <label>عبارة شريط الرسائل</label>
+        <textarea class="scheduledTickerText" placeholder="تظهر في الشريط السفلي المتحرك">${escapeHtml(slots.tickerText)}</textarea>
       </div>
       <div class="scheduled-row-grid">
-        <label class="scheduled-chip"><input class="scheduledAnnual" type="checkbox" style="width:auto;margin-inline-end:6px"> يتكرر سنويًا</label>
-        <label class="scheduled-chip"><input class="scheduledActive" type="checkbox" style="width:auto;margin-inline-end:6px" checked> مفعل</label>
+        <div class="scheduled-slot">
+          <label>عبارة الصندوق الأيمن</label>
+          <textarea class="scheduledRightText" placeholder="تظهر في الصندوق الأيمن">${escapeHtml(slots.rightText)}</textarea>
+        </div>
+        <div class="scheduled-slot">
+          <label>عبارة الصندوق الأيسر</label>
+          <textarea class="scheduledLeftText" placeholder="تظهر ثابتة في الصندوق الأيسر">${escapeHtml(slots.leftText)}</textarea>
+        </div>
       </div>
     `;
 
-    row.querySelector('.scheduledTarget').value = item.target || 'ticker';
     row.querySelector('.scheduledAnnual').checked = !!item.annual;
     row.querySelector('.scheduledActive').checked = item.active !== false;
     row.querySelector('.mini.del').onclick = () => row.remove();
 
     return row;
-  }
-
-  function escapeHtml(value){
-    return String(value || '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;');
   }
 
   function ensureDialog(){
@@ -170,7 +194,7 @@
     dialog.innerHTML = `
       <div>
         <h3>الإعلانات المجدولة</h3>
-        <p class="scheduled-note">اربط الإعلان بتاريخ محدد، وسيظهر تلقائيًا في يومه داخل الشريط أو الصندوقين أو الجميع.</p>
+        <p class="scheduled-note">اربط الإعلان بتاريخ محدد، ويمكنك كتابة عبارة مختلفة للشريط وللصندوقين في المناسبة نفسها.</p>
         <div id="scheduledAnnouncementsList" class="scheduled-list"></div>
         <div class="scheduled-actions">
           <button class="btn light" type="button" id="addScheduledAnnouncementBtn">إضافة مناسبة</button>
@@ -199,14 +223,15 @@
       return {
         id: row.dataset.id || String(Date.now()),
         title: clean(row.querySelector('.scheduledTitle')?.value),
-        text: clean(row.querySelector('.scheduledText')?.value),
-        target: clean(row.querySelector('.scheduledTarget')?.value) || 'ticker',
+        tickerText: clean(row.querySelector('.scheduledTickerText')?.value),
+        rightText: clean(row.querySelector('.scheduledRightText')?.value),
+        leftText: clean(row.querySelector('.scheduledLeftText')?.value),
         start,
         end,
         annual: !!row.querySelector('.scheduledAnnual')?.checked,
         active: !!row.querySelector('.scheduledActive')?.checked
       };
-    }).filter((item) => (item.title || item.text) && item.start && item.end);
+    }).filter((item) => (item.title || item.tickerText || item.rightText || item.leftText) && item.start && item.end);
   }
 
   async function loadAnnouncements(){
@@ -214,9 +239,19 @@
     if (!list) return;
     list.replaceChildren();
 
+    const example = {
+      title: 'اليوم الوطني',
+      tickerText: 'كل عام وعماننا بخير',
+      rightText: 'اليوم الوطني المجيد',
+      leftText: 'دامت عمان عزًا وفخرًا',
+      start: todayKey(),
+      end: todayKey(),
+      annual: true
+    };
+
     const client = getClient();
     if (!client) {
-      addRow({ title: 'اليوم الوطني', text: 'كل عام وعماننا بخير', target: 'all', start: todayKey(), end: todayKey(), annual: true });
+      addRow(example);
       return;
     }
 
@@ -231,7 +266,7 @@
       if (error) return;
       const items = (data || []).map((row) => decode(row.message_text)).filter(Boolean);
       if (!items.length) {
-        addRow({ title: 'اليوم الوطني', text: 'كل عام وعماننا بخير', target: 'all', start: todayKey(), end: todayKey(), annual: true });
+        addRow(example);
         return;
       }
       items.forEach((item) => addRow(item));
@@ -313,6 +348,15 @@
     }
   }
 
+  function hideAddPeriodButton(){
+    [...document.querySelectorAll('button')].forEach((button) => {
+      if (button.textContent.trim().includes('إضافة فترة جديدة')) {
+        button.style.display = 'none';
+        button.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
   function addButton(){
     if (document.getElementById('scheduledAnnouncementsBtn')) return;
     const actions = document.querySelector('.actions');
@@ -331,7 +375,10 @@
 
   function start(){
     addButton();
+    hideAddPeriodButton();
     setTimeout(addButton, 1000);
+    setTimeout(hideAddPeriodButton, 500);
+    setTimeout(hideAddPeriodButton, 1500);
   }
 
   if (document.readyState === 'loading') {
