@@ -1,72 +1,95 @@
 (function(){
-  if (window.__schoolTimerDashboardTitleLayoutFixLoaded) return;
-  window.__schoolTimerDashboardTitleLayoutFixLoaded = true;
+  if (window.__schoolTimerDashboardTitleRestoreLoaded) return;
+  window.__schoolTimerDashboardTitleRestoreLoaded = true;
 
-  function ensureStyles(){
-    if (document.getElementById('dashboardTitleLayoutFixStyles')) return;
+  function applyTitleRestoreStyles(){
+    let style = document.getElementById('dashboardTitleLayoutFixStyles');
 
-    const style = document.createElement('style');
-    style.id = 'dashboardTitleLayoutFixStyles';
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'dashboardTitleLayoutFixStyles';
+      document.head.appendChild(style);
+    }
+
     style.textContent = `
-      .dashboard-title-host-fixed{
-        position:relative!important;
-        overflow:hidden!important;
+      .brand{
+        display:block!important;
+        position:static!important;
+        overflow:visible!important;
+        min-height:0!important;
+        height:auto!important;
       }
 
-      .dashboard-title-host-fixed h1,
-      .dashboard-title-host-fixed h2{
-        position:absolute!important;
-        top:50%!important;
-        left:50%!important;
+      .brand h1{
+        display:block!important;
+        position:static!important;
+        top:auto!important;
+        left:auto!important;
         right:auto!important;
         width:auto!important;
-        max-width:80%!important;
+        max-width:none!important;
+        height:auto!important;
+        min-height:0!important;
         margin:0!important;
         padding:0!important;
-        transform:translate(-50%,-50%)!important;
+        transform:none!important;
         text-align:center!important;
         white-space:nowrap!important;
-        line-height:1!important;
-        z-index:4!important;
+        line-height:1.15!important;
+        opacity:1!important;
+        visibility:visible!important;
+        z-index:auto!important;
       }
 
-      .dashboard-title-host-fixed .dashboard-school-name,
-      .dashboard-title-host-fixed #dashboardSchoolName{
+      #dashboardSchoolName,
+      .dashboard-school-name,
+      .dashboard-school-name-fixed{
         display:none!important;
-      }
-
-      @media(max-width:768px){
-        .dashboard-title-host-fixed h1,
-        .dashboard-title-host-fixed h2{
-          max-width:76%!important;
-          font-size:clamp(22px,6vw,32px)!important;
-        }
+        visibility:hidden!important;
+        height:0!important;
+        min-height:0!important;
+        margin:0!important;
+        padding:0!important;
+        overflow:hidden!important;
       }
     `;
-
-    document.head.appendChild(style);
   }
 
-  function findDashboardTitle(){
-    return [...document.querySelectorAll('h1,h2')].find((title) =>
-      title.textContent.replace(/\s+/g, ' ').trim().includes('إدارة مؤقت الحصص')
-    ) || document.querySelector('h1');
+  function removeOldTitleClass(){
+    document.querySelectorAll('.dashboard-title-host-fixed').forEach((element) => {
+      element.classList.remove('dashboard-title-host-fixed');
+    });
   }
 
-  function applyFix(){
-    ensureStyles();
+  function ensureTitleText(){
+    const title = [...document.querySelectorAll('h1,h2')].find((item) =>
+      item.textContent.replace(/\s+/g, ' ').trim().includes('إدارة مؤقت الحصص')
+    );
 
-    const title = findDashboardTitle();
-    if (!title || !title.parentElement) return;
-
-    title.parentElement.classList.add('dashboard-title-host-fixed');
+    if (title) {
+      title.textContent = 'إدارة مؤقت الحصص';
+      title.style.display = '';
+      title.style.visibility = '';
+      title.style.opacity = '';
+    }
   }
 
   function start(){
-    applyFix();
-    setTimeout(applyFix, 300);
-    setTimeout(applyFix, 1000);
-    setInterval(applyFix, 2000);
+    applyTitleRestoreStyles();
+    removeOldTitleClass();
+    ensureTitleText();
+
+    setTimeout(() => {
+      applyTitleRestoreStyles();
+      removeOldTitleClass();
+      ensureTitleText();
+    }, 300);
+
+    setTimeout(() => {
+      applyTitleRestoreStyles();
+      removeOldTitleClass();
+      ensureTitleText();
+    }, 1200);
   }
 
   if (document.readyState === 'loading') {
