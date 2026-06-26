@@ -7,4 +7,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   messagesScript.src = 'dashboard-messages.js?v=messages-admin-06';
   messagesScript.defer = true;
   document.head.appendChild(messagesScript);
+
+  const fixesScript = document.createElement('script');
+  fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-01';
+  fixesScript.defer = true;
+  document.head.appendChild(fixesScript);
 }
