@@ -1,4 +1,7 @@
 (function(){
+  if (window.__schoolTimerTickerMessagesLoaded) return;
+  window.__schoolTimerTickerMessagesLoaded = true;
+
   const DEFAULT_MESSAGES = [
     'مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري',
     'العلم نور',
@@ -6,8 +9,12 @@
     'نسعى لبناء مستقبل تعليمي متميز'
   ];
 
+  const CACHE_TTL = 10 * 60 * 1000;
+  const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+  const cacheKey = 'school_timer_messages_' + schoolSlug;
   let client = null;
+  let lastSignature = '';
 
   function getClient(){
     if (client) return client;
@@ -33,20 +40,45 @@
     return group;
   }
 
+  function clean(messages){
+    return (Array.isArray(messages) ? messages : [])
+      .map((message) => String(message || '').trim())
+      .filter(Boolean);
+  }
+
   function renderTicker(messages){
     const track = document.getElementById('tickerTrack');
     if (!track) return;
 
-    const cleanMessages = messages
-      .map((message) => String(message || '').trim())
-      .filter(Boolean);
+    const finalMessages = clean(messages).length ? clean(messages) : DEFAULT_MESSAGES;
+    const signature = finalMessages.join('||');
+    if (signature === lastSignature && track.children.length) return;
 
-    const finalMessages = cleanMessages.length ? cleanMessages : DEFAULT_MESSAGES;
-
+    lastSignature = signature;
     track.replaceChildren(
       createGroup(finalMessages),
       createGroup(finalMessages)
     );
+  }
+
+  function readCache(){
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (!cached || !Array.isArray(cached.messages)) return null;
+      if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
+      return clean(cached.messages);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeCache(messages){
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        savedAt: Date.now(),
+        messages: clean(messages)
+      }));
+    } catch (error) {}
   }
 
   async function loadTickerMessages(){
@@ -60,7 +92,7 @@
     try {
       const { data, error } = await db
         .from('school_messages')
-        .select('message_text,is_active,sort_order')
+        .select('message_text,sort_order')
         .eq('school_slug', schoolSlug)
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
@@ -70,16 +102,18 @@
         return;
       }
 
-      renderTicker(data.map((row) => row.message_text));
+      const messages = data.map((row) => row.message_text);
+      writeCache(messages);
+      renderTicker(messages);
     } catch (error) {
-      renderTicker(DEFAULT_MESSAGES);
+      renderTicker(readCache() || DEFAULT_MESSAGES);
     }
   }
 
   function start(){
-    loadTickerMessages();
-    setTimeout(loadTickerMessages, 900);
-    setInterval(loadTickerMessages, 60000);
+    renderTicker(readCache() || DEFAULT_MESSAGES);
+    setTimeout(loadTickerMessages, 1200);
+    setInterval(loadTickerMessages, REFRESH_INTERVAL);
   }
 
   if (document.readyState === 'loading') {
