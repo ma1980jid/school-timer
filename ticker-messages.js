@@ -124,11 +124,29 @@
       .filter((item) => isAnnouncementActive(item));
   }
 
-  function announcementText(item){
+  function legacyAnnouncementText(item){
     const title = String(item && item.title || '').trim();
     const text = String(item && item.text || '').trim();
     if (title && text) return `${title}: ${text}`;
     return text || title;
+  }
+
+  function getScheduledSlotTexts(item){
+    const tickerText = String(item && item.tickerText || '').trim();
+    const rightText = String(item && item.rightText || '').trim();
+    const leftText = String(item && item.leftText || '').trim();
+
+    if (tickerText || rightText || leftText) {
+      return { tickerText, rightText, leftText };
+    }
+
+    const legacyText = legacyAnnouncementText(item);
+    const target = String(item && item.target || 'ticker');
+    return {
+      tickerText: target === 'ticker' || target === 'all' ? legacyText : '',
+      rightText: target === 'right' || target === 'all' ? legacyText : '',
+      leftText: target === 'left' || target === 'all' ? legacyText : ''
+    };
   }
 
   function applyScheduledAnnouncements(items){
@@ -139,20 +157,18 @@
     const cardOverrides = {};
 
     active.forEach((item) => {
-      const target = String(item.target || 'ticker');
-      const text = announcementText(item);
-      if (!text) return;
+      const { tickerText, rightText, leftText } = getScheduledSlotTexts(item);
 
-      if (target === 'ticker' || target === 'all') {
-        tickerMessages.push(`📌 ${text}`);
+      if (tickerText) {
+        tickerMessages.push(`📌 ${tickerText}`);
       }
 
-      if (target === 'right' || target === 'all') {
-        cardOverrides.right = text;
+      if (rightText) {
+        cardOverrides.right = rightText;
       }
 
-      if (target === 'left' || target === 'all') {
-        cardOverrides.left = text;
+      if (leftText) {
+        cardOverrides.left = leftText;
       }
     });
 
@@ -203,7 +219,10 @@
     }
 
     if (leftText) {
-      try { settings.visionMessages = [leftText]; } catch (error) {}
+      try {
+        settings.visionMessages = [leftText];
+        if (typeof visionIndex !== 'undefined') visionIndex = 0;
+      } catch (error) {}
       const leftEl = document.getElementById('visionText');
       if (leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
     }
