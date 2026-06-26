@@ -9,10 +9,13 @@
     'نسعى لبناء مستقبل تعليمي متميز'
   ];
 
+  const RIGHT_PREFIX = '__CARD_RIGHT__:';
+  const LEFT_PREFIX = '__CARD_LEFT__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_messages_' + schoolSlug;
+  const cardsCacheKey = 'school_timer_middle_cards_' + schoolSlug;
   let client = null;
   let lastSignature = '';
   let refreshTimer = null;
@@ -55,6 +58,52 @@
       .map((message) => String(message || '').trim())
       .filter(Boolean)
       .filter((message) => !isCardConfigMessage(message));
+  }
+
+  function parseCards(rows){
+    const cards = {};
+    (Array.isArray(rows) ? rows : []).forEach((row) => {
+      const text = String(row && row.message_text || '');
+      if (text.startsWith(RIGHT_PREFIX)) cards.right = text.slice(RIGHT_PREFIX.length).trim();
+      if (text.startsWith(LEFT_PREFIX)) cards.left = text.slice(LEFT_PREFIX.length).trim();
+    });
+    return cards;
+  }
+
+  function applyCards(cards){
+    if (!cards) return;
+
+    const rightText = String(cards.right || '').trim();
+    const leftText = String(cards.left || '').trim();
+
+    if (rightText) {
+      try { settings.schoolName = rightText; } catch (error) {}
+      const rightEl = document.getElementById('schoolName');
+      if (rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
+    }
+
+    if (leftText) {
+      try { settings.visionMessages = [leftText]; } catch (error) {}
+      const leftEl = document.getElementById('visionText');
+      if (leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
+    }
+  }
+
+  function readCardsCache(){
+    try {
+      const cached = JSON.parse(localStorage.getItem(cardsCacheKey) || 'null');
+      if (!cached || !cached.cards) return null;
+      if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
+      return cached.cards;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeCardsCache(cards){
+    try {
+      localStorage.setItem(cardsCacheKey, JSON.stringify({ savedAt: Date.now(), cards }));
+    } catch (error) {}
   }
 
   function setupTickerMotion(){
@@ -146,6 +195,12 @@
         return;
       }
 
+      const cards = parseCards(data);
+      if (cards.right || cards.left) {
+        writeCardsCache(cards);
+        applyCards(cards);
+      }
+
       const messages = data
         .map((row) => row.message_text)
         .filter((message) => !isCardConfigMessage(message));
@@ -153,6 +208,7 @@
       writeCache(messages);
       renderTicker(messages);
     } catch (error) {
+      applyCards(readCardsCache());
       renderTicker(readCache() || DEFAULT_MESSAGES);
     } finally {
       isLoading = false;
@@ -165,6 +221,7 @@
   }
 
   function start(){
+    applyCards(readCardsCache());
     renderTicker(readCache() || DEFAULT_MESSAGES);
     setTimeout(loadTickerMessages, 1200);
     scheduleRefresh();
