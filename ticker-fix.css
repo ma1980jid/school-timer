@@ -12,7 +12,7 @@
   white-space: nowrap !important;
   will-change: transform !important;
   animation-name: tickerLoopComplete !important;
-  animation-duration: var(--ticker-duration, 55s) !important;
+  animation-duration: var(--ticker-duration, 45s) !important;
   animation-timing-function: linear !important;
   animation-iteration-count: infinite !important;
 }
@@ -28,21 +28,20 @@
 
 @keyframes tickerLoopComplete {
   from {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(var(--ticker-distance, -50%), 0, 0);
   }
 
   to {
-    transform: translate3d(var(--ticker-distance, -50%), 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @media (max-width: 768px) {
   .ticker-track {
     animation-name: tickerLoopComplete !important;
-    animation-duration: var(--ticker-duration, 42s) !important;
+    animation-duration: var(--ticker-duration, 34s) !important;
     animation-timing-function: linear !important;
     animation-iteration-count: infinite !important;
-    transform: translate3d(0, 0, 0) !important;
   }
 
   .ticker-group,
