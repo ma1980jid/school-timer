@@ -12,4 +12,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-07';
   fixesScript.defer = true;
   document.head.appendChild(fixesScript);
+
+  const titleLayoutScript = document.createElement('script');
+  titleLayoutScript.src = 'dashboard-title-layout-fix.js?v=title-layout-01';
+  titleLayoutScript.defer = true;
+  document.head.appendChild(titleLayoutScript);
 }
