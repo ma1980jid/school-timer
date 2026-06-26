@@ -1,4 +1,7 @@
 (function(){
+  if (window.__schoolTimerDashboardMessagesLoaded) return;
+  window.__schoolTimerDashboardMessagesLoaded = true;
+
   const DEFAULT_MESSAGES = [
     'مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري',
     'العلم نور',
@@ -7,6 +10,7 @@
   ];
 
   const $ = (id) => document.getElementById(id);
+  let isSavingMessages = false;
 
   function getSchoolSlug(){
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
@@ -21,6 +25,21 @@
       );
     }
     return window.schoolTimerMessagesClient;
+  }
+
+  function cleanMessages(messages){
+    return (Array.isArray(messages) ? messages : [])
+      .map((message) => String(message || '').trim())
+      .filter(Boolean);
+  }
+
+  function writeTickerCache(messages){
+    try {
+      localStorage.setItem('school_timer_messages_' + getSchoolSlug(), JSON.stringify({
+        savedAt: Date.now(),
+        messages: cleanMessages(messages)
+      }));
+    } catch (error) {}
   }
 
   function toastMsg(text){
@@ -46,9 +65,7 @@
     document.head.appendChild(style);
   }
 
-  function addMessageInput(text=''){
-    const list = $('messagesList');
-    if (!list) return;
+  function createMessageRow(text=''){
     const row = document.createElement('div');
     row.className = 'message-row';
 
@@ -64,12 +81,19 @@
     del.onclick = () => row.remove();
 
     row.append(area, del);
-    list.append(row);
+    return row;
+  }
+
+  function addMessageInput(text=''){
+    const list = $('messagesList');
+    if (!list) return;
+    list.appendChild(createMessageRow(text));
   }
 
   async function loadMessagesDialog(){
     const list = $('messagesList');
     if (!list) return;
+
     list.replaceChildren();
 
     let messages = [];
@@ -80,7 +104,7 @@
       try {
         const { data, error } = await client
           .from('school_messages')
-          .select('message_text,is_active,sort_order')
+          .select('message_text,sort_order')
           .eq('school_slug', schoolSlug)
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
@@ -91,8 +115,14 @@
       } catch (e) {}
     }
 
-    if (!messages.length) messages = DEFAULT_MESSAGES;
-    messages.forEach((m) => addMessageInput(m));
+    const finalMessages = cleanMessages(messages).length ? cleanMessages(messages) : DEFAULT_MESSAGES;
+    const fragment = document.createDocumentFragment();
+
+    finalMessages.forEach((message) => {
+      fragment.appendChild(createMessageRow(message));
+    });
+
+    list.replaceChildren(fragment);
   }
 
   async function openMessages(){
@@ -116,6 +146,8 @@
   }
 
   async function saveMessages(){
+    if (isSavingMessages) return;
+
     const client = getClient();
     const schoolSlug = getSchoolSlug();
     if (!client) return toastMsg('لم يتم ضبط اتصال Supabase');
@@ -123,46 +155,59 @@
     const code = requireAdminCode();
     if (!code) return toastMsg('لم يتم إدخال رمز الإدارة');
 
-    const { data: ok, error: authError } = await client
-      .from('schools')
-      .select('school_slug')
-      .eq('school_slug', schoolSlug)
-      .eq('admin_code', code)
-      .maybeSingle();
-
-    if (authError || !ok) {
-      sessionStorage.removeItem('school_timer_admin_code_' + schoolSlug);
-      return toastMsg('رمز الإدارة غير صحيح');
-    }
-
-    const messages = [...document.querySelectorAll('.messageInput')]
-      .map((x) => x.value.trim())
-      .filter(Boolean);
-
+    const messages = cleanMessages([...document.querySelectorAll('.messageInput')].map((x) => x.value));
     if (!messages.length) return toastMsg('أضف رسالة واحدة على الأقل');
 
-    const { error: delError } = await client
-      .from('school_messages')
-      .delete()
-      .eq('school_slug', schoolSlug);
+    const saveBtn = $('saveMessagesBtn');
+    isSavingMessages = true;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'جارٍ الحفظ...';
+    }
 
-    if (delError) return toastMsg('تعذر تحديث الرسائل');
+    try {
+      const { data: ok, error: authError } = await client
+        .from('schools')
+        .select('school_slug')
+        .eq('school_slug', schoolSlug)
+        .eq('admin_code', code)
+        .maybeSingle();
 
-    const rows = messages.map((message_text, i) => ({
-      school_slug: schoolSlug,
-      message_text,
-      is_active: true,
-      sort_order: i + 1
-    }));
+      if (authError || !ok) {
+        sessionStorage.removeItem('school_timer_admin_code_' + schoolSlug);
+        return toastMsg('رمز الإدارة غير صحيح');
+      }
 
-    const { error: insError } = await client
-      .from('school_messages')
-      .insert(rows);
+      const { error: delError } = await client
+        .from('school_messages')
+        .delete()
+        .eq('school_slug', schoolSlug);
 
-    if (insError) return toastMsg('تعذر حفظ الرسائل');
+      if (delError) return toastMsg('تعذر تحديث الرسائل');
 
-    sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
-    toastMsg('تم حفظ الرسائل بنجاح');
+      const rows = messages.map((message_text, i) => ({
+        school_slug: schoolSlug,
+        message_text,
+        is_active: true,
+        sort_order: i + 1
+      }));
+
+      const { error: insError } = await client
+        .from('school_messages')
+        .insert(rows);
+
+      if (insError) return toastMsg('تعذر حفظ الرسائل');
+
+      sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
+      writeTickerCache(messages);
+      toastMsg('تم حفظ الرسائل بنجاح');
+    } finally {
+      isSavingMessages = false;
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'حفظ الرسائل';
+      }
+    }
   }
 
   function ensureDialog(){
@@ -209,7 +254,6 @@
 
   function init(){
     addButton();
-    ensureDialog();
   }
 
   if (document.readyState === 'loading') {
