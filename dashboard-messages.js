@@ -16,6 +16,14 @@
     return String(message || '').startsWith('__CARD_');
   }
 
+  function isScheduledConfigMessage(message){
+    return String(message || '').startsWith('__SCHEDULED__:');
+  }
+
+  function isSystemMessage(message){
+    return isCardConfigMessage(message) || isScheduledConfigMessage(message);
+  }
+
   function getSchoolSlug(){
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   }
@@ -35,7 +43,7 @@
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
       .filter(Boolean)
-      .filter((message) => !isCardConfigMessage(message));
+      .filter((message) => !isSystemMessage(message));
   }
 
   function writeTickerCache(messages){
@@ -117,7 +125,7 @@
         if (!error && data && data.length) {
           messages = data
             .map((m) => m.message_text)
-            .filter((message) => !isCardConfigMessage(message));
+            .filter((message) => !isSystemMessage(message));
         }
       } catch (e) {}
     }
@@ -189,7 +197,8 @@
         .from('school_messages')
         .delete()
         .eq('school_slug', schoolSlug)
-        .not('message_text', 'like', '__CARD_%');
+        .not('message_text', 'like', '__CARD_%')
+        .not('message_text', 'like', '__SCHEDULED__:%');
 
       if (delError) return toastMsg('تعذر تحديث الرسائل');
 
