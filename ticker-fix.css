@@ -71,4 +71,30 @@
     width: 110px;
     min-width: 110px;
   }
+
+  .schedule-grid tr.current-row td {
+    background: linear-gradient(180deg, rgba(255, 248, 221, .98), rgba(255, 232, 181, .92)) !important;
+    color: #b91c1c !important;
+    border-top: 2px solid #d6a93c !important;
+    border-bottom: 2px solid #d6a93c !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,.55) !important;
+    font-weight: 900 !important;
+  }
+
+  .schedule-grid tr.current-row td:first-child {
+    border-right: 3px solid #d6a93c !important;
+    border-radius: 0 10px 10px 0 !important;
+  }
+
+  .schedule-grid tr.current-row td:last-child {
+    border-left: 3px solid #d6a93c !important;
+    border-radius: 10px 0 0 10px !important;
+    background: #b91c1c !important;
+    color: #fff !important;
+  }
+
+  .schedule-grid tr.current-row .state-text::before {
+    content: "● ";
+    color: #facc15;
+  }
 }
