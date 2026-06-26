@@ -3,8 +3,8 @@ window.SCHOOL_TIMER_SUPABASE_ANON_KEY = "sb_publishable_SMJPGEWFq0B0nCyMvu9Sbg_k
 window.SCHOOL_TIMER_SLUG = "alsheikh-saif";
 
 if (location.pathname.includes('dashboard-v2.html')) {
-  const script = document.createElement('script');
-  script.src = 'dashboard-messages.js?v=messages-admin-02';
-  script.defer = true;
-  document.head.appendChild(script);
+  const messagesScript = document.createElement('script');
+  messagesScript.src = 'dashboard-messages.js?v=messages-admin-06';
+  messagesScript.defer = true;
+  document.head.appendChild(messagesScript);
 }
