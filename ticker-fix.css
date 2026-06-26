@@ -1,4 +1,4 @@
-/* إصلاح حركة شريط الرسائل: حلقة كاملة ومستمرة محسوبة حسب عرض الرسائل */
+/* إصلاح حركة شريط الرسائل: ترتيب RTL + فاصل واضح بين الحلقات */
 .ticker {
   overflow: hidden !important;
   direction: ltr !important;
@@ -21,9 +21,21 @@
 .ticker-group:nth-child(2),
 .ticker-group:nth-child(3) {
   display: flex !important;
+  flex-direction: row !important;
+  direction: rtl !important;
   align-items: center !important;
   flex-shrink: 0 !important;
   white-space: nowrap !important;
+  gap: 5.4vw !important;
+  padding-inline: 0 !important;
+}
+
+.ticker-group::after {
+  content: "";
+  display: block;
+  flex: 0 0 8vw;
+  width: 8vw;
+  min-width: 90px;
 }
 
 @keyframes tickerLoopComplete {
@@ -48,7 +60,15 @@
   .ticker-group:nth-child(2),
   .ticker-group:nth-child(3) {
     display: flex !important;
-    gap: 95px !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    gap: 90px !important;
     padding-inline: 0 !important;
+  }
+
+  .ticker-group::after {
+    flex-basis: 110px;
+    width: 110px;
+    min-width: 110px;
   }
 }
