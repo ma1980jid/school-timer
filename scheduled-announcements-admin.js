@@ -109,21 +109,23 @@
     const style = document.createElement('style');
     style.id = 'scheduledAnnouncementsStyles';
     style.textContent = `
-      .scheduled-list{display:grid;gap:12px;margin:12px 0;max-height:58vh;overflow:auto;padding-left:4px}
+      #scheduledAnnouncementsDialog{overflow:hidden!important;padding:10px!important}
+      #scheduledAnnouncementsDialog>div{max-height:calc(100dvh - 28px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-gutter:stable;padding-bottom:8px!important}
+      .scheduled-list{display:grid;gap:12px;margin:12px 0;max-height:none;overflow:visible;padding-left:4px}
       .scheduled-row{border:1px solid #d7dee8;border-radius:18px;padding:12px;background:#f8fafc;display:grid;gap:10px}
       .scheduled-row-head{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
       .scheduled-row-title{font-weight:900;color:#0f172a}
       .scheduled-row-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
       .scheduled-row label{display:block;font-size:13px;color:#64748b;font-weight:900;margin-bottom:4px;text-align:right}
-      .scheduled-row input,.scheduled-row textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;background:white;color:#0f172a;font-family:Tahoma,Arial,sans-serif;font-size:14px;font-weight:900;padding:8px;outline:none}
+      .scheduled-row input,.scheduled-row textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;background:white;color:#0f172a;font-family:Tahoma,Arial,"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:14px;font-weight:900;padding:8px;outline:none}
       .scheduled-row textarea{min-height:58px;resize:vertical;line-height:1.55}
       .scheduled-row input:focus,.scheduled-row textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
       .scheduled-note{margin:0;color:#64748b;font-weight:900;line-height:1.8}
-      .scheduled-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+      .scheduled-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;position:sticky;bottom:0;z-index:5;background:linear-gradient(180deg,rgba(255,255,255,.72),#fff 42%);padding-top:12px;padding-bottom:4px}
       .scheduled-chip{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;background:#ecfeff;color:#0f766e;font-size:12px;font-weight:900}
       .scheduled-slot{border:1px dashed #cbd5e1;border-radius:14px;padding:8px;background:white}
       .scheduled-slot label{color:#0f766e}
-      @media(max-width:640px){.scheduled-row-grid{grid-template-columns:1fr}.scheduled-actions{grid-template-columns:1fr}}
+      @media(max-width:640px){#scheduledAnnouncementsDialog{align-items:flex-start!important;padding:6px!important}#scheduledAnnouncementsDialog>div{width:min(96vw,560px)!important;max-height:calc(100dvh - 12px)!important;border-radius:18px!important}.scheduled-row-grid{grid-template-columns:1fr}.scheduled-actions{grid-template-columns:1fr}.scheduled-row{padding:10px}.scheduled-row textarea{min-height:52px}}
     `;
     document.head.appendChild(style);
   }
