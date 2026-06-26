@@ -265,13 +265,6 @@ const dayMap = {
   Sat: 6
 };
 
-const messages = [
-  "مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري",
-  "العلم نور",
-  "الانضباط طريق النجاح",
-  "نسعى لبناء مستقبل تعليمي متميز"
-];
-
 function schoolKind(key = settings.activeSchedule) {
   return key.split("_")[0];
 }
@@ -451,13 +444,25 @@ function buildActivityRows(rows, position, kind) {
   });
 }
 
+function getOmanDate(date = new Date()) {
+  if (settings.timeZone === "Asia/Muscat") {
+    return new Date(date.getTime() + 4 * 60 * 60 * 1000);
+  }
+
+  return date;
+}
+
 function getOmanDay(date = new Date()) {
+  if (settings.timeZone === "Asia/Muscat") {
+    return getOmanDate(date).getUTCDay();
+  }
+
   const name = new Intl.DateTimeFormat("en-US", {
     timeZone: settings.timeZone,
     weekday: "short"
   }).format(date);
 
-  return dayMap[name] ?? new Date().getDay();
+  return dayMap[name] ?? date.getDay();
 }
 
 function shouldUseActivity() {
@@ -534,6 +539,16 @@ function normalizePeriod(p, base) {
 }
 
 function getOmanTimeParts(date = new Date()) {
+  if (settings.timeZone === "Asia/Muscat") {
+    const oman = getOmanDate(date);
+
+    return {
+      hour: oman.getUTCHours(),
+      minute: oman.getUTCMinutes(),
+      second: oman.getUTCSeconds()
+    };
+  }
+
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: settings.timeZone,
     hour12: false,
@@ -638,9 +653,7 @@ function getSchedule() {
   };
 }
 
-function updateCards() {
-  const s = getSchedule();
-
+function updateCards(s = getSchedule()) {
   setText("previousName", s.previous ? s.previous.name : "--");
   setTimeRange("previousTime", s.previous);
 
@@ -662,17 +675,23 @@ function updateCards() {
   setTimeRange("nextTime", s.next);
 }
 
-function updateClock() {
-  const t = getOmanTimeParts();
-
+function updateClock(t = getOmanTimeParts()) {
   setText(
     "digitalClock",
     `${pad(t.hour)}:${pad(t.minute)}:${pad(t.second)}`
   );
 }
 
-function updateDate() {
-  const now = new Date();
+let lastDateUpdateAt = 0;
+
+function updateDate(now = new Date(), force = false) {
+  const currentTime = Date.now();
+
+  if (!force && currentTime - lastDateUpdateAt < 60000) {
+    return;
+  }
+
+  lastDateUpdateAt = currentTime;
 
   setText(
     "weekday",
@@ -718,9 +737,7 @@ function formatCountdown(total) {
     : `${pad(m)}:${pad(s)}`;
 }
 
-function updateRemaining() {
-  const s = getSchedule();
-
+function updateRemaining(s = getSchedule()) {
   if (s.current) {
     setText("countLabel", "متبقي من الحصة الحالية");
     setText(
@@ -825,8 +842,7 @@ function createRow(p, s) {
 
 let lastTableSignature = "";
 
-function renderTable() {
-  const s = getSchedule();
+function renderTable(s = getSchedule()) {
   const stateFor = p => s.current === p ? "جارية" : (s.currentMinutes >= p.endMinutes ? "انتهت" : "قادمة");
   const signature = s.list.map(p => `${p.name}|${p.start}|${p.end}|${p.type}|${stateFor(p)}`).join("||");
   if (signature === lastTableSignature) return;
@@ -863,31 +879,6 @@ function updateVision() {
   visionIndex = (visionIndex + 1) % settings.visionMessages.length;
 }
 
-function createTickerGroup() {
-  const group = document.createElement("div");
-  group.className = "ticker-group";
-
-  messages.forEach(message => {
-    const item = document.createElement("span");
-    item.className = "ticker-item";
-    item.textContent = message;
-    group.appendChild(item);
-  });
-
-  return group;
-}
-
-function updateTicker() {
-  const track = el("tickerTrack");
-
-  if (track) {
-    track.replaceChildren(
-      createTickerGroup(),
-      createTickerGroup()
-    );
-  }
-}
-
 function init() {
   const logo = el("schoolLogo");
 
@@ -901,11 +892,13 @@ function init() {
 }
 
 function tick() {
-  updateClock();
-  updateDate();
-  updateCards();
-  updateRemaining();
-  renderTable();
+  const s = getSchedule();
+
+  updateClock(s.time);
+  updateDate(s.now);
+  updateCards(s);
+  updateRemaining(s);
+  renderTable(s);
 }
 
 async function startApp() {
@@ -920,4 +913,3 @@ async function startApp() {
 }
 
 startApp();
-
