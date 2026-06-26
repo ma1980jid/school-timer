@@ -11,11 +11,13 @@
 
   const RIGHT_PREFIX = '__CARD_RIGHT__:';
   const LEFT_PREFIX = '__CARD_LEFT__:';
+  const SCHEDULED_PREFIX = '__SCHEDULED__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_messages_' + schoolSlug;
   const cardsCacheKey = 'school_timer_middle_cards_' + schoolSlug;
+  const scheduledCacheKey = 'school_timer_scheduled_' + schoolSlug;
   let client = null;
   let lastSignature = '';
   let refreshTimer = null;
@@ -24,6 +26,14 @@
 
   function isCardConfigMessage(message){
     return String(message || '').startsWith('__CARD_');
+  }
+
+  function isScheduledConfigMessage(message){
+    return String(message || '').startsWith(SCHEDULED_PREFIX);
+  }
+
+  function isSystemMessage(message){
+    return isCardConfigMessage(message) || isScheduledConfigMessage(message);
   }
 
   function getClient(){
@@ -57,7 +67,117 @@
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
       .filter(Boolean)
-      .filter((message) => !isCardConfigMessage(message));
+      .filter((message) => !isSystemMessage(message));
+  }
+
+  function getTodayKey(){
+    try {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Muscat',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(new Date());
+      const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      return `${map.year}-${map.month}-${map.day}`;
+    } catch (error) {
+      return new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    }
+  }
+
+  function normalizeAnnualDate(dateText, year){
+    const text = String(dateText || '').trim();
+    const parts = text.split('-');
+    if (parts.length !== 3) return text;
+    return `${year}-${parts[1]}-${parts[2]}`;
+  }
+
+  function isAnnouncementActive(item, today = getTodayKey()){
+    if (!item || item.active === false) return false;
+
+    const currentYear = today.slice(0, 4);
+    let start = String(item.start || '').trim();
+    let end = String(item.end || item.start || '').trim();
+
+    if (!start) return false;
+
+    if (item.annual) {
+      start = normalizeAnnualDate(start, currentYear);
+      end = normalizeAnnualDate(end || start, currentYear);
+    }
+
+    return today >= start && today <= end;
+  }
+
+  function parseScheduledAnnouncements(rows){
+    return (Array.isArray(rows) ? rows : [])
+      .map((row) => String(row && row.message_text || ''))
+      .filter((text) => text.startsWith(SCHEDULED_PREFIX))
+      .map((text) => {
+        try {
+          return JSON.parse(text.slice(SCHEDULED_PREFIX.length));
+        } catch (error) {
+          return null;
+        }
+      })
+      .filter(Boolean)
+      .filter((item) => isAnnouncementActive(item));
+  }
+
+  function announcementText(item){
+    const title = String(item && item.title || '').trim();
+    const text = String(item && item.text || '').trim();
+    if (title && text) return `${title}: ${text}`;
+    return text || title;
+  }
+
+  function applyScheduledAnnouncements(items){
+    const active = Array.isArray(items) ? items : [];
+    if (!active.length) return [];
+
+    const tickerMessages = [];
+    const cardOverrides = {};
+
+    active.forEach((item) => {
+      const target = String(item.target || 'ticker');
+      const text = announcementText(item);
+      if (!text) return;
+
+      if (target === 'ticker' || target === 'all') {
+        tickerMessages.push(`📌 ${text}`);
+      }
+
+      if (target === 'right' || target === 'all') {
+        cardOverrides.right = text;
+      }
+
+      if (target === 'left' || target === 'all') {
+        cardOverrides.left = text;
+      }
+    });
+
+    if (cardOverrides.right || cardOverrides.left) {
+      applyCards(cardOverrides);
+    }
+
+    return tickerMessages;
+  }
+
+  function writeScheduledCache(items){
+    try {
+      localStorage.setItem(scheduledCacheKey, JSON.stringify({ savedAt: Date.now(), items: Array.isArray(items) ? items : [] }));
+    } catch (error) {}
+  }
+
+  function readScheduledCache(){
+    try {
+      const cached = JSON.parse(localStorage.getItem(scheduledCacheKey) || 'null');
+      if (!cached || !Array.isArray(cached.items)) return [];
+      if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return [];
+      return cached.items.filter((item) => isAnnouncementActive(item));
+    } catch (error) {
+      return [];
+    }
   }
 
   function parseCards(rows){
@@ -176,7 +296,8 @@
     const db = getClient();
 
     if (!db) {
-      renderTicker(DEFAULT_MESSAGES);
+      const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
+      renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
       return;
     }
 
@@ -191,7 +312,8 @@
         .order('sort_order', { ascending: true });
 
       if (error || !data || !data.length) {
-        renderTicker(DEFAULT_MESSAGES);
+        const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
+        renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
         return;
       }
 
@@ -201,15 +323,21 @@
         applyCards(cards);
       }
 
+      const scheduledItems = parseScheduledAnnouncements(data);
+      writeScheduledCache(scheduledItems);
+      const scheduledMessages = applyScheduledAnnouncements(scheduledItems);
+
       const messages = data
         .map((row) => row.message_text)
-        .filter((message) => !isCardConfigMessage(message));
+        .filter((message) => !isSystemMessage(message));
 
-      writeCache(messages);
-      renderTicker(messages);
+      const finalMessages = [...messages, ...scheduledMessages];
+      writeCache(finalMessages);
+      renderTicker(finalMessages);
     } catch (error) {
       applyCards(readCardsCache());
-      renderTicker(readCache() || DEFAULT_MESSAGES);
+      const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
+      renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
     } finally {
       isLoading = false;
     }
@@ -222,7 +350,8 @@
 
   function start(){
     applyCards(readCardsCache());
-    renderTicker(readCache() || DEFAULT_MESSAGES);
+    const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
+    renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
     setTimeout(loadTickerMessages, 1200);
     scheduleRefresh();
   }
