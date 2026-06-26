@@ -19,6 +19,10 @@
   let isLoading = false;
   let resizeTimer = null;
 
+  function isCardConfigMessage(message){
+    return String(message || '').startsWith('__CARD_');
+  }
+
   function getClient(){
     if (client) return client;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
@@ -49,7 +53,8 @@
   function clean(messages){
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((message) => !isCardConfigMessage(message));
   }
 
   function setupTickerMotion(){
@@ -141,7 +146,10 @@
         return;
       }
 
-      const messages = data.map((row) => row.message_text);
+      const messages = data
+        .map((row) => row.message_text)
+        .filter((message) => !isCardConfigMessage(message));
+
       writeCache(messages);
       renderTicker(messages);
     } catch (error) {
