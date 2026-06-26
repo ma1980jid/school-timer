@@ -29,7 +29,7 @@
     const params = new URLSearchParams({
       school: getSchoolSlug(),
       view,
-      v: '8'
+      v: '11'
     });
 
     return `${origin}${basePath}?${params.toString()}`;
@@ -275,14 +275,25 @@
     actions.insertBefore(btn, messagesBtn || null);
   }
 
+  function loadScheduledAnnouncementsModule(){
+    if (document.getElementById('scheduledAnnouncementsAdminScript')) return;
+    const script = document.createElement('script');
+    script.id = 'scheduledAnnouncementsAdminScript';
+    script.src = 'scheduled-announcements-admin.js?v=scheduled-01';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function start(){
     refreshLinks();
     protectSaveButton();
     addMiddleCardsButton();
+    loadScheduledAnnouncementsModule();
     setTimeout(refreshLinks, 300);
     setTimeout(refreshLinks, 1000);
     setTimeout(protectSaveButton, 1000);
     setTimeout(addMiddleCardsButton, 1000);
+    setTimeout(loadScheduledAnnouncementsModule, 1000);
   }
 
   if (document.readyState === 'loading') {
