@@ -61,8 +61,8 @@
     if (!distance) return;
 
     const isMobile = matchMedia('(max-width: 768px)').matches;
-    const speed = isMobile ? 34 : 44;
-    const minDuration = isMobile ? 34 : 42;
+    const speed = isMobile ? 46 : 58;
+    const minDuration = isMobile ? 24 : 30;
     const duration = Math.max(minDuration, Math.ceil(distance / speed));
 
     track.style.setProperty('--ticker-distance', `-${distance}px`);
