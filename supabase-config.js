@@ -9,7 +9,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
   document.head.appendChild(messagesScript);
 
   const fixesScript = document.createElement('script');
-  fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-06';
+  fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-07';
   fixesScript.defer = true;
   document.head.appendChild(fixesScript);
 }
