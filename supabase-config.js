@@ -17,4 +17,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   titleLayoutScript.src = 'dashboard-title-layout-fix.js?v=title-layout-05';
   titleLayoutScript.defer = true;
   document.head.appendChild(titleLayoutScript);
+
+  const linksCompactScript = document.createElement('script');
+  linksCompactScript.src = 'dashboard-links-compact-fix.js?v=links-compact-01';
+  linksCompactScript.defer = true;
+  document.head.appendChild(linksCompactScript);
 }
