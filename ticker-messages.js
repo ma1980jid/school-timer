@@ -17,6 +17,7 @@
   let lastSignature = '';
   let refreshTimer = null;
   let isLoading = false;
+  let resizeTimer = null;
 
   function getClient(){
     if (client) return client;
@@ -51,6 +52,27 @@
       .filter(Boolean);
   }
 
+  function setupTickerMotion(){
+    const track = document.getElementById('tickerTrack');
+    const firstGroup = track && track.querySelector('.ticker-group');
+    if (!track || !firstGroup) return;
+
+    const distance = Math.ceil(firstGroup.getBoundingClientRect().width);
+    if (!distance) return;
+
+    const isMobile = matchMedia('(max-width: 768px)').matches;
+    const speed = isMobile ? 34 : 44;
+    const minDuration = isMobile ? 34 : 42;
+    const duration = Math.max(minDuration, Math.ceil(distance / speed));
+
+    track.style.setProperty('--ticker-distance', `-${distance}px`);
+    track.style.setProperty('--ticker-duration', `${duration}s`);
+
+    track.style.animation = 'none';
+    track.offsetHeight;
+    track.style.animation = '';
+  }
+
   function renderTicker(messages){
     const track = document.getElementById('tickerTrack');
     if (!track) return;
@@ -58,13 +80,19 @@
     const cleaned = clean(messages);
     const finalMessages = cleaned.length ? cleaned : DEFAULT_MESSAGES;
     const signature = finalMessages.join('||');
-    if (signature === lastSignature && track.children.length) return;
+    if (signature === lastSignature && track.children.length) {
+      requestAnimationFrame(setupTickerMotion);
+      return;
+    }
 
     lastSignature = signature;
     track.replaceChildren(
       createGroup(finalMessages),
+      createGroup(finalMessages),
       createGroup(finalMessages)
     );
+
+    requestAnimationFrame(setupTickerMotion);
   }
 
   function readCache(){
@@ -137,8 +165,14 @@
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       loadTickerMessages();
+      requestAnimationFrame(setupTickerMotion);
     }
   });
+
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setupTickerMotion, 180);
+  }, { passive: true });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
