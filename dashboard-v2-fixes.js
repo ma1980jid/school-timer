@@ -4,6 +4,7 @@
 
   const RIGHT_PREFIX = '__CARD_RIGHT__:';
   const LEFT_PREFIX = '__CARD_LEFT__:';
+  const ANNOUNCEMENT_HINT = 'مساحة مخصصة لعرض إعلانات المدرسة، والمناشط، والفعاليات، والتنبيهات المهمة';
   let isSavingSettings = false;
   let isSavingCards = false;
 
@@ -28,7 +29,7 @@
     const params = new URLSearchParams({
       school: getSchoolSlug(),
       view,
-      v: '7'
+      v: '8'
     });
 
     return `${origin}${basePath}?${params.toString()}`;
@@ -101,7 +102,7 @@
     style.textContent = `
       .card-admin-fields{display:grid;gap:12px;margin:12px 0}
       .card-admin-field label{display:block;color:#64748b;font-weight:900;margin-bottom:6px;text-align:right}
-      .card-admin-field textarea{width:100%;min-height:76px;resize:vertical;border:1px solid #cbd5e1;border-radius:14px;padding:12px;font-family:Tahoma,Arial,sans-serif;font-size:16px;font-weight:900;line-height:1.6;color:#0f172a;outline:none}
+      .card-admin-field textarea{width:100%;min-height:76px;resize:vertical;border:1px solid #cbd5e1;border-radius:14px;padding:12px;font-family:Tahoma,Arial,sans-serif;font-size:16px;font-weight:900;line-height:1.6;color:#0f172a;outline:none;text-align:center}
       .card-admin-field textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
       .card-admin-note{margin:0;color:#64748b;font-weight:900;line-height:1.8}
     `;
@@ -117,20 +118,20 @@
     dialog.className = 'dialog';
     dialog.innerHTML = `
       <div>
-        <h3>إدارة الصندوقين</h3>
-        <p class="card-admin-note">هذه النصوص تظهر في الصندوقين الموجودين أسفل الساعة في واجهة الهاتف، ويتم حفظها لهذه المدرسة فقط.</p>
+        <h3>إعلانات المدرسة</h3>
+        <p class="card-admin-note">${ANNOUNCEMENT_HINT}</p>
         <div class="card-admin-fields">
           <div class="card-admin-field">
             <label for="rightCardInput">الصندوق الأيمن</label>
-            <textarea id="rightCardInput" placeholder="مثال: مدرسة الشيخ سيف بن حمد الأغبري"></textarea>
+            <textarea id="rightCardInput" placeholder="${ANNOUNCEMENT_HINT}"></textarea>
           </div>
           <div class="card-admin-field">
             <label for="leftCardInput">الصندوق الأيسر</label>
-            <textarea id="leftCardInput" placeholder="مثال: قيمنا: الانضباط، الإبداع، المسؤولية"></textarea>
+            <textarea id="leftCardInput" placeholder="${ANNOUNCEMENT_HINT}"></textarea>
           </div>
         </div>
         <div class="dialog-actions">
-          <button class="btn navy" type="button" id="saveMiddleCardsBtn">حفظ الصندوقين</button>
+          <button class="btn navy" type="button" id="saveMiddleCardsBtn">حفظ</button>
           <button class="btn" type="button" id="closeMiddleCardsBtn">إغلاق</button>
         </div>
       </div>
@@ -234,7 +235,7 @@
         .eq('school_slug', schoolSlug)
         .like('message_text', '__CARD_%');
 
-      if (delError) return toastMsg('تعذر تحديث الصندوقين');
+      if (delError) return toastMsg('تعذر تحديث الإعلانات');
 
       const rows = [];
       if (right) rows.push({ school_slug: schoolSlug, message_text: RIGHT_PREFIX + right, is_active: true, sort_order: 9001 });
@@ -242,18 +243,18 @@
 
       if (rows.length) {
         const { error: insError } = await client.from('school_messages').insert(rows);
-        if (insError) return toastMsg('تعذر حفظ الصندوقين');
+        if (insError) return toastMsg('تعذر حفظ الإعلانات');
       }
 
       sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
       writeCardsCache({ right, left });
-      toastMsg('تم حفظ الصندوقين بنجاح');
+      toastMsg('تم الحفظ بنجاح');
       refreshLinks();
     } finally {
       isSavingCards = false;
       if (saveBtn) {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'حفظ الصندوقين';
+        saveBtn.textContent = 'حفظ';
       }
     }
   }
@@ -267,7 +268,7 @@
     btn.id = 'middleCardsAdminBtn';
     btn.className = 'btn light';
     btn.type = 'button';
-    btn.textContent = 'إدارة الصندوقين';
+    btn.textContent = 'إعلانات المدرسة';
     btn.onclick = openMiddleCards;
 
     const messagesBtn = document.getElementById('messagesAdminBtn');
