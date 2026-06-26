@@ -4,12 +4,12 @@ window.SCHOOL_TIMER_SLUG = "alsheikh-saif";
 
 if (location.pathname.includes('dashboard-v2.html')) {
   const messagesScript = document.createElement('script');
-  messagesScript.src = 'dashboard-messages.js?v=messages-admin-07';
+  messagesScript.src = 'dashboard-messages.js?v=messages-admin-08';
   messagesScript.defer = true;
   document.head.appendChild(messagesScript);
 
   const fixesScript = document.createElement('script');
-  fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-04';
+  fixesScript.src = 'dashboard-v2-fixes.js?v=dashboard-fixes-05';
   fixesScript.defer = true;
   document.head.appendChild(fixesScript);
 }
