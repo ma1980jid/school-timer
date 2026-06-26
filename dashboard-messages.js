@@ -12,6 +12,10 @@
   const $ = (id) => document.getElementById(id);
   let isSavingMessages = false;
 
+  function isCardConfigMessage(message){
+    return String(message || '').startsWith('__CARD_');
+  }
+
   function getSchoolSlug(){
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   }
@@ -30,7 +34,8 @@
   function cleanMessages(messages){
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((message) => !isCardConfigMessage(message));
   }
 
   function writeTickerCache(messages){
@@ -110,7 +115,9 @@
           .order('sort_order', { ascending: true });
 
         if (!error && data && data.length) {
-          messages = data.map((m) => m.message_text);
+          messages = data
+            .map((m) => m.message_text)
+            .filter((message) => !isCardConfigMessage(message));
         }
       } catch (e) {}
     }
@@ -181,7 +188,8 @@
       const { error: delError } = await client
         .from('school_messages')
         .delete()
-        .eq('school_slug', schoolSlug);
+        .eq('school_slug', schoolSlug)
+        .not('message_text', 'like', '__CARD_%');
 
       if (delError) return toastMsg('تعذر تحديث الرسائل');
 
