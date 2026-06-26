@@ -15,6 +15,8 @@
   const cacheKey = 'school_timer_messages_' + schoolSlug;
   let client = null;
   let lastSignature = '';
+  let refreshTimer = null;
+  let isLoading = false;
 
   function getClient(){
     if (client) return client;
@@ -30,13 +32,16 @@
     const group = document.createElement('div');
     group.className = 'ticker-group';
 
+    const fragment = document.createDocumentFragment();
+
     messages.forEach((message) => {
       const item = document.createElement('span');
       item.className = 'ticker-item';
       item.textContent = message;
-      group.appendChild(item);
+      fragment.appendChild(item);
     });
 
+    group.appendChild(fragment);
     return group;
   }
 
@@ -50,7 +55,8 @@
     const track = document.getElementById('tickerTrack');
     if (!track) return;
 
-    const finalMessages = clean(messages).length ? clean(messages) : DEFAULT_MESSAGES;
+    const cleaned = clean(messages);
+    const finalMessages = cleaned.length ? cleaned : DEFAULT_MESSAGES;
     const signature = finalMessages.join('||');
     if (signature === lastSignature && track.children.length) return;
 
@@ -82,12 +88,17 @@
   }
 
   async function loadTickerMessages(){
+    if (isLoading) return;
+    if (document.hidden) return;
+
     const db = getClient();
 
     if (!db) {
       renderTicker(DEFAULT_MESSAGES);
       return;
     }
+
+    isLoading = true;
 
     try {
       const { data, error } = await db
@@ -107,14 +118,27 @@
       renderTicker(messages);
     } catch (error) {
       renderTicker(readCache() || DEFAULT_MESSAGES);
+    } finally {
+      isLoading = false;
     }
+  }
+
+  function scheduleRefresh(){
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(loadTickerMessages, REFRESH_INTERVAL);
   }
 
   function start(){
     renderTicker(readCache() || DEFAULT_MESSAGES);
     setTimeout(loadTickerMessages, 1200);
-    setInterval(loadTickerMessages, REFRESH_INTERVAL);
+    scheduleRefresh();
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      loadTickerMessages();
+    }
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
