@@ -22,4 +22,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   linksCompactScript.src = 'dashboard-links-compact-fix.js?v=links-compact-01';
   linksCompactScript.defer = true;
   document.head.appendChild(linksCompactScript);
+
+  const centerSchoolNameScript = document.createElement('script');
+  centerSchoolNameScript.src = 'dashboard-center-school-name.js?v=center-school-01';
+  centerSchoolNameScript.defer = true;
+  document.head.appendChild(centerSchoolNameScript);
 }
