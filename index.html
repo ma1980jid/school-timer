@@ -7,7 +7,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>مؤقّت الحصص</title>
-  <link rel="stylesheet" href="style.css?v=optimized-01">
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://kzhxmwejyfsuorcdvujb.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="//kzhxmwejyfsuorcdvujb.supabase.co">
+
+  <link rel="preload" as="image" href="desktop-bg.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mobile-bg.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+  <link rel="preload" as="image" href="icons/school_logo.png" fetchpriority="high">
+
+  <link rel="stylesheet" href="style.css?v=optimized-02">
   <style>
     @media (max-width: 768px){
       .schedule-section{top:61.2%!important;height:32.8%!important;left:8.2%!important;right:6.2%!important;overflow:hidden!important;padding:0!important;background:transparent!important}
@@ -35,7 +45,7 @@
 <body>
   <main class="timer-app">
     <div class="school-logo-wrap">
-      <img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة">
+      <img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة" decoding="async" fetchpriority="high">
     </div>
     <section class="top-cards">
       <div class="period-card next-card"><div class="period-title">الحصة القادمة</div><div id="nextName" class="period-name">--</div><div class="period-line"></div><div id="nextTime" class="period-time">--</div></div>
@@ -54,9 +64,9 @@
     <footer class="ticker"><div id="tickerTrack" class="ticker-track"></div></footer>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js?v=optimized-01"></script>
-  <script src="script.js?v=optimized-01" defer></script>
-  <script src="ticker-messages.js?v=optimized-01" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js?v=optimized-02" defer></script>
+  <script src="script.js?v=optimized-02" defer></script>
+  <script src="ticker-messages.js?v=optimized-02" defer></script>
 </body>
 </html>
