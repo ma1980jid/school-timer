@@ -1,4 +1,4 @@
-/* إصلاح حركة شريط الرسائل: حلقة كاملة ومستمرة بدون انقطاع مفاجئ */
+/* إصلاح حركة شريط الرسائل: حلقة كاملة ومستمرة محسوبة حسب عرض الرسائل */
 .ticker {
   overflow: hidden !important;
   direction: ltr !important;
@@ -18,7 +18,8 @@
 }
 
 .ticker-group,
-.ticker-group:nth-child(2) {
+.ticker-group:nth-child(2),
+.ticker-group:nth-child(3) {
   display: flex !important;
   align-items: center !important;
   flex-shrink: 0 !important;
@@ -31,7 +32,7 @@
   }
 
   to {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(var(--ticker-distance, -50%), 0, 0);
   }
 }
 
@@ -45,7 +46,8 @@
   }
 
   .ticker-group,
-  .ticker-group:nth-child(2) {
+  .ticker-group:nth-child(2),
+  .ticker-group:nth-child(3) {
     display: flex !important;
     gap: 95px !important;
     padding-inline: 0 !important;
