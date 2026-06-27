@@ -1,10 +1,12 @@
 /* تحسين تمييز الحصة الجارية في واجهة الهاتف فقط */
 @media (max-width: 768px) {
   .schedule-grid tr.current-row {
-    background: rgba(255, 246, 214, 0.96) !important;
-    border: 1px solid rgba(214, 169, 60, 0.62) !important;
-    border-radius: 13px !important;
-    box-shadow: 0 3px 10px rgba(127, 29, 29, 0.08) !important;
+    background: linear-gradient(90deg, rgba(255, 239, 177, 0.98), rgba(255, 248, 222, 0.98)) !important;
+    border: 2px solid rgba(214, 169, 60, 0.9) !important;
+    border-radius: 14px !important;
+    box-shadow:
+      0 0 0 2px rgba(127, 29, 29, 0.08),
+      0 5px 14px rgba(127, 29, 29, 0.16) !important;
     overflow: hidden !important;
   }
 
@@ -23,6 +25,7 @@
   .schedule-grid tr.current-row td {
     color: #7f1d1d !important;
     border-bottom: 0 !important;
+    font-weight: 900 !important;
   }
 
   .schedule-grid tr.current-row .status-cell,
@@ -31,13 +34,18 @@
     font-weight: 900 !important;
   }
 
+  .schedule-grid tr.current-row .status-cell {
+    background: rgba(185, 28, 28, 0.10) !important;
+  }
+
   .schedule-grid tr.current-row .status-cell::before {
     content: "";
-    width: 5px;
-    height: 5px;
+    width: 7px;
+    height: 7px;
     margin-bottom: 2px;
     border-radius: 50%;
-    background: #d6a93c;
+    background: #b91c1c;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
     display: block;
   }
 }
