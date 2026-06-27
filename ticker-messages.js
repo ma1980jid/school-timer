@@ -12,6 +12,7 @@
   const RIGHT_PREFIX = '__CARD_RIGHT__:';
   const LEFT_PREFIX = '__CARD_LEFT__:';
   const SCHEDULED_PREFIX = '__SCHEDULED__:';
+  const SCHEDULE_ROWS_PREFIX = '__SCHEDULE_ROWS__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
@@ -32,8 +33,12 @@
     return String(message || '').startsWith(SCHEDULED_PREFIX);
   }
 
+  function isScheduleRowsMessage(message){
+    return String(message || '').startsWith(SCHEDULE_ROWS_PREFIX);
+  }
+
   function isSystemMessage(message){
-    return isCardConfigMessage(message) || isScheduledConfigMessage(message);
+    return isCardConfigMessage(message) || isScheduledConfigMessage(message) || isScheduleRowsMessage(message);
   }
 
   function getClient(){
