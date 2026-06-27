@@ -32,9 +32,21 @@ if (location.pathname.includes('dashboard-v2.html')) {
   stableLinksScript.src = 'dashboard-stable-links.js?v=stable-links-01';
   stableLinksScript.defer = true;
   document.head.appendChild(stableLinksScript);
+
+  const dashboardScheduleSync = document.createElement('script');
+  dashboardScheduleSync.src = 'dashboard-schedule-sync.js?v=schedule-sync-01';
+  dashboardScheduleSync.defer = true;
+  document.head.appendChild(dashboardScheduleSync);
 } else {
   const mobileCurrentRowStyle = document.createElement('link');
   mobileCurrentRowStyle.rel = 'stylesheet';
   mobileCurrentRowStyle.href = 'mobile-current-row-clean.css?v=mobile-row-01';
   document.head.appendChild(mobileCurrentRowStyle);
+
+  window.addEventListener('load', function(){
+    const viewerScheduleSync = document.createElement('script');
+    viewerScheduleSync.src = 'viewer-schedule-sync.js?v=schedule-sync-01';
+    viewerScheduleSync.defer = true;
+    document.head.appendChild(viewerScheduleSync);
+  });
 }
