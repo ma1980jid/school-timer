@@ -18,14 +18,17 @@
 
   function readRows(){
     return Array.from(document.querySelectorAll('#periodRows .r')).map((row) => {
-      const inputs = Array.from(row.querySelectorAll('input'));
-      const times = inputs.filter((input) => input.type === 'time' || /^\d{2}:\d{2}$/.test(input.value || ''));
-      const textInputs = inputs.filter((input) => input.type !== 'time');
+      const allInputs = Array.from(row.querySelectorAll('input'));
       const select = row.querySelector('select');
-      const name = (textInputs[0] && textInputs[0].value || '').trim();
-      const start = (times[0] && times[0].value || '').trim();
-      const end = (times[1] && times[1].value || '').trim();
+
+      const periodInput = allInputs.find((input) => input.type !== 'time' && !input.closest('.dur'));
+      const timeInputs = allInputs.filter((input) => input.type === 'time');
+
+      const name = (periodInput && periodInput.value || '').trim();
+      const start = (timeInputs[0] && timeInputs[0].value || '').trim();
+      const end = (timeInputs[1] && timeInputs[1].value || '').trim();
       const type = (select && select.value || '').trim();
+
       return { name, start, end, type };
     }).filter((item) => item.name && item.start && item.end);
   }
@@ -64,8 +67,9 @@
     if (!saveButton || saveButton.dataset.scheduleSync === '1') return;
     saveButton.dataset.scheduleSync = '1';
     saveButton.addEventListener('click', function(){
-      setTimeout(saveRows, 500);
-      setTimeout(saveRows, 1200);
+      setTimeout(saveRows, 300);
+      setTimeout(saveRows, 900);
+      setTimeout(saveRows, 1600);
     });
   }
 
