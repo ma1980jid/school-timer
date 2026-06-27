@@ -27,4 +27,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   centerSchoolNameScript.src = 'dashboard-center-school-name.js?v=center-school-01';
   centerSchoolNameScript.defer = true;
   document.head.appendChild(centerSchoolNameScript);
+
+  const stableLinksScript = document.createElement('script');
+  stableLinksScript.src = 'dashboard-stable-links.js?v=stable-links-01';
+  stableLinksScript.defer = true;
+  document.head.appendChild(stableLinksScript);
 }
