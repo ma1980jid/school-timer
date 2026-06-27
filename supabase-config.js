@@ -32,4 +32,9 @@ if (location.pathname.includes('dashboard-v2.html')) {
   stableLinksScript.src = 'dashboard-stable-links.js?v=stable-links-01';
   stableLinksScript.defer = true;
   document.head.appendChild(stableLinksScript);
+} else {
+  const mobileCurrentRowStyle = document.createElement('link');
+  mobileCurrentRowStyle.rel = 'stylesheet';
+  mobileCurrentRowStyle.href = 'mobile-current-row-clean.css?v=mobile-row-01';
+  document.head.appendChild(mobileCurrentRowStyle);
 }
