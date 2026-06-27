@@ -1,0 +1,43 @@
+/* تحسين تمييز الحصة الجارية في واجهة الهاتف فقط */
+@media (max-width: 768px) {
+  .schedule-grid tr.current-row {
+    background: rgba(255, 246, 214, 0.96) !important;
+    border: 1px solid rgba(214, 169, 60, 0.62) !important;
+    border-radius: 13px !important;
+    box-shadow: 0 3px 10px rgba(127, 29, 29, 0.08) !important;
+    overflow: hidden !important;
+  }
+
+  .schedule-grid tr.current-row td,
+  .schedule-grid tr.current-row td:first-child,
+  .schedule-grid tr.current-row td:last-child,
+  .schedule-grid tr.current-row .time-cell,
+  .schedule-grid tr.current-row .status-cell {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+  }
+
+  .schedule-grid tr.current-row td {
+    color: #7f1d1d !important;
+    border-bottom: 0 !important;
+  }
+
+  .schedule-grid tr.current-row .status-cell,
+  .schedule-grid tr.current-row .state-text {
+    color: #b91c1c !important;
+    font-weight: 900 !important;
+  }
+
+  .schedule-grid tr.current-row .status-cell::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    margin-bottom: 2px;
+    border-radius: 50%;
+    background: #d6a93c;
+    display: block;
+  }
+}
