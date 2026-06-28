@@ -40,7 +40,7 @@
       @media (max-width:768px){
         .mobile-school-heading{
           position:absolute!important;
-          top:16.25%!important;
+          top:14.65%!important;
           left:7.5%!important;
           right:7.5%!important;
           height:3.1%!important;
