@@ -37,6 +37,11 @@ if (location.pathname.includes('dashboard-v2.html')) {
   dashboardScheduleSync.src = 'dashboard-schedule-sync.js?v=schedule-sync-03';
   dashboardScheduleSync.defer = true;
   document.head.appendChild(dashboardScheduleSync);
+
+  const dashboardAlerts = document.createElement('script');
+  dashboardAlerts.src = 'dashboard-alert-settings.js?v=alerts-dashboard-01';
+  dashboardAlerts.defer = true;
+  document.head.appendChild(dashboardAlerts);
 } else {
   const mobileCurrentRowStyle = document.createElement('link');
   mobileCurrentRowStyle.rel = 'stylesheet';
@@ -48,5 +53,10 @@ if (location.pathname.includes('dashboard-v2.html')) {
     viewerScheduleSync.src = 'viewer-schedule-sync.js?v=schedule-sync-03';
     viewerScheduleSync.defer = true;
     document.head.appendChild(viewerScheduleSync);
+
+    const viewerAlerts = document.createElement('script');
+    viewerAlerts.src = 'viewer-alerts.js?v=viewer-alerts-01';
+    viewerAlerts.defer = true;
+    document.head.appendChild(viewerAlerts);
   });
 }
