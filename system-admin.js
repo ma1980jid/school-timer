@@ -1,6 +1,7 @@
 (function(){
   const $ = (id) => document.getElementById(id);
-  const state = { schools: [], selected: null, client: null };
+  const EVENT_PREFIX = '__GLOBAL_EVENT_THEME__:';
+  const state = { schools: [], selected: null, client: null, eventTheme: null };
 
   function showStatus(message, type='ok'){
     const box = $('systemStatus');
@@ -253,6 +254,117 @@
     await loadSchools();
   }
 
+  function ensureEventPanel(){
+    if ($('eventThemePanel')) return;
+    const linksBox = $('linksBox');
+    if (!linksBox || !linksBox.parentElement) return;
+    const panel = document.createElement('div');
+    panel.id = 'eventThemePanel';
+    panel.className = 'linkbox';
+    panel.innerHTML = `
+      <b>تصميم مناسبة عام</b>
+      <div class="notice warn">يطبق مؤقتًا على كل المدارس خلال الفترة المحددة، ثم يعود كل مؤقت لتصميم مدرسته الأصلي.</div>
+      <label>تفعيل التصميم المؤقت</label>
+      <select id="eventEnabled"><option value="false">غير مفعّل</option><option value="true">مفعّل</option></select>
+      <label>اسم المناسبة</label>
+      <input id="eventTitle" placeholder="مثال: اليوم الوطني / يوم المعلم / رمضان">
+      <div class="row2">
+        <div><label>من تاريخ</label><input id="eventStart" type="date"></div>
+        <div><label>إلى تاريخ</label><input id="eventEnd" type="date"></div>
+      </div>
+      <label>التصميم المستخدم</label>
+      <select id="eventTheme"><option value="omani">العماني الرسمي</option><option value="white">الأبيض الفاخر</option><option value="green">الأخضر الهادئ</option><option value="gold">الذهبي</option></select>
+      <div class="actions"><button class="btn navy" type="button" id="saveEventThemeBtn">تطبيق على كل المدارس</button><button class="btn red" type="button" id="clearEventThemeBtn">إيقاف التصميم العام</button></div>
+      <div id="eventThemeState" class="meta">لا يوجد تصميم مناسبة نشط.</div>
+    `;
+    linksBox.parentElement.appendChild(panel);
+    $('saveEventThemeBtn').onclick = saveGlobalEventTheme;
+    $('clearEventThemeBtn').onclick = clearGlobalEventTheme;
+  }
+
+  function fillEventForm(config){
+    const item = config || {};
+    if ($('eventEnabled')) $('eventEnabled').value = item.enabled ? 'true' : 'false';
+    if ($('eventTitle')) $('eventTitle').value = item.title || '';
+    if ($('eventStart')) $('eventStart').value = item.startDate || '';
+    if ($('eventEnd')) $('eventEnd').value = item.endDate || '';
+    if ($('eventTheme')) $('eventTheme').value = item.theme || 'gold';
+    if ($('eventThemeState')) {
+      $('eventThemeState').textContent = item.enabled ? `نشط: ${item.title || 'مناسبة'} من ${item.startDate || '--'} إلى ${item.endDate || '--'} — ${themeLabel(item.theme)}` : 'لا يوجد تصميم مناسبة نشط.';
+    }
+  }
+
+  async function loadGlobalEventTheme(){
+    ensureEventPanel();
+    const db = getClient();
+    if (!db) return;
+    try {
+      const { data, error } = await db.from('school_messages')
+        .select('message_text,created_at')
+        .like('message_text', EVENT_PREFIX + '%')
+        .order('created_at', { ascending:false })
+        .limit(1);
+      if (error || !data || !data[0]) {
+        state.eventTheme = null;
+        fillEventForm(null);
+        return;
+      }
+      state.eventTheme = JSON.parse(String(data[0].message_text).slice(EVENT_PREFIX.length));
+      fillEventForm(state.eventTheme);
+    } catch (error) {
+      fillEventForm(null);
+    }
+  }
+
+  function readEventForm(){
+    return {
+      enabled: $('eventEnabled').value === 'true',
+      title: $('eventTitle').value.trim(),
+      startDate: $('eventStart').value,
+      endDate: $('eventEnd').value || $('eventStart').value,
+      theme: $('eventTheme').value || 'gold',
+      savedAt: new Date().toISOString()
+    };
+  }
+
+  async function saveGlobalEventTheme(){
+    const db = getClient();
+    if (!db) return;
+    const config = readEventForm();
+    if (!config.enabled) return clearGlobalEventTheme();
+    if (!config.title || !config.startDate) return showStatus('أدخل اسم المناسبة وتاريخ البداية.', 'err');
+    const schools = state.schools.filter((school) => school.school_slug);
+    if (!schools.length) return showStatus('لا توجد مدارس لتطبيق التصميم عليها.', 'warn');
+    try {
+      await db.from('school_messages').delete().like('message_text', EVENT_PREFIX + '%');
+      const text = EVENT_PREFIX + JSON.stringify(config);
+      const rows = schools.map((school) => ({ school_slug: school.school_slug, message_text:text, is_active:true, sort_order:9996 }));
+      const { error } = await db.from('school_messages').insert(rows);
+      if (error) throw error;
+      state.eventTheme = config;
+      fillEventForm(config);
+      showStatus('تم تطبيق تصميم المناسبة على كل المدارس.');
+    } catch (error) {
+      console.error(error);
+      showStatus('تعذر تطبيق تصميم المناسبة. تحقق من صلاحيات school_messages.', 'err');
+    }
+  }
+
+  async function clearGlobalEventTheme(){
+    const db = getClient();
+    if (!db) return;
+    try {
+      const { error } = await db.from('school_messages').delete().like('message_text', EVENT_PREFIX + '%');
+      if (error) throw error;
+      state.eventTheme = null;
+      fillEventForm(null);
+      showStatus('تم إيقاف التصميم العام المؤقت.');
+    } catch (error) {
+      console.error(error);
+      showStatus('تعذر إيقاف التصميم العام.', 'err');
+    }
+  }
+
   function init(){
     $('refreshBtn').onclick = loadSchools;
     $('saveSchoolBtn').onclick = saveSchool;
@@ -265,8 +377,10 @@
     });
     $('logoUrl').addEventListener('input', () => updateLogoPreview($('logoUrl').value.trim()));
     renderLinks(null);
-    loadSchools();
+    ensureEventPanel();
+    loadSchools().then(loadGlobalEventTheme);
     setTimeout(loadSchools, 1000);
+    setTimeout(loadGlobalEventTheme, 1400);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
