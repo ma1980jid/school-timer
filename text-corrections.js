@@ -40,7 +40,7 @@
       @media (min-width:769px){
         .mobile-school-heading{
           position:absolute!important;
-          top:17.3%!important;
+          top:15.3%!important;
           left:8%!important;
           right:8%!important;
           height:3.2%!important;
@@ -51,7 +51,7 @@
           text-align:center!important;
           direction:rtl!important;
           color:#064b35!important;
-          font-family:"Diwani Letter","DecoType Naskh","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
+          font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
           font-size:clamp(24px,2.05vw,42px)!important;
           font-weight:900!important;
           line-height:1.05!important;
@@ -76,7 +76,7 @@
           text-align:center!important;
           direction:rtl!important;
           color:#064b35!important;
-          font-family:"Diwani Letter","DecoType Naskh","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
+          font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
           font-size:clamp(15px,4.05vw,25px)!important;
           font-weight:900!important;
           line-height:1.05!important;
