@@ -39,7 +39,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
   document.head.appendChild(dashboardScheduleSync);
 
   const dashboardAlerts = document.createElement('script');
-  dashboardAlerts.src = 'dashboard-alert-settings.js?v=alerts-dashboard-01';
+  dashboardAlerts.src = 'dashboard-alert-settings.js?v=alerts-dashboard-02';
   dashboardAlerts.defer = true;
   document.head.appendChild(dashboardAlerts);
 } else {
@@ -55,7 +55,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
     document.head.appendChild(viewerScheduleSync);
 
     const viewerAlerts = document.createElement('script');
-    viewerAlerts.src = 'viewer-alerts.js?v=viewer-alerts-01';
+    viewerAlerts.src = 'viewer-alerts-v2.js?v=viewer-alerts-02';
     viewerAlerts.defer = true;
     document.head.appendChild(viewerAlerts);
   });
