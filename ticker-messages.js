@@ -13,6 +13,7 @@
   const LEFT_PREFIX = '__CARD_LEFT__:';
   const SCHEDULED_PREFIX = '__SCHEDULED__:';
   const SCHEDULE_ROWS_PREFIX = '__SCHEDULE_ROWS__:';
+  const GLOBAL_EVENT_THEME_PREFIX = '__GLOBAL_EVENT_THEME__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
@@ -37,8 +38,12 @@
     return String(message || '').startsWith(SCHEDULE_ROWS_PREFIX);
   }
 
+  function isGlobalEventThemeMessage(message){
+    return String(message || '').startsWith(GLOBAL_EVENT_THEME_PREFIX);
+  }
+
   function isSystemMessage(message){
-    return isCardConfigMessage(message) || isScheduledConfigMessage(message) || isScheduleRowsMessage(message);
+    return isCardConfigMessage(message) || isScheduledConfigMessage(message) || isScheduleRowsMessage(message) || isGlobalEventThemeMessage(message);
   }
 
   function getClient(){
