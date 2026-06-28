@@ -51,6 +51,14 @@
     document.head.appendChild(style);
   }
 
+  function loadScriptOnce(src, startsWith){
+    if (document.querySelector('script[src^="' + startsWith + '"]')) return;
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function setText(id, text){
     const el = document.getElementById(id);
     if (el && text && el.textContent !== text) el.textContent = text;
@@ -137,6 +145,7 @@
 
   function start(){
     ensureStyle();
+    loadScriptOnce('viewer-auto-theme.js?v=auto-theme-01', 'viewer-auto-theme.js');
     const cached = readCache();
     if (cached) applyIdentity(cached);
     loadIdentity();
