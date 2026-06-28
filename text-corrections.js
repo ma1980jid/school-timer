@@ -37,6 +37,31 @@
     style.id = 'mobileSchoolHeadingStyle';
     style.textContent = `
       .mobile-school-heading{display:none;}
+      @media (min-width:769px){
+        .mobile-school-heading{
+          position:absolute!important;
+          top:17.3%!important;
+          left:8%!important;
+          right:8%!important;
+          height:3.2%!important;
+          z-index:32!important;
+          display:flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          text-align:center!important;
+          direction:rtl!important;
+          color:#064b35!important;
+          font-family:"Diwani Letter","DecoType Naskh","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
+          font-size:clamp(24px,2.05vw,42px)!important;
+          font-weight:900!important;
+          line-height:1.05!important;
+          text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 7px rgba(70,46,9,.16)!important;
+          white-space:nowrap!important;
+          overflow:hidden!important;
+          text-overflow:ellipsis!important;
+          pointer-events:none!important;
+        }
+      }
       @media (max-width:768px){
         .mobile-school-heading{
           position:absolute!important;
