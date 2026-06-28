@@ -1,0 +1,43 @@
+.theme-event-ribbon{position:absolute;top:1.15%;left:50%;transform:translateX(-50%);z-index:1000;direction:rtl;background:rgba(15,23,42,.76);color:#fff;border:1px solid rgba(248,231,176,.72);border-radius:999px;padding:6px 18px;font-family:Tahoma,Arial,sans-serif;font-size:clamp(11px,1.05vw,17px);font-weight:900;box-shadow:0 8px 24px rgba(15,23,42,.22);pointer-events:none;white-space:nowrap}
+@media(max-width:768px){.theme-event-ribbon{top:.8%;font-size:clamp(10px,2.8vw,15px);padding:5px 12px;max-width:82vw;overflow:hidden;text-overflow:ellipsis}}
+
+html[data-theme-effective="omani"] .timer-app{filter:none}
+html[data-theme-effective="omani"] .period-title,
+html[data-theme-effective="omani"] .count-label,
+html[data-theme-effective="omani"] .mobile-school-heading{color:#064b35!important}
+html[data-theme-effective="omani"] .ticker-item{color:#f7e6b0!important}
+
+html[data-theme-effective="white"] .timer-app{filter:saturate(.88) brightness(1.045) contrast(.985)}
+html[data-theme-effective="white"] .period-card,
+html[data-theme-effective="white"] .clock-panel,
+html[data-theme-effective="white"] .mini-card{box-shadow:0 10px 28px rgba(15,23,42,.08)!important}
+html[data-theme-effective="white"] .period-title,
+html[data-theme-effective="white"] .count-label,
+html[data-theme-effective="white"] .mobile-school-heading{color:#1f3b34!important}
+html[data-theme-effective="white"] .remaining-time,
+html[data-theme-effective="white"] .digital-clock{color:#0f172a!important;text-shadow:0 1px 0 rgba(255,255,255,.85)!important}
+html[data-theme-effective="white"] .ticker-item{color:#fff7d6!important}
+
+html[data-theme-effective="green"] .timer-app{filter:saturate(1.08) hue-rotate(2deg) contrast(1.015)}
+html[data-theme-effective="green"] .period-title,
+html[data-theme-effective="green"] .count-label,
+html[data-theme-effective="green"] .mobile-school-heading{color:#064e3b!important}
+html[data-theme-effective="green"] .remaining-time,
+html[data-theme-effective="green"] .digital-clock{color:#065f46!important}
+html[data-theme-effective="green"] .ticker-item{color:#d9f99d!important}
+
+html[data-theme-effective="gold"] .timer-app{filter:saturate(1.12) sepia(.09) contrast(1.02) brightness(1.01)}
+html[data-theme-effective="gold"] .period-title,
+html[data-theme-effective="gold"] .count-label,
+html[data-theme-effective="gold"] .mobile-school-heading{color:#6b3f08!important}
+html[data-theme-effective="gold"] .remaining-time,
+html[data-theme-effective="gold"] .digital-clock{color:#7c2d12!important;text-shadow:0 1px 0 rgba(255,255,255,.65),0 3px 12px rgba(120,53,15,.16)!important}
+html[data-theme-effective="gold"] .ticker-item{color:#fde68a!important}
+
+html[data-theme-effective="omani"] body::before,
+html[data-theme-effective="white"] body::before,
+html[data-theme-effective="green"] body::before,
+html[data-theme-effective="gold"] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.08;background:radial-gradient(circle at 18% 20%,#fff 0 1px,transparent 2px),radial-gradient(circle at 82% 78%,#fff 0 1px,transparent 2px);background-size:42px 42px,56px 56px}
+html[data-theme-effective="white"] body::before{opacity:.12;background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(226,232,240,.18))}
+html[data-theme-effective="green"] body::before{opacity:.09;background:linear-gradient(135deg,rgba(5,150,105,.18),rgba(240,253,244,.08))}
+html[data-theme-effective="gold"] body::before{opacity:.13;background:linear-gradient(135deg,rgba(245,158,11,.22),rgba(254,243,199,.08))}
