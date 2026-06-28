@@ -9,19 +9,19 @@
     'نسعى لبناء مستقبل تعليمي متميز'
   ];
 
+  const SYSTEM_MARKERS = [
+    '__CARD_',
+    '__SCHEDULED__:',
+    '__SCHEDULE_ROWS__:',
+    '__ALERT_SETTINGS__:'
+  ];
+
   const $ = (id) => document.getElementById(id);
   let isSavingMessages = false;
 
-  function isCardConfigMessage(message){
-    return String(message || '').startsWith('__CARD_');
-  }
-
-  function isScheduledConfigMessage(message){
-    return String(message || '').startsWith('__SCHEDULED__:');
-  }
-
   function isSystemMessage(message){
-    return isCardConfigMessage(message) || isScheduledConfigMessage(message);
+    const text = String(message || '').trim();
+    return SYSTEM_MARKERS.some((marker) => text.startsWith(marker) || text.includes(marker));
   }
 
   function getSchoolSlug(){
@@ -198,7 +198,9 @@
         .delete()
         .eq('school_slug', schoolSlug)
         .not('message_text', 'like', '__CARD_%')
-        .not('message_text', 'like', '__SCHEDULED__:%');
+        .not('message_text', 'like', '__SCHEDULED__:%')
+        .not('message_text', 'like', '__SCHEDULE_ROWS__:%')
+        .not('message_text', 'like', '__ALERT_SETTINGS__:%');
 
       if (delError) return toastMsg('تعذر تحديث الرسائل');
 
