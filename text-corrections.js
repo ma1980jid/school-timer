@@ -128,9 +128,18 @@
     document.head.appendChild(script);
   }
 
+  function loadStyleOnce(href, startsWith){
+    if (document.querySelector('link[href^="' + startsWith + '"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
   function start(){
     apply();
     ensureMobileSchoolHeading();
+    loadStyleOnce('viewer-design-themes.css?v=themes-01', 'viewer-design-themes.css');
     loadScriptOnce('viewer-school-identity.js?v=identity-01', 'viewer-school-identity.js');
     loadScriptOnce('viewer-theme-manager.js?v=theme-01', 'viewer-theme-manager.js');
     setInterval(ensureMobileSchoolHeading, 3000);
