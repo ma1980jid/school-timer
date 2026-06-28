@@ -40,25 +40,28 @@
       @media (min-width:769px){
         .mobile-school-heading{
           position:absolute!important;
-          top:15.3%!important;
+          top:14.3%!important;
           left:8%!important;
           right:8%!important;
-          height:3.2%!important;
-          z-index:32!important;
+          height:4.2%!important;
+          z-index:999!important;
           display:flex!important;
           align-items:center!important;
           justify-content:center!important;
           text-align:center!important;
           direction:rtl!important;
           color:#064b35!important;
+          background:transparent!important;
+          border:0!important;
+          box-shadow:none!important;
           font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
-          font-size:clamp(24px,2.05vw,42px)!important;
+          font-size:clamp(21px,1.75vw,34px)!important;
           font-weight:900!important;
-          line-height:1.05!important;
+          line-height:1.2!important;
           text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 7px rgba(70,46,9,.16)!important;
           white-space:nowrap!important;
-          overflow:hidden!important;
-          text-overflow:ellipsis!important;
+          overflow:visible!important;
+          text-overflow:clip!important;
           pointer-events:none!important;
         }
       }
