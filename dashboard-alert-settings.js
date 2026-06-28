@@ -67,7 +67,6 @@
       const result = await client.from('school_messages')
         .select('message_text,created_at')
         .eq('school_slug', slug())
-        .eq('is_active', true)
         .like('message_text', PREFIX + '%')
         .order('created_at', { ascending: false })
         .limit(1);
@@ -83,7 +82,7 @@
     if (!client) return;
     const text = PREFIX + JSON.stringify({ ...settings, savedAt: new Date().toISOString() });
     await client.from('school_messages').delete().eq('school_slug', slug()).like('message_text', PREFIX + '%');
-    await client.from('school_messages').insert({ school_slug: slug(), message_text: text, is_active: true, sort_order: 9997 });
+    await client.from('school_messages').insert({ school_slug: slug(), message_text: text, is_active: false, sort_order: 9997 });
   }
 
   function row(label, note, input){
