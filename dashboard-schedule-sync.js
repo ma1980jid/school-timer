@@ -23,13 +23,15 @@
 
       const periodInput = allInputs.find((input) => input.type !== 'time' && !input.closest('.dur'));
       const timeInputs = allInputs.filter((input) => input.type === 'time');
+      const durationInput = row.querySelector('.dur input');
 
       const name = (periodInput && periodInput.value || '').trim();
       const start = (timeInputs[0] && timeInputs[0].value || '').trim();
       const end = (timeInputs[1] && timeInputs[1].value || '').trim();
+      const duration = (durationInput && durationInput.value || '').trim();
       const type = (select && select.value || '').trim();
 
-      return { name, start, end, type };
+      return { name, start, end, duration, type };
     }).filter((item) => item.name && item.start && item.end);
   }
 
