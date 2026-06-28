@@ -55,7 +55,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
     document.head.appendChild(viewerScheduleSync);
 
     const viewerAlerts = document.createElement('script');
-    viewerAlerts.src = 'viewer-alerts-v2.js?v=viewer-alerts-02';
+    viewerAlerts.src = 'viewer-alerts-v2.js?v=viewer-alerts-03';
     viewerAlerts.defer = true;
     document.head.appendChild(viewerAlerts);
   });
