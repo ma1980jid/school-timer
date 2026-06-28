@@ -8,6 +8,7 @@
   let notifiedBefore = '';
   let notifiedEnd = '';
   let lastCurrent = '';
+  let lastCurrentName = '';
   let client = null;
 
   function db(){
@@ -63,7 +64,7 @@
     setTimeout(() => { if (button.parentElement) button.remove(); }, 25000);
   }
 
-  function sendNotification(title, body){
+  function sendNotification(message){
     if (!settings.enabled || !settings.phoneNotificationEnabled) return;
     if (!('Notification' in window)) return;
     if (Notification.permission !== 'granted') {
@@ -71,8 +72,8 @@
       return;
     }
     try {
-      new Notification(title, {
-        body,
+      new Notification(message, {
+        body: '',
         tag: 'school-timer-phone-alert',
         renotify: true,
         icon: 'icons/school_logo.png',
@@ -90,20 +91,21 @@
 
     if (current && key) {
       lastCurrent = key;
+      lastCurrentName = current.name || '';
       if (settings.beforeEndEnabled && remaining !== null && remaining <= 300 && remaining > 0 && notifiedBefore !== key) {
         notifiedBefore = key;
-        sendNotification('مؤقت الحصص', `باقي من الحصة ${current.name} ${Math.ceil(remaining / 60)} د`);
+        sendNotification(`باقي ${Math.ceil(remaining / 60)} د من الحصة ${current.name}`);
       }
       if (settings.endEnabled && remaining !== null && remaining <= 1 && notifiedEnd !== key) {
         notifiedEnd = key;
-        sendNotification('مؤقت الحصص', `انتهت الحصة ${current.name}`);
+        sendNotification(`انتهت الحصة ${current.name}`);
       }
       return;
     }
 
     if (settings.endEnabled && lastCurrent && notifiedEnd !== lastCurrent) {
       notifiedEnd = lastCurrent;
-      sendNotification('مؤقت الحصص', 'انتهت الحصة');
+      sendNotification(lastCurrentName ? `انتهت الحصة ${lastCurrentName}` : 'انتهت الحصة');
     }
   }
 
