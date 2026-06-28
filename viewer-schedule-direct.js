@@ -1,6 +1,8 @@
 (function(){
 if(window.__viewerScheduleDirectLoaded)return;window.__viewerScheduleDirectLoaded=1;
-const P='__SCHEDULE_ROWS__:',slug=new URLSearchParams(location.search).get('school')||window.SCHOOL_TIMER_SLUG||'alsheikh-saif';let rows=[],sig='',loadTries=0;
+const P='__SCHEDULE_ROWS__:',slug=new URLSearchParams(location.search).get('school')||window.SCHOOL_TIMER_SLUG||'alsheikh-saif',CACHE='school_timer_direct_schedule_'+slug;let rows=[],sig='',loadTries=0;
+function readCache(){try{let c=JSON.parse(localStorage.getItem(CACHE)||'null');if(c&&Array.isArray(c.rows)&&c.rows.length){rows=c.rows;return true}}catch(e){}return false}
+function writeCache(r){try{localStorage.setItem(CACHE,JSON.stringify({rows:r,savedAt:Date.now()}))}catch(e){}}
 function db(){return window.supabase&&window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL,window.SCHOOL_TIMER_SUPABASE_ANON_KEY)}
 function m(t){let a=String(t||'').split(':').map(Number);return a.length<2?NaN:a[0]*60+a[1]}
 function pad(n){return String(n).padStart(2,'0')}
@@ -24,7 +26,7 @@ function updateCards(s=schedule()){let first=s.list[0];set('previousName',s.prev
 function updateRemaining(s=schedule()){let first=s.list[0],sec=s.time.h*3600+s.time.m*60+s.time.s;if(s.current){set('countLabel','متبقي من الحصة الحالية');set('remainingTime',dur(s.current.endMinutes*60-sec))}else if(first&&s.currentMinutes<first.startMinutes){set('countLabel','متبقي على بداية الدوام');set('remainingTime',dur(first.startMinutes*60-sec))}else if(s.next){set('countLabel','متبقي على الحصة القادمة');set('remainingTime',dur(s.next.startMinutes*60-sec))}else{set('countLabel','انتهى اليوم الدراسي');set('remainingTime','00:00')}}
 function paint(){let s=schedule();if(!s.list.length)return;updateCards(s);updateRemaining(s);renderTable(s)}
 function patch(){window.getSchedule=schedule;window.updateCards=updateCards;window.updateRemaining=updateRemaining;window.renderTable=renderTable;window.getActivePeriods=list}
-async function load(){let c=db();if(!c){if(loadTries++<20)setTimeout(load,300);return}loadTries=0;let r=await c.from('school_messages').select('message_text').eq('school_slug',slug).eq('is_active',true).like('message_text',P+'%').order('created_at',{ascending:false}).limit(1);if(r.data&&r.data[0]){try{rows=JSON.parse(String(r.data[0].message_text).slice(P.length)).rows||[]}catch(e){}sig='';patch();paint()}}
-function start(){patch();load();setInterval(paint,1000);setInterval(load,60000)}
+async function load(){let c=db();if(!c){if(loadTries++<20)setTimeout(load,300);return}loadTries=0;let r=await c.from('school_messages').select('message_text').eq('school_slug',slug).eq('is_active',true).like('message_text',P+'%').order('created_at',{ascending:false}).limit(1);if(r.data&&r.data[0]){try{let parsed=JSON.parse(String(r.data[0].message_text).slice(P.length));rows=parsed.rows||[];writeCache(rows)}catch(e){}sig='';patch();paint()}}
+function start(){patch();if(readCache()){paint()}load();setInterval(paint,1000);setInterval(load,60000)}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',start):start();
 })();
