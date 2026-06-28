@@ -63,14 +63,33 @@
     </section>
     <script>
       (function(){
+        var defaultSchoolName = 'مدرسة الشيخ سيف بن حمد الأغبري';
+        var defaultVision = 'رؤيتنا: تعليم ملهم لمستقبل مشرق';
+        var rightText = '';
+        var leftText = '';
+        function applyCards(){
+          var rightEl = document.getElementById('schoolName');
+          var leftEl = document.getElementById('visionText');
+          if (rightText && rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
+          if (leftText && leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
+          if (!rightText && rightEl && rightEl.textContent === defaultSchoolName) rightEl.textContent = '--';
+          if (!leftText && leftEl && leftEl.textContent === defaultVision) leftEl.textContent = '--';
+        }
         try {
           var slug = new URLSearchParams(location.search).get('school') || 'alsheikh-saif';
           var cached = JSON.parse(localStorage.getItem('school_timer_middle_cards_' + slug) || 'null');
           if (cached && cached.cards) {
-            if (cached.cards.right) document.getElementById('schoolName').textContent = cached.cards.right;
-            if (cached.cards.left) document.getElementById('visionText').textContent = cached.cards.left;
+            rightText = String(cached.cards.right || '').trim();
+            leftText = String(cached.cards.left || '').trim();
           }
         } catch (error) {}
+        applyCards();
+        document.addEventListener('DOMContentLoaded', function(){
+          applyCards();
+          var target = document.querySelector('.middle-cards');
+          if (!target || !window.MutationObserver) return;
+          new MutationObserver(applyCards).observe(target, { childList: true, subtree: true, characterData: true });
+        });
       })();
     </script>
     <section class="schedule-section"><div class="schedule-grid"><table><tbody id="scheduleCol1"></tbody></table><table><tbody id="scheduleCol2"></tbody></table></div></section>
