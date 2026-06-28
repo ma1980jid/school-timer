@@ -5,7 +5,7 @@
   function loadDirectRenderer(){
     if (document.querySelector('script[src^="viewer-schedule-direct.js"]')) return;
     const script = document.createElement('script');
-    script.src = 'viewer-schedule-direct.js?v=schedule-direct-03';
+    script.src = 'viewer-schedule-direct.js?v=schedule-direct-05';
     script.defer = true;
     document.head.appendChild(script);
   }
