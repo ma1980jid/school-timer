@@ -120,10 +120,10 @@
     if (schoolName && heading.textContent !== schoolName) heading.textContent = schoolName;
   }
 
-  function loadViewerThemeManager(){
-    if (document.querySelector('script[src^="viewer-theme-manager.js"]')) return;
+  function loadScriptOnce(src, startsWith){
+    if (document.querySelector('script[src^="' + startsWith + '"]')) return;
     const script = document.createElement('script');
-    script.src = 'viewer-theme-manager.js?v=theme-01';
+    script.src = src;
     script.defer = true;
     document.head.appendChild(script);
   }
@@ -131,7 +131,8 @@
   function start(){
     apply();
     ensureMobileSchoolHeading();
-    loadViewerThemeManager();
+    loadScriptOnce('viewer-school-identity.js?v=identity-01', 'viewer-school-identity.js');
+    loadScriptOnce('viewer-theme-manager.js?v=theme-01', 'viewer-theme-manager.js');
     setInterval(ensureMobileSchoolHeading, 3000);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
