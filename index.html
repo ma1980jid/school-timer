@@ -58,9 +58,21 @@
       <div class="clock-area"><div id="digitalClock" class="digital-clock">--:--</div><div id="countLabel" class="count-label">متبقي من الحصة الحالية</div><div id="remainingTime" class="remaining-time">--:--</div></div>
     </section>
     <section class="middle-cards">
-      <div class="mini-card school-name-card"><p id="schoolName">مدرسة الشيخ سيف بن حمد الأغبري</p></div>
-      <div class="mini-card vision-card"><p id="visionText">رؤيتنا: تعليم ملهم لمستقبل مشرق</p></div>
+      <div class="mini-card school-name-card"><p id="schoolName">--</p></div>
+      <div class="mini-card vision-card"><p id="visionText">--</p></div>
     </section>
+    <script>
+      (function(){
+        try {
+          var slug = new URLSearchParams(location.search).get('school') || 'alsheikh-saif';
+          var cached = JSON.parse(localStorage.getItem('school_timer_middle_cards_' + slug) || 'null');
+          if (cached && cached.cards) {
+            if (cached.cards.right) document.getElementById('schoolName').textContent = cached.cards.right;
+            if (cached.cards.left) document.getElementById('visionText').textContent = cached.cards.left;
+          }
+        } catch (error) {}
+      })();
+    </script>
     <section class="schedule-section"><div class="schedule-grid"><table><tbody id="scheduleCol1"></tbody></table><table><tbody id="scheduleCol2"></tbody></table></div></section>
     <footer class="ticker"><div id="tickerTrack" class="ticker-track"></div></footer>
   </main>
@@ -69,7 +81,7 @@
   <script src="supabase-config.js?v=optimized-02" defer></script>
   <script src="script.js?v=optimized-02" defer></script>
   <script src="script-optimizations.js?v=optimized-01" defer></script>
-  <script src="ticker-messages.js?v=optimized-09" defer></script>
+  <script src="ticker-messages.js?v=optimized-10" defer></script>
   <script src="text-corrections.js?v=text-corrections-01" defer></script>
 </body>
 </html>
