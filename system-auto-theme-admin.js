@@ -2,7 +2,7 @@
   if (window.__systemAutoThemeAdminLoaded) return;
   window.__systemAutoThemeAdminLoaded = true;
 
-  const AUTO_PREFIX = '__ALERT_SETTINGS__:__AUTO_THEME__:';
+  const AUTO_PREFIX = '__AUTO_THEME__:';
   const THEMES = ['omani','white','green','gold'];
   const THEME_LABELS = { omani:'العماني الرسمي', white:'الأبيض الفاخر', green:'الأخضر الهادئ', gold:'الذهبي' };
   const $ = (id) => document.getElementById(id);
@@ -139,7 +139,7 @@
     try {
       await db.from('school_messages').delete().like('message_text', AUTO_PREFIX + '%');
       const text = AUTO_PREFIX + JSON.stringify(config);
-      const rows = schools.map((school) => ({ school_slug:school.school_slug, message_text:text, is_active:false, sort_order:9995 }));
+      const rows = schools.map((school) => ({ school_slug:school.school_slug, message_text:text, is_active:true, sort_order:9995 }));
       const { error } = await db.from('school_messages').insert(rows);
       if (error) throw error;
       fillForm(config);
