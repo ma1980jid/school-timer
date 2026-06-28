@@ -13,7 +13,8 @@
     '__CARD_',
     '__SCHEDULED__:',
     '__SCHEDULE_ROWS__:',
-    '__ALERT_SETTINGS__:'
+    '__ALERT_SETTINGS__:',
+    '__GLOBAL_EVENT_THEME__:'
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -200,7 +201,8 @@
         .not('message_text', 'like', '__CARD_%')
         .not('message_text', 'like', '__SCHEDULED__:%')
         .not('message_text', 'like', '__SCHEDULE_ROWS__:%')
-        .not('message_text', 'like', '__ALERT_SETTINGS__:%');
+        .not('message_text', 'like', '__ALERT_SETTINGS__:%')
+        .not('message_text', 'like', '__GLOBAL_EVENT_THEME__:%');
 
       if (delError) return toastMsg('تعذر تحديث الرسائل');
 
