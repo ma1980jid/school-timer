@@ -14,7 +14,8 @@
     '__SCHEDULED__:',
     '__SCHEDULE_ROWS__:',
     '__ALERT_SETTINGS__:',
-    '__GLOBAL_EVENT_THEME__:'
+    '__GLOBAL_EVENT_THEME__:',
+    '__AUTO_THEME__:'
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -104,10 +105,51 @@
     list.appendChild(createMessageRow(text));
   }
 
+  async function loadNewMessages(client, schoolSlug){
+    try {
+      const { data, error } = await client
+        .from('school_display_messages')
+        .select('message_text,sort_order,target_area,message_type')
+        .eq('school_slug', schoolSlug)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error || !data || !data.length) return [];
+
+      return cleanMessages(
+        data
+          .filter((row) => ['ticker','all'].includes(String(row.target_area || 'ticker')))
+          .map((row) => row.message_text)
+      );
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async function loadLegacyMessages(client, schoolSlug){
+    try {
+      const { data, error } = await client
+        .from('school_messages')
+        .select('message_text,sort_order')
+        .eq('school_slug', schoolSlug)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error || !data || !data.length) return [];
+
+      return cleanMessages(
+        data
+          .map((m) => m.message_text)
+          .filter((message) => !isSystemMessage(message))
+      );
+    } catch (error) {
+      return [];
+    }
+  }
+
   async function loadMessagesDialog(){
     const list = $('messagesList');
     if (!list) return;
-
     list.replaceChildren();
 
     let messages = [];
@@ -115,29 +157,14 @@
     const schoolSlug = getSchoolSlug();
 
     if (client) {
-      try {
-        const { data, error } = await client
-          .from('school_messages')
-          .select('message_text,sort_order')
-          .eq('school_slug', schoolSlug)
-          .eq('is_active', true)
-          .order('sort_order', { ascending: true });
-
-        if (!error && data && data.length) {
-          messages = data
-            .map((m) => m.message_text)
-            .filter((message) => !isSystemMessage(message));
-        }
-      } catch (e) {}
+      const newMessages = await loadNewMessages(client, schoolSlug);
+      messages = newMessages.length ? newMessages : await loadLegacyMessages(client, schoolSlug);
     }
 
     const finalMessages = cleanMessages(messages).length ? cleanMessages(messages) : DEFAULT_MESSAGES;
     const fragment = document.createDocumentFragment();
 
-    finalMessages.forEach((message) => {
-      fragment.appendChild(createMessageRow(message));
-    });
-
+    finalMessages.forEach((message) => fragment.appendChild(createMessageRow(message)));
     list.replaceChildren(fragment);
   }
 
@@ -159,6 +186,74 @@
     if (code) return code;
     code = prompt('أدخل رمز الإدارة الخاص بالمدرسة');
     return code ? code.trim() : '';
+  }
+
+  async function deleteLegacyNormalMessages(client, schoolSlug){
+    return client
+      .from('school_messages')
+      .delete()
+      .eq('school_slug', schoolSlug)
+      .not('message_text', 'like', '__CARD_%')
+      .not('message_text', 'like', '__SCHEDULED__:%')
+      .not('message_text', 'like', '__SCHEDULE_ROWS__:%')
+      .not('message_text', 'like', '__ALERT_SETTINGS__:%')
+      .not('message_text', 'like', '__GLOBAL_EVENT_THEME__:%')
+      .not('message_text', 'like', '__AUTO_THEME__:%');
+  }
+
+  async function saveLegacyMessages(client, schoolSlug, messages){
+    const legacyRows = messages.map((message_text, i) => ({
+      school_slug: schoolSlug,
+      message_text,
+      is_active: true,
+      sort_order: i + 1
+    }));
+
+    const { error: insError } = await client
+      .from('school_messages')
+      .insert(legacyRows);
+
+    return insError;
+  }
+
+  async function saveNewDisplayMessages(client, schoolSlug, messages){
+    await client
+      .from('school_display_messages')
+      .delete()
+      .eq('school_slug', schoolSlug)
+      .eq('message_type', 'ticker')
+      .eq('target_area', 'ticker');
+
+    const displayRows = messages.map((message_text, i) => ({
+      school_slug: schoolSlug,
+      message_text,
+      message_type: 'ticker',
+      target_area: 'ticker',
+      sort_order: i + 1,
+      is_active: true
+    }));
+
+    if (!displayRows.length) return null;
+
+    const { error } = await client
+      .from('school_display_messages')
+      .insert(displayRows);
+
+    return error || null;
+  }
+
+  async function saveLog(client, schoolSlug, messages){
+    try {
+      await client.from('system_logs').insert({
+        actor_type: 'school_admin',
+        actor_name: 'school-dashboard',
+        school_slug: schoolSlug,
+        action: 'save_display_messages_dual_write',
+        entity_type: 'school_display_messages',
+        new_data: { messages_count: messages.length },
+        details: 'تم حفظ الرسائل في school_display_messages وفي school_messages مؤقتًا.'
+      });
+    } catch (error) {}
   }
 
   async function saveMessages(){
@@ -194,31 +289,16 @@
         return toastMsg('رمز الإدارة غير صحيح');
       }
 
-      const { error: delError } = await client
-        .from('school_messages')
-        .delete()
-        .eq('school_slug', schoolSlug)
-        .not('message_text', 'like', '__CARD_%')
-        .not('message_text', 'like', '__SCHEDULED__:%')
-        .not('message_text', 'like', '__SCHEDULE_ROWS__:%')
-        .not('message_text', 'like', '__ALERT_SETTINGS__:%')
-        .not('message_text', 'like', '__GLOBAL_EVENT_THEME__:%');
+      const { error: delError } = await deleteLegacyNormalMessages(client, schoolSlug);
+      if (delError) return toastMsg('تعذر تحديث الرسائل القديمة');
 
-      if (delError) return toastMsg('تعذر تحديث الرسائل');
+      const legacyError = await saveLegacyMessages(client, schoolSlug, messages);
+      if (legacyError) return toastMsg('تعذر حفظ الرسائل القديمة');
 
-      const rows = messages.map((message_text, i) => ({
-        school_slug: schoolSlug,
-        message_text,
-        is_active: true,
-        sort_order: i + 1
-      }));
+      const newError = await saveNewDisplayMessages(client, schoolSlug, messages);
+      if (newError) return toastMsg('تم حفظ القديم، وتعذر حفظ الجدول الجديد');
 
-      const { error: insError } = await client
-        .from('school_messages')
-        .insert(rows);
-
-      if (insError) return toastMsg('تعذر حفظ الرسائل');
-
+      await saveLog(client, schoolSlug, messages);
       sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
       writeTickerCache(messages);
       toastMsg('تم حفظ الرسائل بنجاح');
@@ -273,13 +353,8 @@
     actions.insertBefore(btn, guideBtn || null);
   }
 
-  function init(){
-    addButton();
-  }
+  function init(){ addButton(); }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
