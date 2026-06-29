@@ -5,7 +5,7 @@ html[data-theme-effective="omani"] .timer-app{filter:none}
 html[data-theme-effective="omani"] .period-title,
 html[data-theme-effective="omani"] .count-label,
 html[data-theme-effective="omani"] .mobile-school-heading{color:#064b35!important}
-html[data-theme-effective="omani"] .ticker-item{color:#f7e6b0!important}
+html[data-theme-effective="omani"] .ticker-item{color:#064b35!important;text-shadow:0 1px 0 rgba(255,255,255,.86),0 2px 5px rgba(6,75,53,.12)!important}
 
 html[data-theme-effective="white"] .timer-app{filter:saturate(.88) brightness(1.045) contrast(.985)}
 html[data-theme-effective="white"] .period-card,
@@ -16,7 +16,7 @@ html[data-theme-effective="white"] .count-label,
 html[data-theme-effective="white"] .mobile-school-heading{color:#1f3b34!important}
 html[data-theme-effective="white"] .remaining-time,
 html[data-theme-effective="white"] .digital-clock{color:#0f172a!important;text-shadow:0 1px 0 rgba(255,255,255,.85)!important}
-html[data-theme-effective="white"] .ticker-item{color:#fff7d6!important}
+html[data-theme-effective="white"] .ticker-item{color:#1f3b34!important;text-shadow:0 1px 0 rgba(255,255,255,.88)!important}
 
 html[data-theme-effective="green"] .timer-app{filter:saturate(1.08) hue-rotate(2deg) contrast(1.015)}
 html[data-theme-effective="green"] .period-title,
@@ -24,7 +24,7 @@ html[data-theme-effective="green"] .count-label,
 html[data-theme-effective="green"] .mobile-school-heading{color:#064e3b!important}
 html[data-theme-effective="green"] .remaining-time,
 html[data-theme-effective="green"] .digital-clock{color:#065f46!important}
-html[data-theme-effective="green"] .ticker-item{color:#d9f99d!important}
+html[data-theme-effective="green"] .ticker-item{color:#064e3b!important;text-shadow:0 1px 0 rgba(255,255,255,.82)!important}
 
 html[data-theme-effective="gold"] .timer-app{filter:saturate(1.12) sepia(.09) contrast(1.02) brightness(1.01)}
 html[data-theme-effective="gold"] .period-title,
@@ -32,7 +32,14 @@ html[data-theme-effective="gold"] .count-label,
 html[data-theme-effective="gold"] .mobile-school-heading{color:#6b3f08!important}
 html[data-theme-effective="gold"] .remaining-time,
 html[data-theme-effective="gold"] .digital-clock{color:#7c2d12!important;text-shadow:0 1px 0 rgba(255,255,255,.65),0 3px 12px rgba(120,53,15,.16)!important}
-html[data-theme-effective="gold"] .ticker-item{color:#fde68a!important}
+html[data-theme-effective="gold"] .ticker-item{color:#6b3f08!important;text-shadow:0 1px 0 rgba(255,255,255,.78)!important}
+
+@media(max-width:768px){
+  html[data-theme-effective="omani"] .ticker-item{color:#f7e6b0!important;text-shadow:none!important}
+  html[data-theme-effective="white"] .ticker-item{color:#fff7d6!important;text-shadow:none!important}
+  html[data-theme-effective="green"] .ticker-item{color:#d9f99d!important;text-shadow:none!important}
+  html[data-theme-effective="gold"] .ticker-item{color:#fde68a!important;text-shadow:none!important}
+}
 
 html[data-theme-effective="omani"] body::before,
 html[data-theme-effective="white"] body::before,
