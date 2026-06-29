@@ -3,7 +3,8 @@
   window.__viewerThemeManagerLoaded = true;
 
   const EVENT_PREFIX = '__GLOBAL_EVENT_THEME__:';
-  const THEMES = ['omani','white','green','gold'];
+  const THEMES = ['green','white','gold','blue'];
+  const LEGACY_THEME_MAP = { omani:'green' };
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_effective_theme_' + schoolSlug;
   let client = null;
@@ -20,7 +21,8 @@
 
   function normalizeTheme(theme){
     const value = String(theme || '').trim();
-    return THEMES.includes(value) ? value : 'omani';
+    const mapped = LEGACY_THEME_MAP[value] || value;
+    return THEMES.includes(mapped) ? mapped : 'green';
   }
 
   function isActiveEvent(event){
@@ -46,10 +48,6 @@
     style.textContent = `
       .theme-event-ribbon{position:absolute;top:1.15%;left:50%;transform:translateX(-50%);z-index:1000;direction:rtl;background:rgba(15,23,42,.76);color:#fff;border:1px solid rgba(248,231,176,.72);border-radius:999px;padding:6px 18px;font-family:Tahoma,Arial,sans-serif;font-size:clamp(11px,1.05vw,17px);font-weight:900;box-shadow:0 8px 24px rgba(15,23,42,.22);pointer-events:none;white-space:nowrap}
       @media(max-width:768px){.theme-event-ribbon{top:.8%;font-size:clamp(10px,2.8vw,15px);padding:5px 12px;max-width:82vw;overflow:hidden;text-overflow:ellipsis}}
-      html[data-theme-effective="white"] .timer-app{filter:saturate(.96) brightness(1.02)}
-      html[data-theme-effective="green"] .timer-app{filter:saturate(1.08) hue-rotate(2deg)}
-      html[data-theme-effective="gold"] .timer-app{filter:saturate(1.08) sepia(.08)}
-      html[data-theme-effective="omani"] .timer-app{filter:none}
     `;
     document.head.appendChild(style);
   }
@@ -99,7 +97,7 @@
 
   function applyTheme(data){
     ensureStyle();
-    const schoolTheme = normalizeTheme(data && data.schoolTheme || 'omani');
+    const schoolTheme = normalizeTheme(data && data.schoolTheme || 'green');
     const autoTheme = computeAutoTheme(data && data.themeSettings);
     const event = data && data.event;
     const activeEvent = isActiveEvent(event) ? event : null;
@@ -123,12 +121,12 @@
     } catch (error) {}
 
     return {
-      selectedTheme: normalizeTheme(row.selected_theme || row.default_theme || 'omani'),
-      defaultTheme: normalizeTheme(row.default_theme || 'omani'),
+      selectedTheme: normalizeTheme(row.selected_theme || row.default_theme || 'green'),
+      defaultTheme: normalizeTheme(row.default_theme || 'green'),
       autoThemeEnabled: !!row.auto_theme_enabled,
       autoThemeDays: Number(row.auto_theme_days || 20),
       autoThemeStartDate: row.auto_theme_start_date || todayMuscat(),
-      autoThemeSequence: Array.isArray(sequence) && sequence.length ? sequence : THEMES,
+      autoThemeSequence: Array.isArray(sequence) && sequence.length ? sequence.map(normalizeTheme) : THEMES,
       manualThemeLocked: !!row.manual_theme_locked
     };
   }
@@ -150,7 +148,7 @@
       const schoolResult = await db.from('schools').select('theme_style').eq('school_slug', schoolSlug).maybeSingle();
       if (schoolResult.data && schoolResult.data.theme_style) return normalizeTheme(schoolResult.data.theme_style);
     } catch (error) {}
-    return 'omani';
+    return 'green';
   }
 
   async function loadLegacyEvent(db){
