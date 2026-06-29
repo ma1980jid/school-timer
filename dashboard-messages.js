@@ -48,6 +48,18 @@
       .filter((message) => !isSystemMessage(message));
   }
 
+  function mergeMessages(){
+    const seen = new Set();
+    const merged = [];
+    Array.from(arguments).flat().forEach((message) => {
+      const text = String(message || '').trim();
+      if (!text || seen.has(text) || isSystemMessage(text)) return;
+      seen.add(text);
+      merged.push(text);
+    });
+    return merged;
+  }
+
   function writeTickerCache(messages){
     try {
       localStorage.setItem('school_timer_messages_' + getSchoolSlug(), JSON.stringify({
@@ -157,8 +169,11 @@
     const schoolSlug = getSchoolSlug();
 
     if (client) {
-      const newMessages = await loadNewMessages(client, schoolSlug);
-      messages = newMessages.length ? newMessages : await loadLegacyMessages(client, schoolSlug);
+      const [newMessages, legacyMessages] = await Promise.all([
+        loadNewMessages(client, schoolSlug),
+        loadLegacyMessages(client, schoolSlug)
+      ]);
+      messages = mergeMessages(newMessages, legacyMessages);
     }
 
     const finalMessages = cleanMessages(messages).length ? cleanMessages(messages) : DEFAULT_MESSAGES;
