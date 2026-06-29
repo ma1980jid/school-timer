@@ -2,12 +2,13 @@
   if(window.__dashboardThemeSettingsLoaded)return;
   window.__dashboardThemeSettingsLoaded=true;
 
-  const THEMES=['omani','white','green','gold'];
-  const LABELS={omani:'العماني الرسمي',white:'الأبيض الفاخر',green:'الأخضر الهادئ',gold:'الذهبي'};
+  const THEMES=['green','white','gold','blue'];
+  const LABELS={green:'الأخضر',white:'الأبيض',gold:'الذهبي',blue:'الأزرق',omani:'الأخضر'};
+  const LEGACY={omani:'green'};
 
   function slug(){return new URLSearchParams(location.search).get('school')||window.SCHOOL_TIMER_SLUG||'alsheikh-saif'}
   function today(){try{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Muscat',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const m=Object.fromEntries(p.map(x=>[x.type,x.value]));return `${m.year}-${m.month}-${m.day}`}catch(e){return new Date(Date.now()+14400000).toISOString().slice(0,10)}}
-  function norm(t){t=String(t||'').trim();return THEMES.includes(t)?t:'omani'}
+  function norm(t){t=String(t||'').trim();t=LEGACY[t]||t;return THEMES.includes(t)?t:'green'}
   function db(){if(!window.supabase||!window.SCHOOL_TIMER_SUPABASE_URL||!window.SCHOOL_TIMER_SUPABASE_ANON_KEY)return null;if(!window.__themeDb)window.__themeDb=window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL,window.SCHOOL_TIMER_SUPABASE_ANON_KEY);return window.__themeDb}
   function toast(t){const x=document.getElementById('toast');if(!x)return alert(t);x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 
@@ -28,7 +29,7 @@
     try{const r=await c.from('school_theme_settings').select('selected_theme,default_theme,auto_theme_enabled,auto_theme_days,auto_theme_start_date,manual_theme_locked').eq('school_slug',slug()).maybeSingle();
       if(!r.error&&r.data)return r.data;
     }catch(e){}
-    return {selected_theme:'omani',default_theme:'omani',auto_theme_enabled:false,auto_theme_days:20,auto_theme_start_date:today(),manual_theme_locked:true};
+    return {selected_theme:'green',default_theme:'green',auto_theme_enabled:false,auto_theme_days:20,auto_theme_start_date:today(),manual_theme_locked:true};
   }
 
   async function save(data){
@@ -42,7 +43,7 @@
   function row(label,note,input){const d=document.createElement('label');d.className='themeRow';const t=document.createElement('span');t.innerHTML=label+(note?`<small>${note}</small>`:'');d.append(t,input);return d}
 
   async function open(){
-    style();const st=await load();let selected=norm(st&&st.selected_theme||'omani');
+    style();const st=await load();let selected=norm(st&&st.selected_theme||'green');
     const o=document.createElement('div');o.className='themeDlg';
     const b=document.createElement('div');b.className='themeBox';b.innerHTML='<h2>إدارة التصاميم</h2><p>اختر التصميم النشط لشاشات الحاسوب والهاتف.</p>';
     const g=document.createElement('div');g.className='themeGrid';
