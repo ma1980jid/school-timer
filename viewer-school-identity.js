@@ -145,7 +145,7 @@
 
   function start(){
     ensureStyle();
-    loadScriptOnce('viewer-auto-theme.js?v=auto-theme-01', 'viewer-auto-theme.js');
+    loadScriptOnce('viewer-auto-theme.js?v=auto-theme-02', 'viewer-auto-theme.js');
     const cached = readCache();
     if (cached) applyIdentity(cached);
     loadIdentity();
