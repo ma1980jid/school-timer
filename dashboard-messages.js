@@ -308,10 +308,21 @@
     actions.insertBefore(btn, guideBtn || null);
   }
 
+  function loadScheduledAnnouncementsModule(){
+    if (document.querySelector('script[src^="scheduled-announcements-admin.js"]')) return;
+    const script = document.createElement('script');
+    script.src = 'scheduled-announcements-admin.js?v=scheduled-04';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function init(){
     addButton();
+    loadScheduledAnnouncementsModule();
     setTimeout(addButton, 800);
     setTimeout(addButton, 1800);
+    setTimeout(loadScheduledAnnouncementsModule, 800);
+    setTimeout(loadScheduledAnnouncementsModule, 1800);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
