@@ -2,7 +2,6 @@
   if (window.__dashboardAlertSettingsLoaded) return;
   window.__dashboardAlertSettingsLoaded = true;
 
-  const PREFIX = '__ALERT_SETTINGS__:';
   const DEFAULTS = {
     enabled: false,
     beforeEndEnabled: true,
@@ -50,7 +49,7 @@
   function makeButton(){
     if (document.getElementById('alertSettingsButton')) return;
     const buttons = Array.from(document.querySelectorAll('button'));
-    const anchor = buttons.find((button) => /الإعلانات المجدولة/.test(button.textContent || '')) || buttons.find((button) => /إدارة الرسائل/.test(button.textContent || '')) || buttons.at(-1);
+    const anchor = buttons.find((button) => /إدارة الرسائل/.test(button.textContent || '')) || buttons.at(-1);
     const button = document.createElement('button');
     button.id = 'alertSettingsButton';
     button.type = 'button';
@@ -75,7 +74,9 @@
     };
   }
 
-  async function loadTableSettings(client){
+  async function loadSettings(){
+    const client = db();
+    if (!client) return { ...DEFAULTS };
     try {
       const result = await client
         .from('school_alert_settings')
@@ -84,37 +85,7 @@
         .maybeSingle();
       if (!result.error && result.data) return { ...DEFAULTS, ...fromTable(result.data) };
     } catch (error) {}
-    return null;
-  }
-
-  async function loadLegacySettings(client){
-    try {
-      const result = await client.from('school_messages')
-        .select('message_text,created_at')
-        .eq('school_slug', slug())
-        .like('message_text', PREFIX + '%')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      if (result.data && result.data[0]) {
-        return { ...DEFAULTS, ...JSON.parse(String(result.data[0].message_text).slice(PREFIX.length)) };
-      }
-    } catch(error) {}
-    return null;
-  }
-
-  async function loadSettings(){
-    const client = db();
-    if (!client) return { ...DEFAULTS };
-    const tableSettings = await loadTableSettings(client);
-    if (tableSettings) return tableSettings;
-    const legacySettings = await loadLegacySettings(client);
-    return legacySettings || { ...DEFAULTS };
-  }
-
-  async function saveLegacySettings(client, settings){
-    const text = PREFIX + JSON.stringify({ ...settings, savedAt: new Date().toISOString() });
-    await client.from('school_messages').delete().eq('school_slug', slug()).like('message_text', PREFIX + '%');
-    await client.from('school_messages').insert({ school_slug: slug(), message_text: text, is_active: false, sort_order: 9997 });
+    return { ...DEFAULTS };
   }
 
   async function saveTableSettings(client, settings){
@@ -142,14 +113,14 @@
         actor_type: 'school_admin',
         actor_name: 'school-dashboard',
         school_slug: slug(),
-        action: 'save_alert_settings_dual_write',
+        action: 'save_alert_settings',
         entity_type: 'school_alert_settings',
         new_data: {
           enabled: !!settings.enabled,
           beforeEndMinutes: Number(settings.beforeEndMinutes || 5),
           soundEnabled: !!settings.soundEnabled
         },
-        details: 'تم حفظ إعدادات التنبيهات في school_alert_settings وفي __ALERT_SETTINGS__ مؤقتًا.'
+        details: 'تم حفظ إعدادات التنبيهات في school_alert_settings.'
       });
     } catch (error) {}
   }
@@ -158,7 +129,6 @@
     const client = db();
     if (!client) return;
     await saveTableSettings(client, settings);
-    await saveLegacySettings(client, settings);
     await saveLog(client, settings);
   }
 
@@ -184,13 +154,15 @@
     const beforeEndEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.beforeEndEnabled });
     const beforeEndMinutes = Object.assign(document.createElement('input'), { type:'number', min:'1', max:'30', value: Number(settings.beforeEndMinutes || 5) });
     const endEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.endEnabled });
+    const phoneNotificationEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: settings.phoneNotificationEnabled !== false });
     const soundEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.soundEnabled });
 
     box.append(
       row('تفعيل التنبيهات', 'تشغيل أو إيقاف جميع التنبيهات.', enabled),
-      row('تنبيه قبل نهاية الحصة', 'يظهر عداد تنازلي داخل شاشة المؤقت.', beforeEndEnabled),
+      row('تنبيه قبل نهاية الحصة', 'يظهر قبل نهاية الحصة بعدد الدقائق المحدد.', beforeEndEnabled),
       row('عدد دقائق التنبيه قبل النهاية', 'من 1 إلى 30 دقيقة.', beforeEndMinutes),
       row('تنبيه عند نهاية الحصة', 'يعرض رسالة عند انتهاء الحصة.', endEnabled),
+      row('إشعار الهاتف', 'يحتاج السماح بالإشعارات من الجهاز.', phoneNotificationEnabled),
       row('الصوت', 'تشغيل صوت التنبيه عند السماح من الجهاز.', soundEnabled)
     );
 
@@ -215,7 +187,7 @@
           beforeEndEnabled: beforeEndEnabled.checked,
           beforeEndMinutes: Number(beforeEndMinutes.value || 5),
           endEnabled: endEnabled.checked,
-          phoneNotificationEnabled: true,
+          phoneNotificationEnabled: phoneNotificationEnabled.checked,
           screenAlertEnabled: true,
           soundEnabled: soundEnabled.checked,
           soundUrl: ''
