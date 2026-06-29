@@ -23,6 +23,23 @@
     return window.schoolTimerDashboardFixesClient;
   }
 
+  function hideDeprecatedControls(){
+    document.querySelectorAll('.field').forEach((field) => {
+      const label = field.querySelector('label');
+      const text = label ? label.textContent || '' : '';
+      if (/نمط الواجهة/.test(text)) {
+        field.style.display = 'none';
+        field.setAttribute('aria-hidden', 'true');
+      }
+    });
+    document.querySelectorAll('button').forEach((button) => {
+      const text = (button.textContent || '').trim();
+      if (/الإعلانات المجدولة|إدارة التصاميم/.test(text)) {
+        button.remove();
+      }
+    });
+  }
+
   function ensureDashboardSchoolNameStyles(){
     if (document.getElementById('dashboardSchoolNameStyles')) return;
 
@@ -108,7 +125,7 @@
     const params = new URLSearchParams({
       school: getSchoolSlug(),
       view,
-      v: '14'
+      v: '15'
     });
 
     return `${origin}${basePath}?${params.toString()}`;
@@ -355,28 +372,19 @@
     actions.insertBefore(btn, messagesBtn || null);
   }
 
-  function loadScheduledAnnouncementsModule(){
-    if (document.getElementById('scheduledAnnouncementsAdminScript')) return;
-    const script = document.createElement('script');
-    script.id = 'scheduledAnnouncementsAdminScript';
-    script.src = 'scheduled-announcements-admin.js?v=scheduled-03';
-    script.defer = true;
-    document.head.appendChild(script);
-  }
-
   function start(){
+    hideDeprecatedControls();
     loadDashboardSchoolName();
     refreshLinks();
     protectSaveButton();
     addMiddleCardsButton();
-    loadScheduledAnnouncementsModule();
+    setInterval(hideDeprecatedControls, 1500);
     setTimeout(loadDashboardSchoolName, 400);
     setTimeout(loadDashboardSchoolName, 1200);
     setTimeout(refreshLinks, 300);
     setTimeout(refreshLinks, 1000);
     setTimeout(protectSaveButton, 1000);
     setTimeout(addMiddleCardsButton, 1000);
-    setTimeout(loadScheduledAnnouncementsModule, 1000);
   }
 
   if (document.readyState === 'loading') {
