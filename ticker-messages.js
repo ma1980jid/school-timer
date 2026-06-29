@@ -13,7 +13,9 @@
   const LEFT_PREFIX = '__CARD_LEFT__:';
   const SCHEDULED_PREFIX = '__SCHEDULED__:';
   const SCHEDULE_ROWS_PREFIX = '__SCHEDULE_ROWS__:';
+  const ALERT_SETTINGS_PREFIX = '__ALERT_SETTINGS__:';
   const GLOBAL_EVENT_THEME_PREFIX = '__GLOBAL_EVENT_THEME__:';
+  const AUTO_THEME_PREFIX = '__AUTO_THEME__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
@@ -26,49 +28,39 @@
   let isLoading = false;
   let resizeTimer = null;
 
-  function isCardConfigMessage(message){
-    return String(message || '').startsWith('__CARD_');
-  }
-
-  function isScheduledConfigMessage(message){
-    return String(message || '').startsWith(SCHEDULED_PREFIX);
-  }
-
-  function isScheduleRowsMessage(message){
-    return String(message || '').startsWith(SCHEDULE_ROWS_PREFIX);
-  }
-
-  function isGlobalEventThemeMessage(message){
-    return String(message || '').startsWith(GLOBAL_EVENT_THEME_PREFIX);
-  }
+  function isCardConfigMessage(message){ return String(message || '').startsWith('__CARD_'); }
+  function isScheduledConfigMessage(message){ return String(message || '').startsWith(SCHEDULED_PREFIX); }
+  function isScheduleRowsMessage(message){ return String(message || '').startsWith(SCHEDULE_ROWS_PREFIX); }
+  function isAlertSettingsMessage(message){ return String(message || '').startsWith(ALERT_SETTINGS_PREFIX); }
+  function isGlobalEventThemeMessage(message){ return String(message || '').startsWith(GLOBAL_EVENT_THEME_PREFIX); }
+  function isAutoThemeMessage(message){ return String(message || '').startsWith(AUTO_THEME_PREFIX); }
 
   function isSystemMessage(message){
-    return isCardConfigMessage(message) || isScheduledConfigMessage(message) || isScheduleRowsMessage(message) || isGlobalEventThemeMessage(message);
+    return isCardConfigMessage(message)
+      || isScheduledConfigMessage(message)
+      || isScheduleRowsMessage(message)
+      || isAlertSettingsMessage(message)
+      || isGlobalEventThemeMessage(message)
+      || isAutoThemeMessage(message);
   }
 
   function getClient(){
     if (client) return client;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
-    client = window.supabase.createClient(
-      window.SCHOOL_TIMER_SUPABASE_URL,
-      window.SCHOOL_TIMER_SUPABASE_ANON_KEY
-    );
+    client = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
     return client;
   }
 
   function createGroup(messages){
     const group = document.createElement('div');
     group.className = 'ticker-group';
-
     const fragment = document.createDocumentFragment();
-
     messages.forEach((message) => {
       const item = document.createElement('span');
       item.className = 'ticker-item';
       item.textContent = message;
       fragment.appendChild(item);
     });
-
     group.appendChild(fragment);
     return group;
   }
@@ -83,10 +75,7 @@
   function getTodayKey(){
     try {
       const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Muscat',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
+        timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
       }).formatToParts(new Date());
       const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
       return `${map.year}-${map.month}-${map.day}`;
@@ -104,18 +93,29 @@
 
   function isAnnouncementActive(item, today = getTodayKey()){
     if (!item || item.active === false) return false;
-
     const currentYear = today.slice(0, 4);
     let start = String(item.start || '').trim();
     let end = String(item.end || item.start || '').trim();
-
     if (!start) return false;
-
     if (item.annual) {
       start = normalizeAnnualDate(start, currentYear);
       end = normalizeAnnualDate(end || start, currentYear);
     }
+    return today >= start && today <= end;
+  }
 
+  function isDisplayMessageActive(row, today = getTodayKey()){
+    if (!row || row.is_active === false) return false;
+    const currentYear = today.slice(0, 4);
+    let start = String(row.start_date || '').trim();
+    let end = String(row.end_date || '').trim();
+    if (!start && !end) return true;
+    if (!start) start = end;
+    if (!end) end = start;
+    if (row.is_annual) {
+      start = normalizeAnnualDate(start, currentYear);
+      end = normalizeAnnualDate(end, currentYear);
+    }
     return today >= start && today <= end;
   }
 
@@ -124,11 +124,8 @@
       .map((row) => String(row && row.message_text || ''))
       .filter((text) => text.startsWith(SCHEDULED_PREFIX))
       .map((text) => {
-        try {
-          return JSON.parse(text.slice(SCHEDULED_PREFIX.length));
-        } catch (error) {
-          return null;
-        }
+        try { return JSON.parse(text.slice(SCHEDULED_PREFIX.length)); }
+        catch (error) { return null; }
       })
       .filter(Boolean)
       .filter((item) => isAnnouncementActive(item));
@@ -145,11 +142,7 @@
     const tickerText = String(item && item.tickerText || '').trim();
     const rightText = String(item && item.rightText || '').trim();
     const leftText = String(item && item.leftText || '').trim();
-
-    if (tickerText || rightText || leftText) {
-      return { tickerText, rightText, leftText };
-    }
-
+    if (tickerText || rightText || leftText) return { tickerText, rightText, leftText };
     const legacyText = legacyAnnouncementText(item);
     const target = String(item && item.target || 'ticker');
     return {
@@ -162,37 +155,21 @@
   function applyScheduledAnnouncements(items){
     const active = Array.isArray(items) ? items : [];
     if (!active.length) return [];
-
     const tickerMessages = [];
     const cardOverrides = {};
-
     active.forEach((item) => {
       const { tickerText, rightText, leftText } = getScheduledSlotTexts(item);
-
-      if (tickerText) {
-        tickerMessages.push(`📌 ${tickerText}`);
-      }
-
-      if (rightText) {
-        cardOverrides.right = rightText;
-      }
-
-      if (leftText) {
-        cardOverrides.left = leftText;
-      }
+      if (tickerText) tickerMessages.push(`📌 ${tickerText}`);
+      if (rightText) cardOverrides.right = rightText;
+      if (leftText) cardOverrides.left = leftText;
     });
-
-    if (cardOverrides.right || cardOverrides.left) {
-      applyCards(cardOverrides);
-    }
-
+    if (cardOverrides.right || cardOverrides.left) applyCards(cardOverrides);
     return tickerMessages;
   }
 
   function writeScheduledCache(items){
-    try {
-      localStorage.setItem(scheduledCacheKey, JSON.stringify({ savedAt: Date.now(), items: Array.isArray(items) ? items : [] }));
-    } catch (error) {}
+    try { localStorage.setItem(scheduledCacheKey, JSON.stringify({ savedAt: Date.now(), items: Array.isArray(items) ? items : [] })); }
+    catch (error) {}
   }
 
   function readScheduledCache(){
@@ -201,9 +178,7 @@
       if (!cached || !Array.isArray(cached.items)) return [];
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return [];
       return cached.items.filter((item) => isAnnouncementActive(item));
-    } catch (error) {
-      return [];
-    }
+    } catch (error) { return []; }
   }
 
   function parseCards(rows){
@@ -218,16 +193,13 @@
 
   function applyCards(cards){
     if (!cards) return;
-
     const rightText = String(cards.right || '').trim();
     const leftText = String(cards.left || '').trim();
-
     if (rightText) {
       try { settings.schoolName = rightText; } catch (error) {}
       const rightEl = document.getElementById('schoolName');
       if (rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
     }
-
     if (leftText) {
       try {
         settings.visionMessages = [leftText];
@@ -244,33 +216,26 @@
       if (!cached || !cached.cards) return null;
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
       return cached.cards;
-    } catch (error) {
-      return null;
-    }
+    } catch (error) { return null; }
   }
 
   function writeCardsCache(cards){
-    try {
-      localStorage.setItem(cardsCacheKey, JSON.stringify({ savedAt: Date.now(), cards }));
-    } catch (error) {}
+    try { localStorage.setItem(cardsCacheKey, JSON.stringify({ savedAt: Date.now(), cards })); }
+    catch (error) {}
   }
 
   function setupTickerMotion(){
     const track = document.getElementById('tickerTrack');
     const firstGroup = track && track.querySelector('.ticker-group');
     if (!track || !firstGroup) return;
-
     const distance = Math.ceil(firstGroup.getBoundingClientRect().width);
     if (!distance) return;
-
     const isMobile = matchMedia('(max-width: 768px)').matches;
     const speed = isMobile ? 46 : 58;
     const minDuration = isMobile ? 24 : 30;
     const duration = Math.max(minDuration, Math.ceil(distance / speed));
-
     track.style.setProperty('--ticker-distance', `-${distance}px`);
     track.style.setProperty('--ticker-duration', `${duration}s`);
-
     track.style.animation = 'none';
     track.offsetHeight;
     track.style.animation = '';
@@ -279,7 +244,6 @@
   function renderTicker(messages){
     const track = document.getElementById('tickerTrack');
     if (!track) return;
-
     const cleaned = clean(messages);
     const finalMessages = cleaned.length ? cleaned : DEFAULT_MESSAGES;
     const signature = finalMessages.join('||');
@@ -287,14 +251,8 @@
       requestAnimationFrame(setupTickerMotion);
       return;
     }
-
     lastSignature = signature;
-    track.replaceChildren(
-      createGroup(finalMessages),
-      createGroup(finalMessages),
-      createGroup(finalMessages)
-    );
-
+    track.replaceChildren(createGroup(finalMessages), createGroup(finalMessages), createGroup(finalMessages));
     requestAnimationFrame(setupTickerMotion);
   }
 
@@ -304,26 +262,48 @@
       if (!cached || !Array.isArray(cached.messages)) return null;
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
       return clean(cached.messages);
-    } catch (error) {
-      return null;
-    }
+    } catch (error) { return null; }
   }
 
   function writeCache(messages){
     try {
-      localStorage.setItem(cacheKey, JSON.stringify({
-        savedAt: Date.now(),
-        messages: clean(messages)
-      }));
+      localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), messages: clean(messages) }));
     } catch (error) {}
   }
 
+  function extractDisplayMessages(rows){
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => isDisplayMessageActive(row))
+      .filter((row) => ['ticker', 'all'].includes(String(row.target_area || 'ticker')))
+      .map((row) => row.message_text)
+      .filter((message) => !isSystemMessage(message));
+  }
+
+  async function fetchNewDisplayMessages(db){
+    const { data, error } = await db
+      .from('school_display_messages')
+      .select('message_text,message_type,target_area,sort_order,is_active,start_date,end_date,is_annual')
+      .eq('school_slug', schoolSlug)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error || !data) return [];
+    return extractDisplayMessages(data);
+  }
+
+  async function fetchLegacyMessages(db){
+    const { data, error } = await db
+      .from('school_messages')
+      .select('message_text,sort_order')
+      .eq('school_slug', schoolSlug)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error || !data) return [];
+    return data;
+  }
+
   async function loadTickerMessages(){
-    if (isLoading) return;
-    if (document.hidden) return;
-
+    if (isLoading || document.hidden) return;
     const db = getClient();
-
     if (!db) {
       const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
       renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
@@ -331,36 +311,28 @@
     }
 
     isLoading = true;
-
     try {
-      const { data, error } = await db
-        .from('school_messages')
-        .select('message_text,sort_order')
-        .eq('school_slug', schoolSlug)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+      const [newMessages, legacyRows] = await Promise.all([
+        fetchNewDisplayMessages(db),
+        fetchLegacyMessages(db)
+      ]);
 
-      if (error || !data || !data.length) {
-        const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
-        renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
-        return;
-      }
-
-      const cards = parseCards(data);
+      const cards = parseCards(legacyRows);
       if (cards.right || cards.left) {
         writeCardsCache(cards);
         applyCards(cards);
       }
 
-      const scheduledItems = parseScheduledAnnouncements(data);
+      const scheduledItems = parseScheduledAnnouncements(legacyRows);
       writeScheduledCache(scheduledItems);
       const scheduledMessages = applyScheduledAnnouncements(scheduledItems);
 
-      const messages = data
+      const legacyMessages = (Array.isArray(legacyRows) ? legacyRows : [])
         .map((row) => row.message_text)
         .filter((message) => !isSystemMessage(message));
 
-      const finalMessages = [...messages, ...scheduledMessages];
+      const baseMessages = newMessages.length ? newMessages : legacyMessages;
+      const finalMessages = [...baseMessages, ...scheduledMessages];
       writeCache(finalMessages);
       renderTicker(finalMessages);
     } catch (error) {
@@ -397,9 +369,6 @@
     resizeTimer = setTimeout(setupTickerMotion, 180);
   }, { passive: true });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 })();
