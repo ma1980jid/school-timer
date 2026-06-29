@@ -2,8 +2,6 @@
   if (window.__dashboardScheduleSyncLoaded) return;
   window.__dashboardScheduleSyncLoaded = true;
 
-  const PREFIX = '__SCHEDULE_ROWS__:';
-
   function slug(){
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   }
@@ -20,17 +18,14 @@
     return Array.from(document.querySelectorAll('#periodRows .r')).map((row) => {
       const allInputs = Array.from(row.querySelectorAll('input'));
       const select = row.querySelector('select');
-
       const periodInput = allInputs.find((input) => input.type !== 'time' && !input.closest('.dur'));
       const timeInputs = allInputs.filter((input) => input.type === 'time');
       const durationInput = row.querySelector('.dur input');
-
       const name = (periodInput && periodInput.value || '').trim();
       const start = (timeInputs[0] && timeInputs[0].value || '').trim();
       const end = (timeInputs[1] && timeInputs[1].value || '').trim();
       const duration = (durationInput && durationInput.value || '').trim();
       const type = (select && select.value || '').trim();
-
       return { name, start, end, duration, type };
     }).filter((item) => item.name && item.start && item.end);
   }
@@ -44,25 +39,6 @@
     if (name.includes('نشاط')) return 'activity';
     if (type === 'حصة') return 'lesson';
     return 'custom';
-  }
-
-  async function saveLegacyRows(db, rows){
-    const text = PREFIX + JSON.stringify({
-      savedAt: new Date().toISOString(),
-      rows
-    });
-
-    await db.from('school_messages')
-      .delete()
-      .eq('school_slug', slug())
-      .like('message_text', PREFIX + '%');
-
-    await db.from('school_messages').insert({
-      school_slug: slug(),
-      message_text: text,
-      is_active: true,
-      sort_order: 9998
-    });
   }
 
   async function saveTableRows(db, rows){
@@ -96,10 +72,10 @@
         actor_type: 'school_admin',
         actor_name: 'school-dashboard',
         school_slug: slug(),
-        action: 'save_schedule_rows_dual_write',
+        action: 'save_schedule_rows',
         entity_type: 'school_schedule_rows',
         new_data: { rows_count: rows.length },
-        details: 'تم حفظ جدول الحصص في الجدول الجديد وفي الرسالة القديمة مؤقتًا.'
+        details: 'تم حفظ جدول الحصص في school_schedule_rows.'
       });
     } catch (error) {}
   }
@@ -112,11 +88,9 @@
 
     try {
       await saveTableRows(db, rows);
-      await saveLegacyRows(db, rows);
       await saveLog(db, rows);
     } catch (error) {
-      console.warn('تعذر حفظ جدول العرض في الجدول الجديد والقديم:', error);
-      try { await saveLegacyRows(db, rows); } catch (legacyError) {}
+      console.warn('تعذر حفظ جدول العرض في school_schedule_rows:', error);
     }
   }
 
