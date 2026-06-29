@@ -82,10 +82,10 @@
   function start(){
     apply();
     ensureMobileSchoolHeading();
-    loadStyleOnce('viewer-design-themes.css?v=themes-01', 'viewer-design-themes.css');
-    loadScriptOnce('viewer-school-identity.js?v=identity-01', 'viewer-school-identity.js');
-    loadScriptOnce('viewer-theme-manager.js?v=theme-01', 'viewer-theme-manager.js');
-    loadScriptOnce('viewer-db-schedule-loader.js?v=db-schedule-01', 'viewer-db-schedule-loader.js');
+    loadStyleOnce('viewer-design-themes.css?v=themes-02', 'viewer-design-themes.css');
+    loadScriptOnce('viewer-school-identity.js?v=identity-02', 'viewer-school-identity.js');
+    loadScriptOnce('viewer-theme-manager.js?v=theme-02', 'viewer-theme-manager.js');
+    loadScriptOnce('viewer-db-schedule-loader.js?v=db-schedule-02', 'viewer-db-schedule-loader.js');
     setInterval(ensureMobileSchoolHeading, 3000);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
