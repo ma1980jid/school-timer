@@ -11,6 +11,7 @@
   function norm(t){t=String(t||'').trim();t=LEGACY[t]||t;return THEMES.includes(t)?t:'green'}
   function db(){if(!window.supabase||!window.SCHOOL_TIMER_SUPABASE_URL||!window.SCHOOL_TIMER_SUPABASE_ANON_KEY)return null;if(!window.__themeDb)window.__themeDb=window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL,window.SCHOOL_TIMER_SUPABASE_ANON_KEY);return window.__themeDb}
   function toast(t){const x=document.getElementById('toast');if(!x)return alert(t);x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+  function hideLegacyTheme(){document.querySelectorAll('.field').forEach(f=>{const l=f.querySelector('label');if(l&&/نمط الواجهة/.test(l.textContent||'')){f.style.display='none';f.setAttribute('aria-hidden','true')}})}
 
   function style(){
     if(document.getElementById('themeSettingsStyle'))return;
@@ -60,6 +61,6 @@
   }
 
   function add(){if(document.getElementById('themeSettingsButton'))return;const a=document.querySelector('.actions');if(!a)return;const btn=document.createElement('button');btn.id='themeSettingsButton';btn.className='btn light themeOpen';btn.type='button';btn.textContent='إدارة التصاميم';btn.onclick=open;a.insertBefore(btn,a.firstChild)}
-  function start(){add();setInterval(add,1500)}
+  function start(){hideLegacyTheme();add();setInterval(hideLegacyTheme,1500);setInterval(add,1500)}
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',start):start();
 })();
