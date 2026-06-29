@@ -72,6 +72,18 @@
       .filter((message) => !isSystemMessage(message));
   }
 
+  function mergeMessages(){
+    const seen = new Set();
+    const merged = [];
+    Array.from(arguments).flat().forEach((message) => {
+      const text = String(message || '').trim();
+      if (!text || seen.has(text) || isSystemMessage(text)) return;
+      seen.add(text);
+      merged.push(text);
+    });
+    return merged;
+  }
+
   function getTodayKey(){
     try {
       const parts = new Intl.DateTimeFormat('en-CA', {
@@ -331,7 +343,7 @@
         .map((row) => row.message_text)
         .filter((message) => !isSystemMessage(message));
 
-      const baseMessages = newMessages.length ? newMessages : legacyMessages;
+      const baseMessages = mergeMessages(newMessages, legacyMessages);
       const finalMessages = [...baseMessages, ...scheduledMessages];
       writeCache(finalMessages);
       renderTicker(finalMessages);
