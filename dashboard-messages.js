@@ -368,7 +368,20 @@
     actions.insertBefore(btn, guideBtn || null);
   }
 
-  function init(){ addButton(); }
+  function loadThemeSettingsModule(){
+    if (document.querySelector('script[src^="dashboard-theme-settings.js"]')) return;
+    const script = document.createElement('script');
+    script.src = 'dashboard-theme-settings.js?v=theme-settings-01';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
+  function init(){
+    addButton();
+    loadThemeSettingsModule();
+    setTimeout(loadThemeSettingsModule, 800);
+    setTimeout(loadThemeSettingsModule, 1800);
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
