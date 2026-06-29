@@ -35,31 +35,88 @@
     }).filter((item) => item.name && item.start && item.end);
   }
 
+  function toPeriodType(row){
+    const name = String(row && row.name || '');
+    const type = String(row && row.type || '');
+    if (name.includes('طابور')) return 'assembly';
+    if (name.includes('فسحة')) return 'break';
+    if (name.includes('صلاة') || name === 'الصلاة') return 'prayer';
+    if (name.includes('نشاط')) return 'activity';
+    if (type === 'حصة') return 'lesson';
+    return 'custom';
+  }
+
+  async function saveLegacyRows(db, rows){
+    const text = PREFIX + JSON.stringify({
+      savedAt: new Date().toISOString(),
+      rows
+    });
+
+    await db.from('school_messages')
+      .delete()
+      .eq('school_slug', slug())
+      .like('message_text', PREFIX + '%');
+
+    await db.from('school_messages').insert({
+      school_slug: slug(),
+      message_text: text,
+      is_active: true,
+      sort_order: 9998
+    });
+  }
+
+  async function saveTableRows(db, rows){
+    const school = slug();
+    await db.from('school_schedule_rows')
+      .delete()
+      .eq('school_slug', school)
+      .eq('schedule_name', 'default');
+
+    const tableRows = rows.map((row, index) => ({
+      school_slug: school,
+      schedule_name: 'default',
+      period_name: row.name,
+      period_type: toPeriodType(row),
+      start_time: row.start,
+      end_time: row.end,
+      duration_minutes: row.duration ? Number(row.duration) : null,
+      order_index: index + 1,
+      is_active: true,
+      notes: row.type || null
+    }));
+
+    if (tableRows.length) {
+      await db.from('school_schedule_rows').insert(tableRows);
+    }
+  }
+
+  async function saveLog(db, rows){
+    try {
+      await db.from('system_logs').insert({
+        actor_type: 'school_admin',
+        actor_name: 'school-dashboard',
+        school_slug: slug(),
+        action: 'save_schedule_rows_dual_write',
+        entity_type: 'school_schedule_rows',
+        new_data: { rows_count: rows.length },
+        details: 'تم حفظ جدول الحصص في الجدول الجديد وفي الرسالة القديمة مؤقتًا.'
+      });
+    } catch (error) {}
+  }
+
   async function saveRows(){
     const db = client();
     if (!db) return;
     const rows = readRows();
     if (!rows.length) return;
 
-    const text = PREFIX + JSON.stringify({
-      savedAt: new Date().toISOString(),
-      rows
-    });
-
     try {
-      await db.from('school_messages')
-        .delete()
-        .eq('school_slug', slug())
-        .like('message_text', PREFIX + '%');
-
-      await db.from('school_messages').insert({
-        school_slug: slug(),
-        message_text: text,
-        is_active: true,
-        sort_order: 9998
-      });
+      await saveTableRows(db, rows);
+      await saveLegacyRows(db, rows);
+      await saveLog(db, rows);
     } catch (error) {
-      console.warn('تعذر حفظ جدول العرض كما هو:', error);
+      console.warn('تعذر حفظ جدول العرض في الجدول الجديد والقديم:', error);
+      try { await saveLegacyRows(db, rows); } catch (legacyError) {}
     }
   }
 
