@@ -12,12 +12,8 @@
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
     const value = node.nodeValue;
     if (!value) return;
-
     let next = value;
-    corrections.forEach((correct, wrong) => {
-      next = next.split(wrong).join(correct);
-    });
-
+    corrections.forEach((correct, wrong) => { next = next.split(wrong).join(correct); });
     if (next !== value) node.nodeValue = next;
   }
 
@@ -27,9 +23,7 @@
     while ((node = walker.nextNode())) normalizeTextNode(node);
   }
 
-  function apply(){
-    walk(document.body);
-  }
+  function apply(){ walk(document.body); }
 
   function ensureMobileSchoolHeadingStyle(){
     if (document.getElementById('mobileSchoolHeadingStyle')) return;
@@ -37,59 +31,8 @@
     style.id = 'mobileSchoolHeadingStyle';
     style.textContent = `
       .mobile-school-heading{display:none;}
-      @media (min-width:769px){
-        .mobile-school-heading{
-          position:absolute!important;
-          top:14.3%!important;
-          left:8%!important;
-          right:8%!important;
-          height:4.2%!important;
-          z-index:999!important;
-          display:flex!important;
-          align-items:center!important;
-          justify-content:center!important;
-          text-align:center!important;
-          direction:rtl!important;
-          color:#064b35!important;
-          background:transparent!important;
-          border:0!important;
-          box-shadow:none!important;
-          font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
-          font-size:clamp(21px,1.75vw,34px)!important;
-          font-weight:900!important;
-          line-height:1.2!important;
-          text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 7px rgba(70,46,9,.16)!important;
-          white-space:nowrap!important;
-          overflow:visible!important;
-          text-overflow:clip!important;
-          pointer-events:none!important;
-        }
-      }
-      @media (max-width:768px){
-        .mobile-school-heading{
-          position:absolute!important;
-          top:12.65%!important;
-          left:7.5%!important;
-          right:7.5%!important;
-          height:3.1%!important;
-          z-index:32!important;
-          display:flex!important;
-          align-items:center!important;
-          justify-content:center!important;
-          text-align:center!important;
-          direction:rtl!important;
-          color:#064b35!important;
-          font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;
-          font-size:clamp(15px,4.05vw,25px)!important;
-          font-weight:900!important;
-          line-height:1.05!important;
-          text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(70,46,9,.16)!important;
-          white-space:nowrap!important;
-          overflow:hidden!important;
-          text-overflow:ellipsis!important;
-          pointer-events:none!important;
-        }
-      }
+      @media (min-width:769px){.mobile-school-heading{position:absolute!important;top:14.3%!important;left:8%!important;right:8%!important;height:4.2%!important;z-index:999!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;direction:rtl!important;color:#064b35!important;background:transparent!important;border:0!important;box-shadow:none!important;font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;font-size:clamp(21px,1.75vw,34px)!important;font-weight:900!important;line-height:1.2!important;text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 7px rgba(70,46,9,.16)!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;pointer-events:none!important}}
+      @media (max-width:768px){.mobile-school-heading{position:absolute!important;top:12.65%!important;left:7.5%!important;right:7.5%!important;height:3.1%!important;z-index:32!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;direction:rtl!important;color:#064b35!important;font-family:"Decotype Thuluth","DecoType Thuluth","Decotype Naskh","DecoType Naskh","Diwani Letter","Aref Ruqaa","Geeza Pro","Noto Naskh Arabic","Amiri",Tahoma,serif!important;font-size:clamp(15px,4.05vw,25px)!important;font-weight:900!important;line-height:1.05!important;text-shadow:0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(70,46,9,.16)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;pointer-events:none!important}}
     `;
     document.head.appendChild(style);
   }
@@ -142,6 +85,7 @@
     loadStyleOnce('viewer-design-themes.css?v=themes-01', 'viewer-design-themes.css');
     loadScriptOnce('viewer-school-identity.js?v=identity-01', 'viewer-school-identity.js');
     loadScriptOnce('viewer-theme-manager.js?v=theme-01', 'viewer-theme-manager.js');
+    loadScriptOnce('viewer-db-schedule-loader.js?v=db-schedule-01', 'viewer-db-schedule-loader.js');
     setInterval(ensureMobileSchoolHeading, 3000);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
