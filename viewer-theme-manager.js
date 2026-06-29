@@ -3,6 +3,7 @@
   window.__viewerThemeManagerLoaded = true;
 
   const EVENT_PREFIX = '__GLOBAL_EVENT_THEME__:';
+  const THEMES = ['omani','white','green','gold'];
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_effective_theme_' + schoolSlug;
   let client = null;
@@ -15,6 +16,11 @@
     } catch (error) {
       return new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 10);
     }
+  }
+
+  function normalizeTheme(theme){
+    const value = String(theme || '').trim();
+    return THEMES.includes(value) ? value : 'omani';
   }
 
   function isActiveEvent(event){
@@ -78,16 +84,90 @@
     ribbon.textContent = clean;
   }
 
+  function computeAutoTheme(settings){
+    if (!settings || !settings.autoThemeEnabled || settings.manualThemeLocked) return null;
+    const startText = String(settings.autoThemeStartDate || todayMuscat()).slice(0, 10);
+    const start = new Date(startText + 'T00:00:00+04:00').getTime();
+    const now = new Date(todayMuscat() + 'T00:00:00+04:00').getTime();
+    const days = Math.max(0, Math.floor((now - start) / 86400000));
+    const interval = Math.max(1, Number(settings.autoThemeDays || 20));
+    const sequence = Array.isArray(settings.autoThemeSequence) && settings.autoThemeSequence.length
+      ? settings.autoThemeSequence.map(normalizeTheme)
+      : THEMES;
+    return normalizeTheme(sequence[Math.floor(days / interval) % sequence.length]);
+  }
+
   function applyTheme(data){
     ensureStyle();
-    const schoolTheme = String(data && data.schoolTheme || 'omani').trim() || 'omani';
+    const schoolTheme = normalizeTheme(data && data.schoolTheme || 'omani');
+    const autoTheme = computeAutoTheme(data && data.themeSettings);
     const event = data && data.event;
     const activeEvent = isActiveEvent(event) ? event : null;
-    const effectiveTheme = activeEvent && activeEvent.theme ? activeEvent.theme : schoolTheme;
+    const effectiveTheme = activeEvent && activeEvent.theme
+      ? normalizeTheme(activeEvent.theme)
+      : autoTheme || schoolTheme;
+
     document.documentElement.setAttribute('data-theme', effectiveTheme);
     document.documentElement.setAttribute('data-theme-effective', effectiveTheme);
+    document.documentElement.setAttribute('data-theme-source', activeEvent ? 'event' : autoTheme ? 'auto' : 'school');
+
     if (activeEvent && activeEvent.title) setRibbon(activeEvent.title);
     else setRibbon('');
+  }
+
+  function normalizeThemeSettings(row){
+    if (!row) return null;
+    let sequence = null;
+    try {
+      sequence = Array.isArray(row.auto_theme_sequence) ? row.auto_theme_sequence : JSON.parse(row.auto_theme_sequence || 'null');
+    } catch (error) {}
+
+    return {
+      selectedTheme: normalizeTheme(row.selected_theme || row.default_theme || 'omani'),
+      defaultTheme: normalizeTheme(row.default_theme || 'omani'),
+      autoThemeEnabled: !!row.auto_theme_enabled,
+      autoThemeDays: Number(row.auto_theme_days || 20),
+      autoThemeStartDate: row.auto_theme_start_date || todayMuscat(),
+      autoThemeSequence: Array.isArray(sequence) && sequence.length ? sequence : THEMES,
+      manualThemeLocked: !!row.manual_theme_locked
+    };
+  }
+
+  async function loadThemeSettings(db){
+    try {
+      const result = await db
+        .from('school_theme_settings')
+        .select('selected_theme,default_theme,auto_theme_enabled,auto_theme_days,auto_theme_start_date,auto_theme_sequence,manual_theme_locked,updated_at')
+        .eq('school_slug', schoolSlug)
+        .maybeSingle();
+      if (!result.error && result.data) return normalizeThemeSettings(result.data);
+    } catch (error) {}
+    return null;
+  }
+
+  async function loadLegacyTheme(db){
+    try {
+      const schoolResult = await db.from('schools').select('theme_style').eq('school_slug', schoolSlug).maybeSingle();
+      if (schoolResult.data && schoolResult.data.theme_style) return normalizeTheme(schoolResult.data.theme_style);
+    } catch (error) {}
+    return 'omani';
+  }
+
+  async function loadLegacyEvent(db){
+    try {
+      const eventResult = await db
+        .from('school_messages')
+        .select('message_text,created_at')
+        .eq('school_slug', schoolSlug)
+        .eq('is_active', true)
+        .like('message_text', EVENT_PREFIX + '%')
+        .order('created_at', { ascending:false })
+        .limit(1);
+
+      const row = eventResult.data && eventResult.data[0];
+      if (row && row.message_text) return JSON.parse(String(row.message_text).slice(EVENT_PREFIX.length));
+    } catch (error) {}
+    return null;
   }
 
   async function loadTheme(){
@@ -98,17 +178,14 @@
       return;
     }
     try {
-      const [schoolResult, eventResult] = await Promise.all([
-        db.from('schools').select('theme_style').eq('school_slug', schoolSlug).maybeSingle(),
-        db.from('school_messages').select('message_text,created_at').eq('school_slug', schoolSlug).eq('is_active', true).like('message_text', EVENT_PREFIX + '%').order('created_at', { ascending:false }).limit(1)
+      const [themeSettings, event] = await Promise.all([
+        loadThemeSettings(db),
+        loadLegacyEvent(db)
       ]);
-      let event = null;
-      const row = eventResult.data && eventResult.data[0];
-      if (row && row.message_text) {
-        try { event = JSON.parse(String(row.message_text).slice(EVENT_PREFIX.length)); } catch (error) {}
-      }
+      const legacyTheme = themeSettings ? null : await loadLegacyTheme(db);
       const data = {
-        schoolTheme: schoolResult.data && schoolResult.data.theme_style || 'omani',
+        schoolTheme: themeSettings ? themeSettings.selectedTheme : legacyTheme,
+        themeSettings,
         event
       };
       writeCache(data);
