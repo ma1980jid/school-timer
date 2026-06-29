@@ -2,9 +2,16 @@
   if (window.__viewerAlertsExternalFixLoaded) return;
   window.__viewerAlertsExternalFixLoaded = true;
 
-  const PREFIX = '__ALERT_SETTINGS__:';
   const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
-  let settings = { enabled: false, beforeEndEnabled: true, endEnabled: true, phoneNotificationEnabled: true };
+  const DEFAULT_SETTINGS = {
+    enabled: false,
+    beforeEndEnabled: true,
+    endEnabled: true,
+    phoneNotificationEnabled: true,
+    beforeEndMinutes: 5
+  };
+
+  let settings = { ...DEFAULT_SETTINGS };
   let notifiedBefore = '';
   let notifiedEnd = '';
   let lastCurrent = '';
@@ -16,6 +23,32 @@
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
     client = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
     return client;
+  }
+
+  function boolValue(value, fallback){
+    if (value === undefined || value === null) return fallback;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value !== 0;
+    const text = String(value).trim().toLowerCase();
+    if (['true', '1', 'yes', 'on', 'enabled'].includes(text)) return true;
+    if (['false', '0', 'no', 'off', 'disabled'].includes(text)) return false;
+    return fallback;
+  }
+
+  function numberValue(value, fallback){
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+  }
+
+  function normalizeSettings(row){
+    if (!row) return { ...DEFAULT_SETTINGS };
+    return {
+      enabled: boolValue(row.enabled ?? row.is_enabled ?? row.alerts_enabled ?? row.notification_enabled, DEFAULT_SETTINGS.enabled),
+      beforeEndEnabled: boolValue(row.before_end_enabled ?? row.beforeEndEnabled ?? row.before_end_alert_enabled, DEFAULT_SETTINGS.beforeEndEnabled),
+      endEnabled: boolValue(row.end_enabled ?? row.endEnabled ?? row.end_alert_enabled, DEFAULT_SETTINGS.endEnabled),
+      phoneNotificationEnabled: boolValue(row.phone_notification_enabled ?? row.phoneNotificationEnabled, DEFAULT_SETTINGS.phoneNotificationEnabled),
+      beforeEndMinutes: numberValue(row.before_end_minutes ?? row.beforeEndMinutes ?? row.minutes_before_end, DEFAULT_SETTINGS.beforeEndMinutes)
+    };
   }
 
   function periodKey(period){
@@ -34,16 +67,15 @@
     const c = db();
     if (!c) return;
     try {
-      const r = await c.from('school_messages')
-        .select('message_text,created_at')
+      const { data, error } = await c
+        .from('school_alert_settings')
+        .select('*')
         .eq('school_slug', slug)
-        .like('message_text', PREFIX + '%')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      if (r.data && r.data[0]) {
-        settings = Object.assign(settings, JSON.parse(String(r.data[0].message_text).slice(PREFIX.length)));
-        settings.phoneNotificationEnabled = true;
-      }
+        .maybeSingle();
+
+      if (error) return;
+      settings = normalizeSettings(data);
+      settings.phoneNotificationEnabled = true;
     } catch (error) {}
   }
 
@@ -88,11 +120,12 @@
     const current = schedule && schedule.current;
     const key = periodKey(current);
     const remaining = remainingSeconds(schedule);
+    const beforeEndSeconds = Math.max(1, settings.beforeEndMinutes) * 60;
 
     if (current && key) {
       lastCurrent = key;
       lastCurrentName = current.name || '';
-      if (settings.beforeEndEnabled && remaining !== null && remaining <= 300 && remaining > 0 && notifiedBefore !== key) {
+      if (settings.beforeEndEnabled && remaining !== null && remaining <= beforeEndSeconds && remaining > 0 && notifiedBefore !== key) {
         notifiedBefore = key;
         sendNotification(`باقي ${Math.ceil(remaining / 60)} د من الحصة ${current.name}`);
       }
