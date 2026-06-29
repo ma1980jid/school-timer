@@ -138,27 +138,6 @@
     }
   }
 
-  async function loadLegacyMessages(client, schoolSlug){
-    try {
-      const { data, error } = await client
-        .from('school_messages')
-        .select('message_text,sort_order')
-        .eq('school_slug', schoolSlug)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-
-      if (error || !data || !data.length) return [];
-
-      return cleanMessages(
-        data
-          .map((m) => m.message_text)
-          .filter((message) => !isSystemMessage(message))
-      );
-    } catch (error) {
-      return [];
-    }
-  }
-
   async function loadMessagesDialog(){
     const list = $('messagesList');
     if (!list) return;
@@ -169,16 +148,11 @@
     const schoolSlug = getSchoolSlug();
 
     if (client) {
-      const [newMessages, legacyMessages] = await Promise.all([
-        loadNewMessages(client, schoolSlug),
-        loadLegacyMessages(client, schoolSlug)
-      ]);
-      messages = mergeMessages(newMessages, legacyMessages);
+      messages = await loadNewMessages(client, schoolSlug);
     }
 
     const finalMessages = cleanMessages(messages).length ? cleanMessages(messages) : DEFAULT_MESSAGES;
     const fragment = document.createDocumentFragment();
-
     finalMessages.forEach((message) => fragment.appendChild(createMessageRow(message)));
     list.replaceChildren(fragment);
   }
@@ -201,34 +175,6 @@
     if (code) return code;
     code = prompt('أدخل رمز الإدارة الخاص بالمدرسة');
     return code ? code.trim() : '';
-  }
-
-  async function deleteLegacyNormalMessages(client, schoolSlug){
-    return client
-      .from('school_messages')
-      .delete()
-      .eq('school_slug', schoolSlug)
-      .not('message_text', 'like', '__CARD_%')
-      .not('message_text', 'like', '__SCHEDULED__:%')
-      .not('message_text', 'like', '__SCHEDULE_ROWS__:%')
-      .not('message_text', 'like', '__ALERT_SETTINGS__:%')
-      .not('message_text', 'like', '__GLOBAL_EVENT_THEME__:%')
-      .not('message_text', 'like', '__AUTO_THEME__:%');
-  }
-
-  async function saveLegacyMessages(client, schoolSlug, messages){
-    const legacyRows = messages.map((message_text, i) => ({
-      school_slug: schoolSlug,
-      message_text,
-      is_active: true,
-      sort_order: i + 1
-    }));
-
-    const { error: insError } = await client
-      .from('school_messages')
-      .insert(legacyRows);
-
-    return insError;
   }
 
   async function saveNewDisplayMessages(client, schoolSlug, messages){
@@ -263,10 +209,10 @@
         actor_type: 'school_admin',
         actor_name: 'school-dashboard',
         school_slug: schoolSlug,
-        action: 'save_display_messages_dual_write',
+        action: 'save_display_messages',
         entity_type: 'school_display_messages',
         new_data: { messages_count: messages.length },
-        details: 'تم حفظ الرسائل في school_display_messages وفي school_messages مؤقتًا.'
+        details: 'تم حفظ الرسائل في school_display_messages.'
       });
     } catch (error) {}
   }
@@ -304,14 +250,8 @@
         return toastMsg('رمز الإدارة غير صحيح');
       }
 
-      const { error: delError } = await deleteLegacyNormalMessages(client, schoolSlug);
-      if (delError) return toastMsg('تعذر تحديث الرسائل القديمة');
-
-      const legacyError = await saveLegacyMessages(client, schoolSlug, messages);
-      if (legacyError) return toastMsg('تعذر حفظ الرسائل القديمة');
-
       const newError = await saveNewDisplayMessages(client, schoolSlug, messages);
-      if (newError) return toastMsg('تم حفظ القديم، وتعذر حفظ الجدول الجديد');
+      if (newError) return toastMsg('تعذر حفظ الرسائل');
 
       await saveLog(client, schoolSlug, messages);
       sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
@@ -368,19 +308,10 @@
     actions.insertBefore(btn, guideBtn || null);
   }
 
-  function loadThemeSettingsModule(){
-    if (document.querySelector('script[src^="dashboard-theme-settings.js"]')) return;
-    const script = document.createElement('script');
-    script.src = 'dashboard-theme-settings.js?v=theme-settings-01';
-    script.defer = true;
-    document.head.appendChild(script);
-  }
-
   function init(){
     addButton();
-    loadThemeSettingsModule();
-    setTimeout(loadThemeSettingsModule, 800);
-    setTimeout(loadThemeSettingsModule, 1800);
+    setTimeout(addButton, 800);
+    setTimeout(addButton, 1800);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
