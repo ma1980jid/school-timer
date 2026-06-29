@@ -75,7 +75,6 @@
 
       if (error) return;
       settings = normalizeSettings(data);
-      settings.phoneNotificationEnabled = true;
     } catch (error) {}
   }
 
