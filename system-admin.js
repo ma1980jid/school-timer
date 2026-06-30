@@ -12,6 +12,22 @@
     showStatus.timer = setTimeout(() => { box.style.display = 'none'; }, 3500);
   }
 
+  function ensureQrStyle(){
+    if (document.getElementById('systemAdminQrStyle')) return;
+    const style = document.createElement('style');
+    style.id = 'systemAdminQrStyle';
+    style.textContent = `
+      .qr-wrap{display:grid;place-items:center;background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:10px;margin-top:6px;min-height:138px}
+      .qr-wrap img{width:124px;height:124px;object-fit:contain;display:block}
+      .qr-note{text-align:center;color:#64748b;font-size:12px;font-weight:900;margin-top:4px}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function qrSrc(url){
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=' + encodeURIComponent(url || '');
+  }
+
   function getClient(){
     if (state.client) return state.client;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) {
@@ -66,6 +82,7 @@
   }
 
   function renderLinks(school){
+    ensureQrStyle();
     const box = $('linksBox');
     if (!box) return;
     if (!school) {
@@ -83,6 +100,7 @@
         <b>${label}</b>
         <div class="url" id="url_${key}">${links[key]}</div>
         <button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button>
+        <div class="qr-wrap"><img src="${qrSrc(links[key])}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div></div>
       </div>
     `).join('');
     box.querySelectorAll('[data-copy]').forEach((button) => {
@@ -236,6 +254,7 @@
   }
 
   function init(){
+    ensureQrStyle();
     $('refreshBtn').onclick = loadSchools;
     $('saveSchoolBtn').onclick = saveSchool;
     $('newSchoolBtn').onclick = resetForm;
