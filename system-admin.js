@@ -2,14 +2,17 @@
   const $ = (id) => document.getElementById(id);
   const state = { schools: [], selected: null, client: null };
 
-  function showStatus(message, type='ok'){
+  function schoolKey(school){ return String((school && school.school_slug) || ''); }
+  function errorText(error){ return error ? [error.message, error.details, error.hint, error.code].filter(Boolean).join(' | ') : ''; }
+
+  function showStatus(message, type='ok', sticky=false){
     const box = $('systemStatus');
     if (!box) return;
     box.style.display = 'block';
     box.className = type === 'err' ? 'notice err' : type === 'warn' ? 'notice warn' : 'notice';
     box.textContent = message;
     clearTimeout(showStatus.timer);
-    showStatus.timer = setTimeout(() => { box.style.display = 'none'; }, 3500);
+    if (!sticky) showStatus.timer = setTimeout(() => { box.style.display = 'none'; }, 4500);
   }
 
   function ensureQrStyle(){
@@ -25,9 +28,7 @@
     document.head.appendChild(style);
   }
 
-  function qrSrc(url){
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=' + encodeURIComponent(url || '');
-  }
+  function qrSrc(url){ return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=' + encodeURIComponent(url || ''); }
 
   function getClient(){
     if (state.client) return state.client;
@@ -39,21 +40,13 @@
     return state.client;
   }
 
-  function cleanSlug(text){
-    return String(text || '').trim().toLowerCase().replace(/[^a-z0-9\-]+/g, '-').replace(/\-+/g, '-').replace(/^\-+|\-+$/g, '');
-  }
-
+  function cleanSlug(text){ return String(text || '').trim().toLowerCase().replace(/[^a-z0-9\-]+/g, '-').replace(/\-+/g, '-').replace(/^\-+|\-+$/g, ''); }
   function slugFromName(name){
     const clean = String(name || '').replace(/\s+/g, ' ').trim();
     if (clean.includes('الشيخ سيف')) return 'alsheikh-saif';
     return 'school-' + Date.now().toString(36);
   }
-
-  function appBase(){
-    const path = location.pathname.replace(/[^/]*$/, '');
-    return location.origin + path;
-  }
-
+  function appBase(){ return location.origin + location.pathname.replace(/[^/]*$/, ''); }
   function buildLinks(slug){
     const base = appBase();
     const s = encodeURIComponent(slug || '');
@@ -105,28 +98,12 @@
       return;
     }
     const links = buildLinks(school.school_slug);
-    box.innerHTML = Object.entries({
-      dashboard: 'لوحة مدير المدرسة',
-      desktop: 'شاشة الحاسوب',
-      mobile: 'الهاتف والآيباد',
-      app: 'صفحة التثبيت و QR'
-    }).map(([key, label]) => {
+    box.innerHTML = Object.entries({ dashboard:'لوحة مدير المدرسة', desktop:'شاشة الحاسوب', mobile:'الهاتف والآيباد', app:'صفحة التثبيت و QR' }).map(([key,label]) => {
       const qr = qrSrc(links[key]);
-      return `
-        <div class="linkbox">
-          <b>${label}</b>
-          <div class="url" id="url_${key}">${links[key]}</div>
-          <button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button>
-          <div class="qr-wrap"><img src="${qr}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div><button class="qr-copy" type="button" data-copy-qr-image="${qr}">نسخ صورة QR</button></div>
-        </div>
-      `;
+      return `<div class="linkbox"><b>${label}</b><div class="url" id="url_${key}">${links[key]}</div><button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button><div class="qr-wrap"><img src="${qr}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div><button class="qr-copy" type="button" data-copy-qr-image="${qr}">نسخ صورة QR</button></div></div>`;
     }).join('');
-    box.querySelectorAll('[data-copy]').forEach((button) => {
-      button.onclick = () => copyText(links[button.dataset.copy], 'تم نسخ الرابط بنجاح');
-    });
-    box.querySelectorAll('[data-copy-qr-image]').forEach((button) => {
-      button.onclick = () => copyQrImage(button.getAttribute('data-copy-qr-image'));
-    });
+    box.querySelectorAll('[data-copy]').forEach((button) => { button.onclick = () => copyText(links[button.dataset.copy], 'تم نسخ الرابط بنجاح'); });
+    box.querySelectorAll('[data-copy-qr-image]').forEach((button) => { button.onclick = () => copyQrImage(button.getAttribute('data-copy-qr-image')); });
   }
 
   function renderSchools(){
@@ -142,41 +119,31 @@
       list.innerHTML = '<div class="notice warn">لا توجد مدارس مطابقة.</div>';
       return;
     }
-    list.innerHTML = filtered.map((school) => `
-      <div class="school-card ${state.selected && state.selected.id === school.id ? 'active' : ''}" data-id="${school.id}">
-        <div class="school-title">
-          <span>${school.school_name || 'مدرسة بدون اسم'}</span>
-          <span class="status ${school.is_active ? 'on' : 'off'}">${school.is_active ? 'مفعلة' : 'موقوفة'}</span>
-        </div>
-        <div class="meta">
-          الرابط: ${school.school_slug || '--'}<br>
-          ${school.governorate || ''}${school.wilayat ? ' - ' + school.wilayat : ''}
-        </div>
-      </div>
-    `).join('');
-    list.querySelectorAll('.school-card').forEach((card) => {
-      card.onclick = () => selectSchool(Number(card.dataset.id));
-    });
+    list.innerHTML = filtered.map((school) => {
+      const key = schoolKey(school);
+      return `<div class="school-card ${state.selected && schoolKey(state.selected) === key ? 'active' : ''}" data-slug="${key}"><div class="school-title"><span>${school.school_name || 'مدرسة بدون اسم'}</span><span class="status ${school.is_active ? 'on' : 'off'}">${school.is_active ? 'مفعلة' : 'موقوفة'}</span></div><div class="meta">الرابط: ${school.school_slug || '--'}<br>${school.governorate || ''}${school.wilayat ? ' - ' + school.wilayat : ''}</div></div>`;
+    }).join('');
+    list.querySelectorAll('.school-card').forEach((card) => { card.onclick = () => selectSchool(card.dataset.slug); });
   }
 
   async function loadSchools(){
     const db = getClient();
     if (!db) return;
-    const { data, error } = await db.from('schools').select('*').order('id', { ascending:true });
-    if (error) return showStatus('تعذر تحميل المدارس. تحقق من صلاحيات قاعدة البيانات.', 'err');
+    const { data, error } = await db.from('schools').select('*').order('school_slug', { ascending:true });
+    if (error) return showStatus('تعذر تحميل المدارس: ' + errorText(error), 'err', true);
     state.schools = data || [];
     renderSchools();
     if (state.selected) {
-      const fresh = state.schools.find((school) => school.id === state.selected.id);
-      if (fresh) selectSchool(fresh.id);
+      const fresh = state.schools.find((school) => schoolKey(school) === schoolKey(state.selected));
+      if (fresh) selectSchool(schoolKey(fresh));
     }
   }
 
-  function selectSchool(id){
-    const school = state.schools.find((item) => item.id === id);
+  function selectSchool(slug){
+    const school = state.schools.find((item) => schoolKey(item) === String(slug));
     if (!school) return;
     state.selected = school;
-    $('schoolId').value = school.id || '';
+    $('schoolId').value = school.school_slug || '';
     $('schoolName').value = school.school_name || '';
     $('schoolSlug').value = school.school_slug || '';
     $('governorate').value = school.governorate || '';
@@ -218,7 +185,7 @@
     const path = `logos/${safeName}`;
     const { error } = await db.storage.from('school-logos').upload(path, file, { upsert:true });
     if (error) {
-      showStatus('تعذر رفع الشعار. سيتم حفظ رابط الشعار إن وجد.', 'warn');
+      showStatus('تعذر رفع الشعار. سيتم حفظ رابط الشعار إن وجد. السبب: ' + errorText(error), 'warn', true);
       return $('logoUrl').value.trim();
     }
     const { data } = db.storage.from('school-logos').getPublicUrl(path);
@@ -228,7 +195,7 @@
   async function saveSchool(){
     const db = getClient();
     if (!db) return;
-    const id = $('schoolId').value.trim();
+    const originalSlug = $('schoolId').value.trim();
     const name = $('schoolName').value.trim();
     const slug = cleanSlug($('schoolSlug').value.trim() || slugFromName(name));
     if (!name || !slug) return showStatus('أدخل اسم المدرسة والرابط المختصر.', 'err');
@@ -248,19 +215,16 @@
       background_color: '#f8f2e8',
       theme_style: 'omani'
     };
-
-    const result = id
-      ? await db.from('schools').update(payload).eq('id', id)
-      : await db.from('schools').insert(payload);
-
+    const exists = originalSlug && state.schools.some((school) => schoolKey(school) === originalSlug);
+    const result = exists ? await db.from('schools').update(payload).eq('school_slug', originalSlug) : await db.from('schools').insert(payload);
     if (result.error) {
       console.error(result.error);
-      return showStatus('تعذر حفظ المدرسة. قد يكون الرابط المختصر مكررًا أو تحتاج صلاحيات قاعدة البيانات.', 'err');
+      return showStatus('تعذر حفظ المدرسة: ' + errorText(result.error), 'err', true);
     }
-    showStatus(id ? 'تم تحديث بيانات المدرسة.' : 'تمت إضافة المدرسة بنجاح.');
+    showStatus(exists ? 'تم تحديث بيانات المدرسة.' : 'تمت إضافة المدرسة بنجاح.');
     await loadSchools();
     const saved = state.schools.find((school) => school.school_slug === slug);
-    if (saved) selectSchool(saved.id);
+    if (saved) selectSchool(schoolKey(saved));
   }
 
   async function toggleSelected(){
@@ -268,8 +232,8 @@
     const db = getClient();
     if (!db) return;
     const next = !state.selected.is_active;
-    const { error } = await db.from('schools').update({ is_active: next }).eq('id', state.selected.id);
-    if (error) return showStatus('تعذر تغيير حالة المدرسة.', 'err');
+    const { error } = await db.from('schools').update({ is_active: next }).eq('school_slug', schoolKey(state.selected));
+    if (error) return showStatus('تعذر تغيير حالة المدرسة: ' + errorText(error), 'err', true);
     showStatus(next ? 'تم تفعيل المدرسة.' : 'تم إيقاف المدرسة.');
     await loadSchools();
   }
@@ -282,9 +246,7 @@
     $('toggleSchoolBtn').onclick = toggleSelected;
     $('copySelectedBtn').onclick = () => state.selected ? copyText(linksText(state.selected), 'تم نسخ روابط المدرسة') : showStatus('اختر مدرسة أولًا.', 'warn');
     $('searchBox').addEventListener('input', renderSchools);
-    $('schoolName').addEventListener('input', () => {
-      if (!$('schoolSlug').value.trim() && !state.selected) $('schoolSlug').value = slugFromName($('schoolName').value);
-    });
+    $('schoolName').addEventListener('input', () => { if (!$('schoolSlug').value.trim() && !state.selected) $('schoolSlug').value = slugFromName($('schoolName').value); });
     $('logoUrl').addEventListener('input', () => updateLogoPreview($('logoUrl').value.trim()));
     renderLinks(null);
     loadSchools();
