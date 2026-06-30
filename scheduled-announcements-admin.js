@@ -12,10 +12,7 @@
   function getClient(){
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
     if (!window.schoolTimerScheduledClient) {
-      window.schoolTimerScheduledClient = window.supabase.createClient(
-        window.SCHOOL_TIMER_SUPABASE_URL,
-        window.SCHOOL_TIMER_SUPABASE_ANON_KEY
-      );
+      window.schoolTimerScheduledClient = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
     }
     return window.schoolTimerScheduledClient;
   }
@@ -38,12 +35,7 @@
 
   function todayKey(){
     try {
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Muscat',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).formatToParts(new Date());
+      const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Muscat', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(new Date());
       const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
       return `${map.year}-${map.month}-${map.day}`;
     } catch (error) {
@@ -57,9 +49,7 @@
     return date.toISOString().slice(0, 10);
   }
 
-  function encode(item){
-    return PREFIX + JSON.stringify(item);
-  }
+  function encode(item){ return PREFIX + JSON.stringify(item); }
 
   function decode(text){
     const value = String(text || '');
@@ -71,17 +61,11 @@
   function clean(text){ return String(text || '').trim(); }
 
   function escapeHtml(value){
-    return String(value || '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;');
+    return String(value || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
   }
 
   function legacyToSlotTexts(item){
-    if (item.tickerText || item.rightText || item.leftText) {
-      return { tickerText:item.tickerText || '', rightText:item.rightText || '', leftText:item.leftText || '' };
-    }
+    if (item.tickerText || item.rightText || item.leftText) return { tickerText:item.tickerText || '', rightText:item.rightText || '', leftText:item.leftText || '' };
     const title = clean(item.title);
     const text = clean(item.text);
     const legacyText = title && text ? `${title}: ${text}` : (text || title);
@@ -150,41 +134,20 @@
     const dialog = document.createElement('div');
     dialog.id = 'scheduledAnnouncementsDialog';
     dialog.className = 'dialog';
-    dialog.innerHTML = `
-      <div>
-        <h3>الإعلانات المجدولة</h3>
-        <p class="scheduled-note">اربط الإعلان بتاريخ محدد، ويمكنك كتابة عبارة مختلفة للشريط وللصندوقين في المناسبة نفسها.</p>
-        <div id="scheduledAnnouncementsList" class="scheduled-list"></div>
-        <div class="scheduled-actions"><button class="btn light" type="button" id="addScheduledAnnouncementBtn">إضافة مناسبة</button><button class="btn navy" type="button" id="saveScheduledAnnouncementsBtn">حفظ</button><button class="btn" type="button" id="closeScheduledAnnouncementsBtn">إغلاق</button></div>
-      </div>
-    `;
+    dialog.innerHTML = `<div><h3>الإعلانات المجدولة</h3><p class="scheduled-note">اربط الإعلان بتاريخ محدد، ويمكنك كتابة عبارة مختلفة للشريط وللصندوقين في المناسبة نفسها.</p><div id="scheduledAnnouncementsList" class="scheduled-list"></div><div class="scheduled-actions"><button class="btn light" type="button" id="addScheduledAnnouncementBtn">إضافة مناسبة</button><button class="btn navy" type="button" id="saveScheduledAnnouncementsBtn">حفظ</button><button class="btn" type="button" id="closeScheduledAnnouncementsBtn">إغلاق</button></div></div>`;
     document.body.appendChild(dialog);
     document.getElementById('addScheduledAnnouncementBtn').onclick = () => addRow();
     document.getElementById('saveScheduledAnnouncementsBtn').onclick = saveAnnouncements;
     document.getElementById('closeScheduledAnnouncementsBtn').onclick = closeDialog;
   }
 
-  function addRow(item){
-    const list = document.getElementById('scheduledAnnouncementsList');
-    if (!list) return;
-    list.appendChild(createRow(item));
-  }
+  function addRow(item){ const list = document.getElementById('scheduledAnnouncementsList'); if (list) list.appendChild(createRow(item)); }
 
   function collectRows(){
     return [...document.querySelectorAll('.scheduled-row')].map((row) => {
       const start = clean(row.querySelector('.scheduledStart')?.value);
       const end = clean(row.querySelector('.scheduledEnd')?.value) || start;
-      return {
-        id: row.dataset.id || String(Date.now()),
-        title: clean(row.querySelector('.scheduledTitle')?.value),
-        tickerText: clean(row.querySelector('.scheduledTickerText')?.value),
-        rightText: clean(row.querySelector('.scheduledRightText')?.value),
-        leftText: clean(row.querySelector('.scheduledLeftText')?.value),
-        start,
-        end,
-        annual: !!row.querySelector('.scheduledAnnual')?.checked,
-        active: !!row.querySelector('.scheduledActive')?.checked
-      };
+      return { id:row.dataset.id || String(Date.now()), title:clean(row.querySelector('.scheduledTitle')?.value), tickerText:clean(row.querySelector('.scheduledTickerText')?.value), rightText:clean(row.querySelector('.scheduledRightText')?.value), leftText:clean(row.querySelector('.scheduledLeftText')?.value), start, end, annual:!!row.querySelector('.scheduledAnnual')?.checked, active:!!row.querySelector('.scheduledActive')?.checked };
     }).filter((item) => (item.title || item.tickerText || item.rightText || item.leftText) && item.start && item.end);
   }
 
@@ -196,7 +159,7 @@
     const client = getClient();
     if (!client) { addRow(example); return; }
     try {
-      const { data, error } = await client.from('school_messages').select('message_text,sort_order').eq('school_slug', getSchoolSlug()).eq('is_active', true).order('sort_order', { ascending: true });
+      const { data, error } = await client.from('school_messages').select('message_text,sort_order').eq('school_slug', getSchoolSlug()).eq('is_active', true).order('sort_order', { ascending:true });
       if (error) return;
       const items = (data || []).map((row) => decode(row.message_text)).filter(Boolean);
       if (!items.length) { addRow(example); return; }
@@ -210,13 +173,9 @@
     if (dialog) dialog.classList.add('show');
     await loadAnnouncements();
   }
-
   window.openScheduledAnnouncementsDialog = openDialog;
 
-  function closeDialog(){
-    const dialog = document.getElementById('scheduledAnnouncementsDialog');
-    if (dialog) dialog.classList.remove('show');
-  }
+  function closeDialog(){ const dialog = document.getElementById('scheduledAnnouncementsDialog'); if (dialog) dialog.classList.remove('show'); }
 
   async function saveAnnouncements(){
     if (isSaving) return;
@@ -235,11 +194,11 @@
       if (authError || !ok) { sessionStorage.removeItem('school_timer_admin_code_' + schoolSlug); return toastMsg('رمز الإدارة غير صحيح'); }
       const { error: delError } = await client.from('school_messages').delete().eq('school_slug', schoolSlug).like('message_text', PREFIX + '%');
       if (delError) return toastMsg('تعذر تحديث الإعلانات المجدولة');
-      const rows = items.map((item, index) => ({ school_slug: schoolSlug, message_text: encode(item), is_active: true, sort_order: 8000 + index }));
+      const rows = items.map((item, index) => ({ school_slug:schoolSlug, message_text:encode(item), is_active:true, sort_order:8000 + index }));
       const { error: insError } = await client.from('school_messages').insert(rows);
       if (insError) return toastMsg('تعذر حفظ الإعلانات المجدولة');
       sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
-      localStorage.setItem('school_timer_scheduled_' + schoolSlug, JSON.stringify({ savedAt: Date.now(), items }));
+      localStorage.setItem('school_timer_scheduled_' + schoolSlug, JSON.stringify({ savedAt:Date.now(), items }));
       toastMsg('تم حفظ الإعلانات المجدولة بنجاح');
     } finally {
       isSaving = false;
@@ -256,26 +215,9 @@
     });
   }
 
-  function ensureMovedActionsBox(){
-    const rightSection = document.querySelector('.right-panel .section');
-    if (!rightSection) return null;
-    let box = document.getElementById('movedActionsBox');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'movedActionsBox';
-      box.className = 'moved-actions-box';
-      box.innerHTML = '<div class="moved-title">أوامر إضافية</div>';
-      rightSection.appendChild(box);
-    }
-    return box;
-  }
-
   function addButton(){
-    const box = ensureMovedActionsBox();
-    const actions = document.querySelector('.actions');
-    const target = box || actions;
-    if (!target) return;
-
+    const actions = document.querySelector('.left-panel .actions') || document.querySelector('.actions');
+    if (!actions) return;
     let btn = document.getElementById('scheduledAnnouncementsBtn');
     if (!btn) {
       btn = document.createElement('button');
@@ -287,7 +229,7 @@
     }
     btn.style.display = '';
     btn.removeAttribute('aria-hidden');
-    if (btn.parentElement !== target) target.appendChild(btn);
+    if (btn.parentElement !== actions) actions.appendChild(btn);
   }
 
   function start(){
