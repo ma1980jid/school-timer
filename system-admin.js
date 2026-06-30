@@ -17,9 +17,10 @@
     const style = document.createElement('style');
     style.id = 'systemAdminQrStyle';
     style.textContent = `
-      .qr-wrap{display:grid;place-items:center;background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:10px;margin-top:6px;min-height:138px}
+      .qr-wrap{display:grid;place-items:center;background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:10px;margin-top:6px;min-height:166px;gap:6px}
       .qr-wrap img{width:124px;height:124px;object-fit:contain;display:block}
-      .qr-note{text-align:center;color:#64748b;font-size:12px;font-weight:900;margin-top:4px}
+      .qr-note{text-align:center;color:#64748b;font-size:12px;font-weight:900;margin-top:2px}
+      .qr-copy{height:30px!important;min-height:30px!important;border-radius:10px!important;font-size:12px!important;padding:0 10px!important;background:#f8fafc!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-weight:900!important;cursor:pointer!important}
     `;
     document.head.appendChild(style);
   }
@@ -64,9 +65,9 @@
     };
   }
 
-  function copyText(text){
+  function copyText(text, msg){
     if (!text) return;
-    navigator.clipboard.writeText(text).then(() => showStatus('تم نسخ الرابط بنجاح')).catch(() => showStatus('تعذر النسخ', 'err'));
+    navigator.clipboard.writeText(text).then(() => showStatus(msg || 'تم نسخ الرابط بنجاح')).catch(() => showStatus('تعذر النسخ', 'err'));
   }
 
   function linksText(school){
@@ -95,16 +96,22 @@
       desktop: 'شاشة الحاسوب',
       mobile: 'الهاتف والآيباد',
       app: 'صفحة التثبيت و QR'
-    }).map(([key, label]) => `
-      <div class="linkbox">
-        <b>${label}</b>
-        <div class="url" id="url_${key}">${links[key]}</div>
-        <button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button>
-        <div class="qr-wrap"><img src="${qrSrc(links[key])}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div></div>
-      </div>
-    `).join('');
+    }).map(([key, label]) => {
+      const qr = qrSrc(links[key]);
+      return `
+        <div class="linkbox">
+          <b>${label}</b>
+          <div class="url" id="url_${key}">${links[key]}</div>
+          <button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button>
+          <div class="qr-wrap"><img src="${qr}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div><button class="qr-copy" type="button" data-copy-qr="${qr}">نسخ QR</button></div>
+        </div>
+      `;
+    }).join('');
     box.querySelectorAll('[data-copy]').forEach((button) => {
-      button.onclick = () => copyText(links[button.dataset.copy]);
+      button.onclick = () => copyText(links[button.dataset.copy], 'تم نسخ الرابط بنجاح');
+    });
+    box.querySelectorAll('[data-copy-qr]').forEach((button) => {
+      button.onclick = () => copyText(button.getAttribute('data-copy-qr'), 'تم نسخ رابط صورة QR');
     });
   }
 
@@ -259,7 +266,7 @@
     $('saveSchoolBtn').onclick = saveSchool;
     $('newSchoolBtn').onclick = resetForm;
     $('toggleSchoolBtn').onclick = toggleSelected;
-    $('copySelectedBtn').onclick = () => state.selected ? copyText(linksText(state.selected)) : showStatus('اختر مدرسة أولًا.', 'warn');
+    $('copySelectedBtn').onclick = () => state.selected ? copyText(linksText(state.selected), 'تم نسخ روابط المدرسة') : showStatus('اختر مدرسة أولًا.', 'warn');
     $('searchBox').addEventListener('input', renderSchools);
     $('schoolName').addEventListener('input', () => {
       if (!$('schoolSlug').value.trim() && !state.selected) $('schoolSlug').value = slugFromName($('schoolName').value);
