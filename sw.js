@@ -1,12 +1,10 @@
-const CACHE_NAME = 'school-timer-v1';
+const CACHE_NAME = 'school-timer-v2-multischool';
 const CORE_ASSETS = [
   './',
   './index.html',
   './style.css',
   './desktop-bg.webp',
-  './mobile-bg.webp',
-  './manifest.json',
-  './icons/school_logo.png'
+  './mobile-bg.webp'
 ];
 
 self.addEventListener('install', (event) => {
