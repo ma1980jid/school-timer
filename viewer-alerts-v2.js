@@ -80,6 +80,9 @@
       activeToastKey = '';
       activeType = '';
     }
+    if (!activeToast) {
+      document.querySelectorAll('.viewer-alert-toast').forEach((e) => e.remove());
+    }
   }
 
   function tone(c, f, d){
@@ -224,7 +227,11 @@
     const p = s && s.current;
     const k = key(p);
     const r = remain(s);
+
     if (p && k) {
+      if (activeType === 'before' && activeToastKey && activeToastKey !== k) {
+        closeToast();
+      }
       lastKey = k;
       const beforeSeconds = Math.max(1, Number(cfg.beforeEndMinutes || 5)) * 60;
       if (cfg.beforeEndEnabled && r !== null && r <= beforeSeconds && r > 1) {
@@ -235,6 +242,8 @@
       if (cfg.endEnabled && r !== null && r <= 1) fireEnd(p, k);
       return;
     }
+
+    if (activeType === 'before') closeToast();
     if (cfg.endEnabled && lastKey && ended !== lastKey) fireEnd({ name: 'السابقة' }, lastKey);
   }
 
