@@ -29,19 +29,10 @@
     if (btn) btn.onclick = function(){ copy(next); };
   }
 
-  function loadSingleDesignCleanup(){
-    if (window.__systemAdminSingleDesignCleanupRequested) return;
-    window.__systemAdminSingleDesignCleanupRequested = true;
-    const script = document.createElement('script');
-    script.src = 'system-admin-single-design-cleanup.js?v=system-single-design-02';
-    script.defer = true;
-    document.head.appendChild(script);
-  }
-
   function start(){
     patch();
-    setInterval(patch, 1200);
-    loadSingleDesignCleanup();
+    setTimeout(patch, 1200);
+    setTimeout(patch, 3000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
