@@ -26,6 +26,20 @@
     navigator.clipboard.writeText(text).then(() => notify(okMessage || 'تم النسخ')).catch(() => notify('تعذر النسخ'));
   }
 
+  async function copyQrImage(qrUrl){
+    try{
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('clipboard-image-not-supported');
+      const response = await fetch(qrUrl, { mode:'cors', cache:'no-store' });
+      if (!response.ok) throw new Error('qr-fetch-failed');
+      let blob = await response.blob();
+      if (blob.type !== 'image/png') blob = new Blob([blob], { type:'image/png' });
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      notify('تم نسخ صورة QR');
+    }catch(error){
+      notify('تعذر نسخ صورة QR من هذا المتصفح. افتح QR واضغط بزر الفأرة الأيمن أو اضغط مطولًا لنسخ الصورة.');
+    }
+  }
+
   function ensureQrStyle(){
     if (document.getElementById('dashboardLinksQrStyle')) return;
     const style = document.createElement('style');
@@ -60,11 +74,11 @@
     const desktopQr = qrSrc(desktopUrl);
     const mobileQr = qrSrc(mobileUrl);
     wrap.innerHTML = `
-      <div class="dashboard-qr-box"><b>QR شاشة الحاسوب</b><img src="${desktopQr}" alt="QR شاشة الحاسوب"><button class="dashboard-qr-copy" data-copy-qr="${desktopQr}">نسخ QR</button></div>
-      <div class="dashboard-qr-box"><b>QR الهاتف والآيباد</b><img src="${mobileQr}" alt="QR الهاتف والآيباد"><button class="dashboard-qr-copy" data-copy-qr="${mobileQr}">نسخ QR</button></div>
+      <div class="dashboard-qr-box"><b>QR شاشة الحاسوب</b><img src="${desktopQr}" alt="QR شاشة الحاسوب"><button class="dashboard-qr-copy" data-copy-qr-image="${desktopQr}">نسخ صورة QR</button></div>
+      <div class="dashboard-qr-box"><b>QR الهاتف والآيباد</b><img src="${mobileQr}" alt="QR الهاتف والآيباد"><button class="dashboard-qr-copy" data-copy-qr-image="${mobileQr}">نسخ صورة QR</button></div>
     `;
-    wrap.querySelectorAll('[data-copy-qr]').forEach((btn) => {
-      btn.onclick = () => copyText(btn.getAttribute('data-copy-qr'), 'تم نسخ رابط صورة QR');
+    wrap.querySelectorAll('[data-copy-qr-image]').forEach((btn) => {
+      btn.onclick = () => copyQrImage(btn.getAttribute('data-copy-qr-image'));
     });
   }
 
@@ -81,7 +95,7 @@
         box.innerHTML = '<div class="moved-title">أوامر إضافية</div>';
         rightSection.appendChild(box);
       }
-      const labelsToMove = ['إدارة الرسائل','تنبيهات الهاتف','إعلانات المدرسة','الإعلانات المجدولة'];
+      const labelsToMove = ['إدارة الرسائل','تنبيهات الهاتف','إعلانات المدرسة'];
       Array.from(leftSection.querySelectorAll('button')).forEach((button) => {
         const txt = (button.textContent || '').trim();
         if (txt.includes('دليل المستخدم') && box.contains(button)) {
