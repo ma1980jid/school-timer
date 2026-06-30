@@ -70,6 +70,20 @@
     navigator.clipboard.writeText(text).then(() => showStatus(msg || 'تم نسخ الرابط بنجاح')).catch(() => showStatus('تعذر النسخ', 'err'));
   }
 
+  async function copyQrImage(qrUrl){
+    try{
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('clipboard-image-not-supported');
+      const response = await fetch(qrUrl, { mode:'cors', cache:'no-store' });
+      if (!response.ok) throw new Error('qr-fetch-failed');
+      let blob = await response.blob();
+      if (blob.type !== 'image/png') blob = new Blob([blob], { type:'image/png' });
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      showStatus('تم نسخ صورة QR');
+    }catch(error){
+      showStatus('تعذر نسخ صورة QR من هذا المتصفح. افتح QR واضغط بزر الفأرة الأيمن أو اضغط مطولًا لنسخ الصورة.', 'warn');
+    }
+  }
+
   function linksText(school){
     const links = buildLinks(school.school_slug);
     return [
@@ -103,15 +117,15 @@
           <b>${label}</b>
           <div class="url" id="url_${key}">${links[key]}</div>
           <button class="btn light" type="button" data-copy="${key}">نسخ الرابط</button>
-          <div class="qr-wrap"><img src="${qr}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div><button class="qr-copy" type="button" data-copy-qr="${qr}">نسخ QR</button></div>
+          <div class="qr-wrap"><img src="${qr}" alt="QR ${label}" loading="lazy"><div class="qr-note">امسح الرمز لفتح الرابط</div><button class="qr-copy" type="button" data-copy-qr-image="${qr}">نسخ صورة QR</button></div>
         </div>
       `;
     }).join('');
     box.querySelectorAll('[data-copy]').forEach((button) => {
       button.onclick = () => copyText(links[button.dataset.copy], 'تم نسخ الرابط بنجاح');
     });
-    box.querySelectorAll('[data-copy-qr]').forEach((button) => {
-      button.onclick = () => copyText(button.getAttribute('data-copy-qr'), 'تم نسخ رابط صورة QR');
+    box.querySelectorAll('[data-copy-qr-image]').forEach((button) => {
+      button.onclick = () => copyQrImage(button.getAttribute('data-copy-qr-image'));
     });
   }
 
