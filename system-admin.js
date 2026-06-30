@@ -1,7 +1,6 @@
 (function(){
   const $ = (id) => document.getElementById(id);
-  const EVENT_PREFIX = '__GLOBAL_EVENT_THEME__:';
-  const state = { schools: [], selected: null, client: null, eventTheme: null };
+  const state = { schools: [], selected: null, client: null };
 
   function showStatus(message, type='ok'){
     const box = $('systemStatus');
@@ -24,21 +23,12 @@
   }
 
   function cleanSlug(text){
-    return String(text || '')
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\-]+/g, '-')
-      .replace(/\-+/g, '-')
-      .replace(/^\-+|\-+$/g, '');
+    return String(text || '').trim().toLowerCase().replace(/[^a-z0-9\-]+/g, '-').replace(/\-+/g, '-').replace(/^\-+|\-+$/g, '');
   }
 
   function slugFromName(name){
-    const map = {
-      'مدرسة الشيخ سيف بن حمد الأغبري': 'alsheikh-saif',
-      'مدرسة الأحبة': 'alahba'
-    };
     const clean = String(name || '').replace(/\s+/g, ' ').trim();
-    if (map[clean]) return map[clean];
+    if (clean.includes('الشيخ سيف')) return 'alsheikh-saif';
     return 'school-' + Date.now().toString(36);
   }
 
@@ -54,7 +44,7 @@
       dashboard: `${base}dashboard-v2.html?school=${s}`,
       desktop: `${base}index.html?school=${s}&view=desktop`,
       mobile: `${base}index.html?school=${s}&view=mobile`,
-      app: `${base}index.html?school=${s}&view=mobile&app=1`
+      app: `${base}install.html?school=${s}`
     };
   }
 
@@ -70,7 +60,7 @@
       `رابط لوحة مدير المدرسة: ${links.dashboard}`,
       `رابط شاشة الحاسوب: ${links.desktop}`,
       `رابط الهاتف والآيباد: ${links.mobile}`,
-      `رابط الإضافة كتطبيق: ${links.app}`,
+      `رابط صفحة التثبيت: ${links.app}`,
       school.admin_code ? `رمز المدير: ${school.admin_code}` : ''
     ].filter(Boolean).join('\n');
   }
@@ -87,7 +77,7 @@
       dashboard: 'لوحة مدير المدرسة',
       desktop: 'شاشة الحاسوب',
       mobile: 'الهاتف والآيباد',
-      app: 'الإضافة كتطبيق'
+      app: 'صفحة التثبيت و QR'
     }).map(([key, label]) => `
       <div class="linkbox">
         <b>${label}</b>
@@ -121,18 +111,13 @@
         </div>
         <div class="meta">
           الرابط: ${school.school_slug || '--'}<br>
-          ${school.governorate || ''}${school.wilayat ? ' - ' + school.wilayat : ''}<br>
-          التصميم: ${themeLabel(school.theme_style)}
+          ${school.governorate || ''}${school.wilayat ? ' - ' + school.wilayat : ''}
         </div>
       </div>
     `).join('');
     list.querySelectorAll('.school-card').forEach((card) => {
       card.onclick = () => selectSchool(Number(card.dataset.id));
     });
-  }
-
-  function themeLabel(value){
-    return ({ omani:'العماني الرسمي', white:'الأبيض الفاخر', green:'الأخضر الهادئ', gold:'الذهبي' })[value] || 'العماني الرسمي';
   }
 
   async function loadSchools(){
@@ -159,7 +144,6 @@
     $('wilayat').value = school.wilayat || '';
     $('adminCode').value = school.admin_code || '';
     $('isActive').value = school.is_active ? 'true' : 'false';
-    $('themeStyle').value = school.theme_style || 'omani';
     $('logoUrl').value = school.logo_url || '';
     updateLogoPreview(school.logo_url || '');
     $('toggleSchoolBtn').style.display = 'block';
@@ -172,7 +156,6 @@
     state.selected = null;
     ['schoolId','schoolName','schoolSlug','governorate','wilayat','adminCode','logoUrl'].forEach((id) => { const el=$(id); if (el) el.value=''; });
     $('isActive').value = 'true';
-    $('themeStyle').value = 'omani';
     $('logoFile').value = '';
     $('toggleSchoolBtn').style.display = 'none';
     updateLogoPreview('');
@@ -224,15 +207,13 @@
       primary_color: '#0f766e',
       secondary_color: '#b7791f',
       background_color: '#f8f2e8',
-      theme_style: $('themeStyle').value || 'omani'
+      theme_style: 'omani'
     };
 
-    let result;
-    if (id) {
-      result = await db.from('schools').update(payload).eq('id', id);
-    } else {
-      result = await db.from('schools').insert(payload);
-    }
+    const result = id
+      ? await db.from('schools').update(payload).eq('id', id)
+      : await db.from('schools').insert(payload);
+
     if (result.error) {
       console.error(result.error);
       return showStatus('تعذر حفظ المدرسة. قد يكون الرابط المختصر مكررًا أو تحتاج صلاحيات قاعدة البيانات.', 'err');
@@ -254,117 +235,6 @@
     await loadSchools();
   }
 
-  function ensureEventPanel(){
-    if ($('eventThemePanel')) return;
-    const linksBox = $('linksBox');
-    if (!linksBox || !linksBox.parentElement) return;
-    const panel = document.createElement('div');
-    panel.id = 'eventThemePanel';
-    panel.className = 'linkbox';
-    panel.innerHTML = `
-      <b>تصميم مناسبة عام</b>
-      <div class="notice warn">يطبق مؤقتًا على كل المدارس خلال الفترة المحددة، ثم يعود كل مؤقت لتصميم مدرسته الأصلي.</div>
-      <label>تفعيل التصميم المؤقت</label>
-      <select id="eventEnabled"><option value="false">غير مفعّل</option><option value="true">مفعّل</option></select>
-      <label>اسم المناسبة</label>
-      <input id="eventTitle" placeholder="مثال: اليوم الوطني / يوم المعلم / رمضان">
-      <div class="row2">
-        <div><label>من تاريخ</label><input id="eventStart" type="date"></div>
-        <div><label>إلى تاريخ</label><input id="eventEnd" type="date"></div>
-      </div>
-      <label>التصميم المستخدم</label>
-      <select id="eventTheme"><option value="omani">العماني الرسمي</option><option value="white">الأبيض الفاخر</option><option value="green">الأخضر الهادئ</option><option value="gold">الذهبي</option></select>
-      <div class="actions"><button class="btn navy" type="button" id="saveEventThemeBtn">تطبيق على كل المدارس</button><button class="btn red" type="button" id="clearEventThemeBtn">إيقاف التصميم العام</button></div>
-      <div id="eventThemeState" class="meta">لا يوجد تصميم مناسبة نشط.</div>
-    `;
-    linksBox.parentElement.appendChild(panel);
-    $('saveEventThemeBtn').onclick = saveGlobalEventTheme;
-    $('clearEventThemeBtn').onclick = clearGlobalEventTheme;
-  }
-
-  function fillEventForm(config){
-    const item = config || {};
-    if ($('eventEnabled')) $('eventEnabled').value = item.enabled ? 'true' : 'false';
-    if ($('eventTitle')) $('eventTitle').value = item.title || '';
-    if ($('eventStart')) $('eventStart').value = item.startDate || '';
-    if ($('eventEnd')) $('eventEnd').value = item.endDate || '';
-    if ($('eventTheme')) $('eventTheme').value = item.theme || 'gold';
-    if ($('eventThemeState')) {
-      $('eventThemeState').textContent = item.enabled ? `نشط: ${item.title || 'مناسبة'} من ${item.startDate || '--'} إلى ${item.endDate || '--'} — ${themeLabel(item.theme)}` : 'لا يوجد تصميم مناسبة نشط.';
-    }
-  }
-
-  async function loadGlobalEventTheme(){
-    ensureEventPanel();
-    const db = getClient();
-    if (!db) return;
-    try {
-      const { data, error } = await db.from('school_messages')
-        .select('message_text,created_at')
-        .like('message_text', EVENT_PREFIX + '%')
-        .order('created_at', { ascending:false })
-        .limit(1);
-      if (error || !data || !data[0]) {
-        state.eventTheme = null;
-        fillEventForm(null);
-        return;
-      }
-      state.eventTheme = JSON.parse(String(data[0].message_text).slice(EVENT_PREFIX.length));
-      fillEventForm(state.eventTheme);
-    } catch (error) {
-      fillEventForm(null);
-    }
-  }
-
-  function readEventForm(){
-    return {
-      enabled: $('eventEnabled').value === 'true',
-      title: $('eventTitle').value.trim(),
-      startDate: $('eventStart').value,
-      endDate: $('eventEnd').value || $('eventStart').value,
-      theme: $('eventTheme').value || 'gold',
-      savedAt: new Date().toISOString()
-    };
-  }
-
-  async function saveGlobalEventTheme(){
-    const db = getClient();
-    if (!db) return;
-    const config = readEventForm();
-    if (!config.enabled) return clearGlobalEventTheme();
-    if (!config.title || !config.startDate) return showStatus('أدخل اسم المناسبة وتاريخ البداية.', 'err');
-    const schools = state.schools.filter((school) => school.school_slug);
-    if (!schools.length) return showStatus('لا توجد مدارس لتطبيق التصميم عليها.', 'warn');
-    try {
-      await db.from('school_messages').delete().like('message_text', EVENT_PREFIX + '%');
-      const text = EVENT_PREFIX + JSON.stringify(config);
-      const rows = schools.map((school) => ({ school_slug: school.school_slug, message_text:text, is_active:true, sort_order:9996 }));
-      const { error } = await db.from('school_messages').insert(rows);
-      if (error) throw error;
-      state.eventTheme = config;
-      fillEventForm(config);
-      showStatus('تم تطبيق تصميم المناسبة على كل المدارس.');
-    } catch (error) {
-      console.error(error);
-      showStatus('تعذر تطبيق تصميم المناسبة. تحقق من صلاحيات school_messages.', 'err');
-    }
-  }
-
-  async function clearGlobalEventTheme(){
-    const db = getClient();
-    if (!db) return;
-    try {
-      const { error } = await db.from('school_messages').delete().like('message_text', EVENT_PREFIX + '%');
-      if (error) throw error;
-      state.eventTheme = null;
-      fillEventForm(null);
-      showStatus('تم إيقاف التصميم العام المؤقت.');
-    } catch (error) {
-      console.error(error);
-      showStatus('تعذر إيقاف التصميم العام.', 'err');
-    }
-  }
-
   function init(){
     $('refreshBtn').onclick = loadSchools;
     $('saveSchoolBtn').onclick = saveSchool;
@@ -377,10 +247,8 @@
     });
     $('logoUrl').addEventListener('input', () => updateLogoPreview($('logoUrl').value.trim()));
     renderLinks(null);
-    ensureEventPanel();
-    loadSchools().then(loadGlobalEventTheme);
+    loadSchools();
     setTimeout(loadSchools, 1000);
-    setTimeout(loadGlobalEventTheme, 1400);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
