@@ -1,24 +1,29 @@
 (function(){
   'use strict';
 
+  if (window.__systemAdminSingleDesignCleanupSafeLoaded) return;
+  window.__systemAdminSingleDesignCleanupSafeLoaded = true;
+
   function hideElement(el){
-    if(!el) return;
+    if(!el || el.dataset.singleDesignHidden === 'true') return;
     el.style.display = 'none';
-    el.setAttribute('data-single-design-hidden', 'true');
+    el.dataset.singleDesignHidden = 'true';
   }
 
   function closestBlock(el){
     if(!el) return null;
-    return el.closest('.linkbox, .field, .row2, .row3, div, section, aside');
+    return el.closest('.linkbox, .field, .row2, .row3, div');
   }
 
   function cleanThemeTextFromSchoolCards(){
     document.querySelectorAll('.meta').forEach(function(meta){
+      if (meta.dataset.themeLineCleaned === 'true') return;
       const html = meta.innerHTML || '';
       if(html.includes('التصميم:')){
         meta.innerHTML = html
           .replace(/<br>\s*التصميم:[\s\S]*$/g, '')
           .replace(/\n\s*التصميم:[\s\S]*$/g, '');
+        meta.dataset.themeLineCleaned = 'true';
       }
     });
   }
@@ -28,13 +33,14 @@
       if(!location.pathname.includes('system-admin.html')) return;
 
       const subtitle = document.querySelector('.topbar p');
-      if(subtitle){
-        subtitle.textContent = 'إدارة المدارس، الشعارات، التفعيل، وروابط مؤقت الحصص';
+      const cleanSubtitle = 'إدارة المدارس، الشعارات، التفعيل، وروابط مؤقت الحصص';
+      if(subtitle && subtitle.textContent !== cleanSubtitle){
+        subtitle.textContent = cleanSubtitle;
       }
 
       const themeSelect = document.getElementById('themeStyle');
       if(themeSelect){
-        themeSelect.value = 'omani';
+        if (themeSelect.value !== 'omani') themeSelect.value = 'omani';
         hideElement(closestBlock(themeSelect));
       }
 
@@ -55,8 +61,7 @@
       });
 
       document.querySelectorAll('h2').forEach(function(title){
-        const txt = title.textContent || '';
-        if(txt.includes('التصاميم المعتمدة')) hideElement(title);
+        if((title.textContent || '').includes('التصاميم المعتمدة')) hideElement(title);
       });
 
       hideElement(document.getElementById('eventThemePanel'));
@@ -81,16 +86,8 @@
     const timer = setInterval(function(){
       cleanSystemAdminThemeOptions();
       runs += 1;
-      if(runs >= 20) clearInterval(timer);
-    }, 250);
-
-    if(document.body && window.MutationObserver){
-      const observer = new MutationObserver(function(){
-        cleanSystemAdminThemeOptions();
-      });
-      observer.observe(document.body, { childList:true, subtree:true });
-      setTimeout(function(){ observer.disconnect(); }, 8000);
-    }
+      if(runs >= 10) clearInterval(timer);
+    }, 600);
   }
 
   if(document.readyState === 'loading'){
@@ -99,5 +96,5 @@
     startCleanup();
   }
 
-  window.addEventListener('load', cleanSystemAdminThemeOptions);
+  window.addEventListener('load', cleanSystemAdminThemeOptions, { once:true });
 })();
