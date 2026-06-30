@@ -23,21 +23,25 @@ on conflict (id) do update set
   allowed_mime_types = array['image/png','image/jpeg','image/webp','image/svg+xml'];
 
 -- 2) السماح بقراءة الشعارات العامة
-create policy if not exists "school_logos_public_read"
+-- ملاحظة: PostgreSQL في Supabase لا يدعم create policy if not exists؛ لذلك نحذف السياسة ثم نعيد إنشاءها.
+drop policy if exists "school_logos_public_read" on storage.objects;
+create policy "school_logos_public_read"
 on storage.objects
 for select
 to anon, authenticated
 using (bucket_id = 'school-logos');
 
 -- 3) السماح برفع الشعارات من لوحة مدير النظام في مرحلة الاختبار
-create policy if not exists "school_logos_public_insert"
+drop policy if exists "school_logos_public_insert" on storage.objects;
+create policy "school_logos_public_insert"
 on storage.objects
 for insert
 to anon, authenticated
 with check (bucket_id = 'school-logos');
 
 -- 4) السماح بتحديث واستبدال الشعارات في مرحلة الاختبار
-create policy if not exists "school_logos_public_update"
+drop policy if exists "school_logos_public_update" on storage.objects;
+create policy "school_logos_public_update"
 on storage.objects
 for update
 to anon, authenticated
@@ -45,7 +49,8 @@ using (bucket_id = 'school-logos')
 with check (bucket_id = 'school-logos');
 
 -- 5) السماح بحذف شعار إذا احتجنا لاحقًا
-create policy if not exists "school_logos_public_delete"
+drop policy if exists "school_logos_public_delete" on storage.objects;
+create policy "school_logos_public_delete"
 on storage.objects
 for delete
 to anon, authenticated
