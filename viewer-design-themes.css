@@ -3,7 +3,6 @@
 
 html[data-theme-effective="omani"] .timer-app{filter:none}
 html[data-theme-effective="omani"] .period-title,
-html[data-theme-effective="omani"] .count-label,
 html[data-theme-effective="omani"] .mobile-school-heading{color:#064b35!important}
 html[data-theme-effective="omani"] .ticker-item{color:#064b35!important;text-shadow:0 1px 0 rgba(255,255,255,.86),0 2px 5px rgba(6,75,53,.12)!important}
 
@@ -12,7 +11,6 @@ html[data-theme-effective="white"] .period-card,
 html[data-theme-effective="white"] .clock-panel,
 html[data-theme-effective="white"] .mini-card{box-shadow:0 10px 28px rgba(15,23,42,.08)!important}
 html[data-theme-effective="white"] .period-title,
-html[data-theme-effective="white"] .count-label,
 html[data-theme-effective="white"] .mobile-school-heading{color:#1f3b34!important}
 html[data-theme-effective="white"] .remaining-time,
 html[data-theme-effective="white"] .digital-clock{color:#0f172a!important;text-shadow:0 1px 0 rgba(255,255,255,.85)!important}
@@ -20,7 +18,6 @@ html[data-theme-effective="white"] .ticker-item{color:#1f3b34!important;text-sha
 
 html[data-theme-effective="green"] .timer-app{filter:saturate(1.08) hue-rotate(2deg) contrast(1.015)}
 html[data-theme-effective="green"] .period-title,
-html[data-theme-effective="green"] .count-label,
 html[data-theme-effective="green"] .mobile-school-heading{color:#064e3b!important}
 html[data-theme-effective="green"] .remaining-time,
 html[data-theme-effective="green"] .digital-clock{color:#065f46!important}
@@ -28,7 +25,6 @@ html[data-theme-effective="green"] .ticker-item{color:#064e3b!important;text-sha
 
 html[data-theme-effective="gold"] .timer-app{filter:saturate(1.12) sepia(.09) contrast(1.02) brightness(1.01)}
 html[data-theme-effective="gold"] .period-title,
-html[data-theme-effective="gold"] .count-label,
 html[data-theme-effective="gold"] .mobile-school-heading{color:#6b3f08!important}
 html[data-theme-effective="gold"] .remaining-time,
 html[data-theme-effective="gold"] .digital-clock{color:#7c2d12!important;text-shadow:0 1px 0 rgba(255,255,255,.65),0 3px 12px rgba(120,53,15,.16)!important}
@@ -48,3 +44,10 @@ html[data-theme-effective="gold"] body::before{content:"";position:fixed;inset:0
 html[data-theme-effective="white"] body::before{opacity:.12;background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(226,232,240,.18))}
 html[data-theme-effective="green"] body::before{opacity:.09;background:linear-gradient(135deg,rgba(5,150,105,.18),rgba(240,253,244,.08))}
 html[data-theme-effective="gold"] body::before{opacity:.13;background:linear-gradient(135deg,rgba(245,158,11,.22),rgba(254,243,199,.08))}
+
+/* تثبيت لون عبارة متبقي من الحصة بعد اعتماد التصميم الواحد */
+.count-label,
+html[data-theme-effective] .count-label{
+  color:#fff!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.28)!important;
+}
