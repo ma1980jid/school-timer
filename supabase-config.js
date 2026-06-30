@@ -25,6 +25,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
   loadScript('dashboard-stable-links.js?v=stable-links-01');
   loadScript('dashboard-schedule-sync.js?v=schedule-sync-03');
   loadScript('dashboard-alert-settings.js?v=alerts-dashboard-03');
+  loadScript('dashboard-single-design-lock.js?v=single-design-01');
 } else {
   loadStyle('mobile-current-row-clean.css?v=mobile-row-01');
   loadScript('viewer-schedule-sync.js?v=schedule-sync-05');
