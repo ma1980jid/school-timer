@@ -4,11 +4,12 @@
 
   const PREFIX = '__ALERT_SETTINGS__:';
   const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
-  let settings = { enabled: false, beforeEndEnabled: true, endEnabled: true, phoneNotificationEnabled: true };
+  let settings = { enabled: false, beforeEndEnabled: true, endEnabled: true, phoneNotificationEnabled: true, beforeEndMinutes: 5 };
   let notifiedBefore = '';
   let notifiedEnd = '';
   let lastCurrent = '';
   let lastCurrentName = '';
+  let lastSeenCurrent = '';
   let client = null;
 
   function db(){
@@ -33,6 +34,23 @@
   async function loadSettings(){
     const c = db();
     if (!c) return;
+    try {
+      const table = await c.from('school_alert_settings')
+        .select('enabled,before_end_enabled,before_end_minutes,end_enabled,phone_notification_enabled')
+        .eq('school_slug', slug)
+        .maybeSingle();
+      if (!table.error && table.data) {
+        settings = {
+          enabled: !!table.data.enabled,
+          beforeEndEnabled: table.data.before_end_enabled !== false,
+          beforeEndMinutes: Math.max(1, Math.min(30, Number(table.data.before_end_minutes || 5))),
+          endEnabled: table.data.end_enabled !== false,
+          phoneNotificationEnabled: table.data.phone_notification_enabled !== false
+        };
+        return;
+      }
+    } catch (error) {}
+
     try {
       const r = await c.from('school_messages')
         .select('message_text,created_at')
@@ -82,6 +100,19 @@
     } catch (error) {}
   }
 
+  function closeStaleScreenAlert(key){
+    try {
+      if (lastSeenCurrent && key && lastSeenCurrent !== key) {
+        document.querySelectorAll('.viewer-alert-toast').forEach((el) => el.remove());
+      }
+      if (!key) {
+        document.querySelectorAll('.viewer-alert-toast').forEach((el) => {
+          if ((el.textContent || '').includes('باقي')) el.remove();
+        });
+      }
+    } catch (error) {}
+  }
+
   function check(){
     if (!settings.enabled || typeof window.getSchedule !== 'function') return;
     const schedule = window.getSchedule();
@@ -89,10 +120,14 @@
     const key = periodKey(current);
     const remaining = remainingSeconds(schedule);
 
+    closeStaleScreenAlert(key);
+
     if (current && key) {
       lastCurrent = key;
       lastCurrentName = current.name || '';
-      if (settings.beforeEndEnabled && remaining !== null && remaining <= 300 && remaining > 0 && notifiedBefore !== key) {
+      lastSeenCurrent = key;
+      const beforeSeconds = Math.max(1, Number(settings.beforeEndMinutes || 5)) * 60;
+      if (settings.beforeEndEnabled && remaining !== null && remaining <= beforeSeconds && remaining > 0 && notifiedBefore !== key) {
         notifiedBefore = key;
         sendNotification(`باقي ${Math.ceil(remaining / 60)} د من الحصة ${current.name}`);
       }
