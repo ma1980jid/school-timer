@@ -21,11 +21,6 @@
     else alert(message);
   }
 
-  function copyText(text, okMessage){
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(() => notify(okMessage || 'تم النسخ')).catch(() => notify('تعذر النسخ'));
-  }
-
   async function copyQrImage(qrUrl){
     try{
       if (!navigator.clipboard || !window.ClipboardItem) throw new Error('clipboard-image-not-supported');
@@ -46,10 +41,10 @@
     style.id = 'dashboardLinksQrStyle';
     style.textContent = `
       .dashboard-qr-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-      .dashboard-qr-box{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:8px;display:grid;place-items:center;text-align:center;gap:5px;min-height:168px}
-      .dashboard-qr-box img{width:108px;height:108px;object-fit:contain;display:block}
-      .dashboard-qr-box b{font-size:12px;color:#0f172a;margin-bottom:2px;line-height:1.4}
-      .dashboard-qr-copy{height:28px!important;min-height:28px!important;border-radius:9px!important;font-size:11px!important;padding:0 8px!important;background:#f8fafc!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-weight:900!important;cursor:pointer!important}
+      .dashboard-qr-box{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:7px;display:grid;place-items:center;text-align:center;gap:4px;min-height:158px}
+      .dashboard-qr-box img{width:106px;height:106px;object-fit:contain;display:block}
+      .dashboard-qr-box b{font-size:12px;color:#0f172a;margin-bottom:0;line-height:1.25}
+      .dashboard-qr-copy{height:27px!important;min-height:27px!important;border-radius:9px!important;font-size:10.5px!important;padding:0 6px!important;background:#f8fafc!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-weight:900!important;cursor:pointer!important;white-space:nowrap!important}
       .moved-actions-box{background:#f8fafc;border:1px solid #d7dee8;border-radius:13px;padding:7px;margin-bottom:6px;display:grid;gap:5px}
       .moved-actions-box .moved-title{text-align:center;color:#64748b;font-size:13px;font-weight:900;margin-bottom:2px}
       .moved-actions-box button{height:32px!important;min-height:32px!important;font-size:12px!important;border-radius:10px!important}
@@ -74,7 +69,7 @@
     const desktopQr = qrSrc(desktopUrl);
     const mobileQr = qrSrc(mobileUrl);
     wrap.innerHTML = `
-      <div class="dashboard-qr-box"><b>QR شاشة الحاسوب</b><img src="${desktopQr}" alt="QR شاشة الحاسوب"><button class="dashboard-qr-copy" data-copy-qr-image="${desktopQr}">نسخ صورة QR</button></div>
+      <div class="dashboard-qr-box"><b>QR الحاسوب</b><img src="${desktopQr}" alt="QR الحاسوب"><button class="dashboard-qr-copy" data-copy-qr-image="${desktopQr}">نسخ صورة QR</button></div>
       <div class="dashboard-qr-box"><b>QR الهاتف والآيباد</b><img src="${mobileQr}" alt="QR الهاتف والآيباد"><button class="dashboard-qr-copy" data-copy-qr-image="${mobileQr}">نسخ صورة QR</button></div>
     `;
     wrap.querySelectorAll('[data-copy-qr-image]').forEach((btn) => {
