@@ -29,9 +29,19 @@
     if (btn) btn.onclick = function(){ copy(next); };
   }
 
+  function loadSingleDesignCleanup(){
+    if (window.__systemAdminSingleDesignCleanupRequested) return;
+    window.__systemAdminSingleDesignCleanupRequested = true;
+    const script = document.createElement('script');
+    script.src = 'system-admin-single-design-cleanup.js?v=system-single-design-01';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   function start(){
     patch();
     setInterval(patch, 800);
+    loadSingleDesignCleanup();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
