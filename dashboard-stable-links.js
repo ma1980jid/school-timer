@@ -81,12 +81,19 @@
         box.innerHTML = '<div class="moved-title">أوامر إضافية</div>';
         rightSection.appendChild(box);
       }
-      const labelsToMove = ['إدارة الرسائل','تنبيهات الهاتف','دليل المستخدم','إعلانات المدرسة','الإعلانات المجدولة'];
+      const labelsToMove = ['إدارة الرسائل','تنبيهات الهاتف','إعلانات المدرسة','الإعلانات المجدولة'];
       Array.from(leftSection.querySelectorAll('button')).forEach((button) => {
         const txt = (button.textContent || '').trim();
+        if (txt.includes('دليل المستخدم') && box.contains(button)) {
+          button.remove();
+          return;
+        }
         if (labelsToMove.some((label) => txt.includes(label)) && !box.contains(button)) {
           box.appendChild(button);
         }
+      });
+      Array.from(box.querySelectorAll('button')).forEach((button) => {
+        if ((button.textContent || '').trim().includes('دليل المستخدم')) button.remove();
       });
     }catch(e){}
   }
