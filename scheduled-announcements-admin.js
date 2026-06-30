@@ -64,16 +64,11 @@
   function decode(text){
     const value = String(text || '');
     if (!value.startsWith(PREFIX)) return null;
-    try {
-      return JSON.parse(value.slice(PREFIX.length));
-    } catch (error) {
-      return null;
-    }
+    try { return JSON.parse(value.slice(PREFIX.length)); }
+    catch (error) { return null; }
   }
 
-  function clean(text){
-    return String(text || '').trim();
-  }
+  function clean(text){ return String(text || '').trim(); }
 
   function escapeHtml(value){
     return String(value || '')
@@ -85,18 +80,12 @@
 
   function legacyToSlotTexts(item){
     if (item.tickerText || item.rightText || item.leftText) {
-      return {
-        tickerText: item.tickerText || '',
-        rightText: item.rightText || '',
-        leftText: item.leftText || ''
-      };
+      return { tickerText:item.tickerText || '', rightText:item.rightText || '', leftText:item.leftText || '' };
     }
-
     const title = clean(item.title);
     const text = clean(item.text);
     const legacyText = title && text ? `${title}: ${text}` : (text || title);
     const target = clean(item.target) || 'ticker';
-
     return {
       tickerText: target === 'ticker' || target === 'all' ? legacyText : '',
       rightText: target === 'right' || target === 'all' ? legacyText : '',
@@ -133,63 +122,31 @@
   function createRow(item = {}){
     const row = document.createElement('div');
     row.className = 'scheduled-row';
-
     const start = item.start || todayKey();
     const end = item.end || item.start || addDays(start, 0);
     const id = item.id || String(Date.now()) + Math.random().toString(16).slice(2);
     const slots = legacyToSlotTexts(item);
-
     row.dataset.id = id;
     row.innerHTML = `
-      <div class="scheduled-row-head">
-        <span class="scheduled-row-title">مناسبة مجدولة</span>
-        <button class="mini del" type="button">حذف</button>
-      </div>
+      <div class="scheduled-row-head"><span class="scheduled-row-title">مناسبة مجدولة</span><button class="mini del" type="button">حذف</button></div>
       <div class="scheduled-row-grid">
-        <div>
-          <label>عنوان المناسبة</label>
-          <input class="scheduledTitle" value="${escapeHtml(item.title || '')}" placeholder="مثال: اليوم الوطني">
-        </div>
-        <div>
-          <label>تاريخ البداية</label>
-          <input class="scheduledStart" type="date" value="${escapeHtml(start)}">
-        </div>
-        <div>
-          <label>تاريخ النهاية</label>
-          <input class="scheduledEnd" type="date" value="${escapeHtml(end)}">
-        </div>
-        <div class="scheduled-row-grid">
-          <label class="scheduled-chip"><input class="scheduledAnnual" type="checkbox" style="width:auto;margin-inline-end:6px"> يتكرر سنويًا</label>
-          <label class="scheduled-chip"><input class="scheduledActive" type="checkbox" style="width:auto;margin-inline-end:6px" checked> مفعل</label>
-        </div>
+        <div><label>عنوان المناسبة</label><input class="scheduledTitle" value="${escapeHtml(item.title || '')}" placeholder="مثال: اليوم الوطني"></div>
+        <div><label>تاريخ البداية</label><input class="scheduledStart" type="date" value="${escapeHtml(start)}"></div>
+        <div><label>تاريخ النهاية</label><input class="scheduledEnd" type="date" value="${escapeHtml(end)}"></div>
+        <div class="scheduled-row-grid"><label class="scheduled-chip"><input class="scheduledAnnual" type="checkbox" style="width:auto;margin-inline-end:6px"> يتكرر سنويًا</label><label class="scheduled-chip"><input class="scheduledActive" type="checkbox" style="width:auto;margin-inline-end:6px" checked> مفعل</label></div>
       </div>
-      <div class="scheduled-slot">
-        <label>عبارة شريط الرسائل</label>
-        <textarea class="scheduledTickerText" placeholder="تظهر في الشريط السفلي المتحرك">${escapeHtml(slots.tickerText)}</textarea>
-      </div>
-      <div class="scheduled-row-grid">
-        <div class="scheduled-slot">
-          <label>عبارة الصندوق الأيمن</label>
-          <textarea class="scheduledRightText" placeholder="تظهر في الصندوق الأيمن">${escapeHtml(slots.rightText)}</textarea>
-        </div>
-        <div class="scheduled-slot">
-          <label>عبارة الصندوق الأيسر</label>
-          <textarea class="scheduledLeftText" placeholder="تظهر ثابتة في الصندوق الأيسر">${escapeHtml(slots.leftText)}</textarea>
-        </div>
-      </div>
+      <div class="scheduled-slot"><label>عبارة شريط الرسائل</label><textarea class="scheduledTickerText" placeholder="تظهر في الشريط السفلي المتحرك">${escapeHtml(slots.tickerText)}</textarea></div>
+      <div class="scheduled-row-grid"><div class="scheduled-slot"><label>عبارة الصندوق الأيمن</label><textarea class="scheduledRightText" placeholder="تظهر في الصندوق الأيمن">${escapeHtml(slots.rightText)}</textarea></div><div class="scheduled-slot"><label>عبارة الصندوق الأيسر</label><textarea class="scheduledLeftText" placeholder="تظهر ثابتة في الصندوق الأيسر">${escapeHtml(slots.leftText)}</textarea></div></div>
     `;
-
     row.querySelector('.scheduledAnnual').checked = !!item.annual;
     row.querySelector('.scheduledActive').checked = item.active !== false;
     row.querySelector('.mini.del').onclick = () => row.remove();
-
     return row;
   }
 
   function ensureDialog(){
     ensureStyles();
     if (document.getElementById('scheduledAnnouncementsDialog')) return;
-
     const dialog = document.createElement('div');
     dialog.id = 'scheduledAnnouncementsDialog';
     dialog.className = 'dialog';
@@ -198,14 +155,9 @@
         <h3>الإعلانات المجدولة</h3>
         <p class="scheduled-note">اربط الإعلان بتاريخ محدد، ويمكنك كتابة عبارة مختلفة للشريط وللصندوقين في المناسبة نفسها.</p>
         <div id="scheduledAnnouncementsList" class="scheduled-list"></div>
-        <div class="scheduled-actions">
-          <button class="btn light" type="button" id="addScheduledAnnouncementBtn">إضافة مناسبة</button>
-          <button class="btn navy" type="button" id="saveScheduledAnnouncementsBtn">حفظ</button>
-          <button class="btn" type="button" id="closeScheduledAnnouncementsBtn">إغلاق</button>
-        </div>
+        <div class="scheduled-actions"><button class="btn light" type="button" id="addScheduledAnnouncementBtn">إضافة مناسبة</button><button class="btn navy" type="button" id="saveScheduledAnnouncementsBtn">حفظ</button><button class="btn" type="button" id="closeScheduledAnnouncementsBtn">إغلاق</button></div>
       </div>
     `;
-
     document.body.appendChild(dialog);
     document.getElementById('addScheduledAnnouncementBtn').onclick = () => addRow();
     document.getElementById('saveScheduledAnnouncementsBtn').onclick = saveAnnouncements;
@@ -240,37 +192,14 @@
     const list = document.getElementById('scheduledAnnouncementsList');
     if (!list) return;
     list.replaceChildren();
-
-    const example = {
-      title: 'اليوم الوطني',
-      tickerText: 'كل عام وعماننا بخير',
-      rightText: 'اليوم الوطني المجيد',
-      leftText: 'دامت عمان عزًا وفخرًا',
-      start: todayKey(),
-      end: todayKey(),
-      annual: true
-    };
-
+    const example = { title:'اليوم الوطني', tickerText:'كل عام وعماننا بخير', rightText:'اليوم الوطني المجيد', leftText:'دامت عمان عزًا وفخرًا', start:todayKey(), end:todayKey(), annual:true };
     const client = getClient();
-    if (!client) {
-      addRow(example);
-      return;
-    }
-
+    if (!client) { addRow(example); return; }
     try {
-      const { data, error } = await client
-        .from('school_messages')
-        .select('message_text,sort_order')
-        .eq('school_slug', getSchoolSlug())
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-
+      const { data, error } = await client.from('school_messages').select('message_text,sort_order').eq('school_slug', getSchoolSlug()).eq('is_active', true).order('sort_order', { ascending: true });
       if (error) return;
       const items = (data || []).map((row) => decode(row.message_text)).filter(Boolean);
-      if (!items.length) {
-        addRow(example);
-        return;
-      }
+      if (!items.length) { addRow(example); return; }
       items.forEach((item) => addRow(item));
     } catch (error) {}
   }
@@ -282,6 +211,8 @@
     await loadAnnouncements();
   }
 
+  window.openScheduledAnnouncementsDialog = openDialog;
+
   function closeDialog(){
     const dialog = document.getElementById('scheduledAnnouncementsDialog');
     if (dialog) dialog.classList.remove('show');
@@ -289,64 +220,30 @@
 
   async function saveAnnouncements(){
     if (isSaving) return;
-
     const client = getClient();
     if (!client) return toastMsg('لم يتم ضبط اتصال Supabase');
-
     const code = requireAdminCode();
     if (!code) return toastMsg('لم يتم إدخال رمز الإدارة');
-
     const items = collectRows();
     if (!items.length) return toastMsg('أضف إعلانًا واحدًا على الأقل');
-
     const saveBtn = document.getElementById('saveScheduledAnnouncementsBtn');
     isSaving = true;
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'جارٍ الحفظ...';
-    }
-
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'جارٍ الحفظ...'; }
     try {
       const schoolSlug = getSchoolSlug();
-      const { data: ok, error: authError } = await client
-        .from('schools')
-        .select('school_slug')
-        .eq('school_slug', schoolSlug)
-        .eq('admin_code', code)
-        .maybeSingle();
-
-      if (authError || !ok) {
-        sessionStorage.removeItem('school_timer_admin_code_' + schoolSlug);
-        return toastMsg('رمز الإدارة غير صحيح');
-      }
-
-      const { error: delError } = await client
-        .from('school_messages')
-        .delete()
-        .eq('school_slug', schoolSlug)
-        .like('message_text', PREFIX + '%');
-
+      const { data: ok, error: authError } = await client.from('schools').select('school_slug').eq('school_slug', schoolSlug).eq('admin_code', code).maybeSingle();
+      if (authError || !ok) { sessionStorage.removeItem('school_timer_admin_code_' + schoolSlug); return toastMsg('رمز الإدارة غير صحيح'); }
+      const { error: delError } = await client.from('school_messages').delete().eq('school_slug', schoolSlug).like('message_text', PREFIX + '%');
       if (delError) return toastMsg('تعذر تحديث الإعلانات المجدولة');
-
-      const rows = items.map((item, index) => ({
-        school_slug: schoolSlug,
-        message_text: encode(item),
-        is_active: true,
-        sort_order: 8000 + index
-      }));
-
+      const rows = items.map((item, index) => ({ school_slug: schoolSlug, message_text: encode(item), is_active: true, sort_order: 8000 + index }));
       const { error: insError } = await client.from('school_messages').insert(rows);
       if (insError) return toastMsg('تعذر حفظ الإعلانات المجدولة');
-
       sessionStorage.setItem('school_timer_admin_code_' + schoolSlug, code);
       localStorage.setItem('school_timer_scheduled_' + schoolSlug, JSON.stringify({ savedAt: Date.now(), items }));
       toastMsg('تم حفظ الإعلانات المجدولة بنجاح');
     } finally {
       isSaving = false;
-      if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'حفظ';
-      }
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'حفظ'; }
     }
   }
 
@@ -359,33 +256,50 @@
     });
   }
 
+  function ensureMovedActionsBox(){
+    const rightSection = document.querySelector('.right-panel .section');
+    if (!rightSection) return null;
+    let box = document.getElementById('movedActionsBox');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'movedActionsBox';
+      box.className = 'moved-actions-box';
+      box.innerHTML = '<div class="moved-title">أوامر إضافية</div>';
+      rightSection.appendChild(box);
+    }
+    return box;
+  }
+
   function addButton(){
-    if (document.getElementById('scheduledAnnouncementsBtn')) return;
+    const box = ensureMovedActionsBox();
     const actions = document.querySelector('.actions');
-    if (!actions) return;
+    const target = box || actions;
+    if (!target) return;
 
-    const btn = document.createElement('button');
-    btn.id = 'scheduledAnnouncementsBtn';
-    btn.className = 'btn light';
-    btn.type = 'button';
-    btn.textContent = 'الإعلانات المجدولة';
-    btn.onclick = openDialog;
-
-    const announcementsBtn = document.getElementById('middleCardsAdminBtn');
-    actions.insertBefore(btn, announcementsBtn ? announcementsBtn.nextSibling : null);
+    let btn = document.getElementById('scheduledAnnouncementsBtn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'scheduledAnnouncementsBtn';
+      btn.className = 'btn light';
+      btn.type = 'button';
+      btn.textContent = 'الإعلانات المجدولة';
+      btn.onclick = openDialog;
+    }
+    btn.style.display = '';
+    btn.removeAttribute('aria-hidden');
+    if (btn.parentElement !== target) target.appendChild(btn);
   }
 
   function start(){
     addButton();
     hideAddPeriodButton();
+    setTimeout(addButton, 400);
     setTimeout(addButton, 1000);
+    setTimeout(addButton, 2500);
     setTimeout(hideAddPeriodButton, 500);
     setTimeout(hideAddPeriodButton, 1500);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 })();
