@@ -77,6 +77,40 @@
     }
   }
 
+  function fileToDataUrl(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function logoFileToCompactDataUrl(file){
+    const raw = await fileToDataUrl(file);
+    if (!file || !file.type || !file.type.startsWith('image/') || file.type.includes('svg')) return raw;
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const max = 512;
+          const scale = Math.min(1, max / Math.max(img.width || max, img.height || max));
+          const w = Math.max(1, Math.round((img.width || max) * scale));
+          const h = Math.max(1, Math.round((img.height || max) * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (error) { resolve(raw); }
+      };
+      img.onerror = () => resolve(raw);
+      img.src = raw;
+    });
+  }
+
   function linksText(school){
     const links = buildLinks(school.school_slug);
     return [
@@ -150,8 +184,8 @@
     $('wilayat').value = school.wilayat || '';
     $('adminCode').value = school.admin_code || '';
     $('isActive').value = school.is_active ? 'true' : 'false';
-    $('logoUrl').value = school.logo_url || '';
-    updateLogoPreview(school.logo_url || '');
+    $('logoUrl').value = school.logo_url || school.app_icon_url || '';
+    updateLogoPreview(school.logo_url || school.app_icon_url || '');
     $('toggleSchoolBtn').style.display = 'block';
     $('toggleSchoolBtn').textContent = school.is_active ? 'إيقاف المدرسة' : 'تفعيل المدرسة';
     renderLinks(school);
@@ -180,16 +214,31 @@
     const file = $('logoFile').files && $('logoFile').files[0];
     if (!file) return $('logoUrl').value.trim();
     const db = getClient();
-    if (!db) return $('logoUrl').value.trim();
     const safeName = `${slug || 'school'}-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9._\-]/g, '-');
     const path = `logos/${safeName}`;
-    const { error } = await db.storage.from('school-logos').upload(path, file, { upsert:true });
-    if (error) {
-      showStatus('تعذر رفع الشعار. سيتم حفظ رابط الشعار إن وجد. السبب: ' + errorText(error), 'warn', true);
-      return $('logoUrl').value.trim();
+
+    if (db && db.storage) {
+      try {
+        const { error } = await db.storage.from('school-logos').upload(path, file, { upsert:true });
+        if (!error) {
+          const { data } = db.storage.from('school-logos').getPublicUrl(path);
+          if (data && data.publicUrl) return data.publicUrl;
+        }
+        if (error) showStatus('لم يتم الرفع إلى Storage، سيتم حفظ الشعار داخل بيانات المدرسة. السبب: ' + errorText(error), 'warn', true);
+      } catch (error) {
+        showStatus('لم يتم الرفع إلى Storage، سيتم حفظ الشعار داخل بيانات المدرسة.', 'warn', true);
+      }
     }
-    const { data } = db.storage.from('school-logos').getPublicUrl(path);
-    return data && data.publicUrl || $('logoUrl').value.trim();
+
+    try {
+      const dataUrl = await logoFileToCompactDataUrl(file);
+      if (dataUrl) {
+        showStatus('تم تجهيز الشعار للحفظ داخل بيانات المدرسة. اضغط حفظ المدرسة لإكمال العملية.', 'warn', false);
+        return dataUrl;
+      }
+    } catch (error) {}
+
+    return $('logoUrl').value.trim();
   }
 
   async function saveSchool(){
@@ -248,6 +297,12 @@
     $('searchBox').addEventListener('input', renderSchools);
     $('schoolName').addEventListener('input', () => { if (!$('schoolSlug').value.trim() && !state.selected) $('schoolSlug').value = slugFromName($('schoolName').value); });
     $('logoUrl').addEventListener('input', () => updateLogoPreview($('logoUrl').value.trim()));
+    $('logoFile').addEventListener('change', async () => {
+      const file = $('logoFile').files && $('logoFile').files[0];
+      if (!file) return;
+      try { updateLogoPreview(await logoFileToCompactDataUrl(file)); }
+      catch (error) {}
+    });
     renderLinks(null);
     loadSchools();
     setTimeout(loadSchools, 1000);
