@@ -29,16 +29,25 @@
     try {
       const key = 'school_timer_messages_' + slug;
       const cached = JSON.parse(localStorage.getItem(key) || 'null');
-      if (!cached || !Array.isArray(cached.messages)) return;
-      const fixed = cached.messages.map((message) => String(message || '').includes('مدرسة الشيخ سيف بن حمد الأغبري') ? replacementText() : message);
-      localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), messages: fixed }));
+      if (cached && Array.isArray(cached.messages)) {
+        const fixed = cached.messages.map((message) => String(message || '').includes('مدرسة الشيخ سيف بن حمد الأغبري') ? replacementText() : message);
+        localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), messages: fixed }));
+      }
+      localStorage.removeItem('school_timer_messages_alsheikh-saif');
     } catch (error) {}
   }
 
   function start(){
     cleanCache();
     cleanTickerText();
-    setInterval(cleanTickerText, 3000);
+    let runs = 0;
+    const fast = setInterval(function(){
+      cleanCache();
+      cleanTickerText();
+      runs += 1;
+      if (runs >= 80) clearInterval(fast);
+    }, 150);
+    setInterval(cleanTickerText, 2500);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
