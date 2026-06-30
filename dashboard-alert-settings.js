@@ -147,6 +147,7 @@
         new_data: {
           enabled: !!settings.enabled,
           beforeEndMinutes: Number(settings.beforeEndMinutes || 5),
+          phoneNotificationEnabled: settings.phoneNotificationEnabled !== false,
           soundEnabled: !!settings.soundEnabled
         },
         details: 'تم حفظ إعدادات التنبيهات في school_alert_settings وفي __ALERT_SETTINGS__ مؤقتًا.'
@@ -184,6 +185,7 @@
     const beforeEndEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.beforeEndEnabled });
     const beforeEndMinutes = Object.assign(document.createElement('input'), { type:'number', min:'1', max:'30', value: Number(settings.beforeEndMinutes || 5) });
     const endEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.endEnabled });
+    const phoneNotificationEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: settings.phoneNotificationEnabled !== false });
     const soundEnabled = Object.assign(document.createElement('input'), { type:'checkbox', checked: !!settings.soundEnabled });
 
     box.append(
@@ -191,6 +193,7 @@
       row('تنبيه قبل نهاية الحصة', 'يظهر عداد تنازلي داخل شاشة المؤقت.', beforeEndEnabled),
       row('عدد دقائق التنبيه قبل النهاية', 'من 1 إلى 30 دقيقة.', beforeEndMinutes),
       row('تنبيه عند نهاية الحصة', 'يعرض رسالة عند انتهاء الحصة.', endEnabled),
+      row('إشعار الهاتف', 'يحتاج السماح بالإشعارات من الجهاز، وسيظهر زر تفعيل التنبيهات في شاشة العرض عند الحاجة.', phoneNotificationEnabled),
       row('الصوت', 'تشغيل صوت التنبيه عند السماح من الجهاز.', soundEnabled)
     );
 
@@ -215,7 +218,7 @@
           beforeEndEnabled: beforeEndEnabled.checked,
           beforeEndMinutes: Number(beforeEndMinutes.value || 5),
           endEnabled: endEnabled.checked,
-          phoneNotificationEnabled: true,
+          phoneNotificationEnabled: phoneNotificationEnabled.checked,
           screenAlertEnabled: true,
           soundEnabled: soundEnabled.checked,
           soundUrl: ''
