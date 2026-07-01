@@ -2,13 +2,6 @@
   if (window.__schoolTimerDashboardMessagesLoaded) return;
   window.__schoolTimerDashboardMessagesLoaded = true;
 
-  const DEFAULT_MESSAGES = [
-    'مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري',
-    'العلم نور',
-    'الانضباط طريق النجاح',
-    'نسعى لبناء مستقبل تعليمي متميز'
-  ];
-
   const SYSTEM_MARKERS = [
     '__CARD_',
     '__SCHEDULED__:',
@@ -45,7 +38,8 @@
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
       .filter(Boolean)
-      .filter((message) => !isSystemMessage(message));
+      .filter((message) => !isSystemMessage(message))
+      .filter((message) => !message.includes('مدرسة الشيخ سيف بن حمد الأغبري') || getSchoolSlug() === 'alsheikh-saif');
   }
 
   function mergeMessages(){
@@ -54,10 +48,26 @@
     Array.from(arguments).flat().forEach((message) => {
       const text = String(message || '').trim();
       if (!text || seen.has(text) || isSystemMessage(text)) return;
+      if (getSchoolSlug() !== 'alsheikh-saif' && text.includes('مدرسة الشيخ سيف بن حمد الأغبري')) return;
       seen.add(text);
       merged.push(text);
     });
     return merged;
+  }
+
+  function clearOldSchoolLocalCaches(){
+    const schoolSlug = getSchoolSlug();
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        const isTimerCache = key.startsWith('school_timer_messages_') || key.startsWith('school_timer_middle_cards_') || key.startsWith('school_timer_scheduled_');
+        if (isTimerCache && !key.endsWith('_' + schoolSlug)) localStorage.removeItem(key);
+      });
+      if (schoolSlug !== 'alsheikh-saif') {
+        localStorage.removeItem('school_timer_messages_alsheikh-saif');
+        localStorage.removeItem('school_timer_middle_cards_alsheikh-saif');
+        localStorage.removeItem('school_timer_scheduled_alsheikh-saif');
+      }
+    } catch (error) {}
   }
 
   function writeTickerCache(messages){
@@ -87,6 +97,7 @@
       .message-row textarea{width:100%;min-height:48px;resize:vertical;border:1px solid #cbd5e1;border-radius:12px;padding:10px;font-family:Tahoma,Arial,sans-serif;font-size:15px;font-weight:900;line-height:1.5;color:#0f172a;outline:none}
       .message-row textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
       .msg-note{margin:0;color:#64748b;font-weight:900;line-height:1.8}
+      .empty-messages-note{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:10px;text-align:center;color:#64748b;font-weight:900;line-height:1.8}
       .dialog-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
     `;
     document.head.appendChild(style);
@@ -114,6 +125,8 @@
   function addMessageInput(text=''){
     const list = $('messagesList');
     if (!list) return;
+    const empty = list.querySelector('.empty-messages-note');
+    if (empty) empty.remove();
     list.appendChild(createMessageRow(text));
   }
 
@@ -160,6 +173,7 @@
   }
 
   async function loadMessagesDialog(){
+    clearOldSchoolLocalCaches();
     const list = $('messagesList');
     if (!list) return;
     list.replaceChildren();
@@ -176,10 +190,19 @@
       messages = mergeMessages(newMessages, legacyMessages);
     }
 
-    const finalMessages = cleanMessages(messages).length ? cleanMessages(messages) : DEFAULT_MESSAGES;
+    const finalMessages = cleanMessages(messages);
     const fragment = document.createDocumentFragment();
 
-    finalMessages.forEach((message) => fragment.appendChild(createMessageRow(message)));
+    if (finalMessages.length) {
+      finalMessages.forEach((message) => fragment.appendChild(createMessageRow(message)));
+    } else {
+      const note = document.createElement('div');
+      note.className = 'empty-messages-note';
+      note.textContent = 'لا توجد رسائل محفوظة لهذه المدرسة حتى الآن. أضف رسالة جديدة ثم اضغط حفظ الرسائل.';
+      fragment.appendChild(note);
+      fragment.appendChild(createMessageRow(''));
+    }
+
     list.replaceChildren(fragment);
   }
 
@@ -368,7 +391,10 @@
     actions.insertBefore(btn, guideBtn || null);
   }
 
-  function init(){ addButton(); }
+  function init(){
+    clearOldSchoolLocalCaches();
+    addButton();
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
