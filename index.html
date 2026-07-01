@@ -7,13 +7,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>مؤقّت الحصص</title>
+  <script>
+    (function(){
+      var s = new URLSearchParams(location.search).get('school') || '';
+      if (s && s !== 'alsheikh-saif') document.documentElement.setAttribute('data-non-default-school','1');
+    })();
+  </script>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 
   <link rel="preload" as="image" href="desktop-bg.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
   <link rel="preload" as="image" href="mobile-bg.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
-  <link rel="preload" as="image" href="icons/school_logo.png" fetchpriority="high">
   <link rel="icon" href="icons/school_logo.png">
   <link rel="icon" sizes="192x192" href="icons/school_logo.png">
   <link rel="apple-touch-icon" href="icons/school_logo.png">
@@ -22,6 +27,7 @@
 
   <link rel="stylesheet" href="style.css?v=optimized-02">
   <style>
+    html[data-non-default-school="1"] #schoolLogo[src*="icons/school_logo"]{display:none!important}
     @media (max-width: 768px){
       .schedule-section{top:61.2%!important;height:32.8%!important;left:8.2%!important;right:6.2%!important;overflow:hidden!important;padding:0!important;background:transparent!important}
       .schedule-grid{height:100%!important;padding:8px 8px 7px!important;gap:1.6%!important;align-content:stretch!important;display:grid!important;grid-template-columns:1fr 1fr!important;background:transparent!important}
@@ -50,7 +56,7 @@
 <body>
   <main class="timer-app">
     <div class="school-logo-wrap">
-      <img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة" decoding="async" fetchpriority="high">
+      <img id="schoolLogo" alt="شعار المدرسة" decoding="async" fetchpriority="high">
     </div>
     <section class="top-cards">
       <div class="period-card next-card"><div class="period-title">الحصة القادمة</div><div id="nextName" class="period-name">--</div><div class="period-line"></div><div id="nextTime" class="period-time">--</div></div>
