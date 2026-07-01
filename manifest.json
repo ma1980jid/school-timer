@@ -1,7 +1,7 @@
 {
   "name": "مؤقت الحصص المدرسية",
   "short_name": "مؤقت الحصص",
-  "start_url": "index.html?school=alsheikh-saif&view=mobile",
+  "start_url": "index.html?view=mobile",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f8f2e8",
