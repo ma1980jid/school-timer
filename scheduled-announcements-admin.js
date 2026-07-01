@@ -9,6 +9,10 @@
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   }
 
+  function isDefaultSchool(){ return getSchoolSlug() === 'alsheikh-saif'; }
+  function isWrongSchoolText(text){ return !isDefaultSchool() && String(text || '').includes('مدرسة الشيخ سيف بن حمد الأغبري'); }
+  function clean(text){ return String(text || '').trim(); }
+
   function getClient(){
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
     if (!window.schoolTimerScheduledClient) {
@@ -58,7 +62,29 @@
     catch (error) { return null; }
   }
 
-  function clean(text){ return String(text || '').trim(); }
+  function scheduledHasWrongSchool(item){
+    if (!item) return false;
+    return [item.title, item.text, item.tickerText, item.rightText, item.leftText].some(isWrongSchoolText);
+  }
+
+  function sanitizeItem(item){
+    if (!item || scheduledHasWrongSchool(item)) return null;
+    return item;
+  }
+
+  function clearOldScheduledCaches(){
+    const schoolSlug = getSchoolSlug();
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('school_timer_scheduled_') && !key.endsWith('_' + schoolSlug)) localStorage.removeItem(key);
+      });
+      if (!isDefaultSchool()) localStorage.removeItem('school_timer_scheduled_alsheikh-saif');
+      const cached = JSON.parse(localStorage.getItem('school_timer_scheduled_' + schoolSlug) || 'null');
+      if (cached && Array.isArray(cached.items) && cached.items.some(scheduledHasWrongSchool)) {
+        localStorage.removeItem('school_timer_scheduled_' + schoolSlug);
+      }
+    } catch (error) {}
+  }
 
   function escapeHtml(value){
     return String(value || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -94,6 +120,7 @@
       .scheduled-row textarea{min-height:58px;resize:vertical;line-height:1.55}
       .scheduled-row input:focus,.scheduled-row textarea:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
       .scheduled-note{margin:0;color:#64748b;font-weight:900;line-height:1.8}
+      .scheduled-empty-note{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:12px;text-align:center;color:#64748b;font-weight:900;line-height:1.8}
       .scheduled-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;position:sticky;bottom:0;z-index:5;background:linear-gradient(180deg,rgba(255,255,255,.72),#fff 42%);padding-top:12px;padding-bottom:4px}
       .scheduled-chip{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;background:#ecfeff;color:#0f766e;font-size:12px;font-weight:900}
       .scheduled-slot{border:1px dashed #cbd5e1;border-radius:14px;padding:8px;background:white}
@@ -141,28 +168,45 @@
     document.getElementById('closeScheduledAnnouncementsBtn').onclick = closeDialog;
   }
 
-  function addRow(item){ const list = document.getElementById('scheduledAnnouncementsList'); if (list) list.appendChild(createRow(item)); }
+  function addRow(item){
+    const list = document.getElementById('scheduledAnnouncementsList');
+    if (!list) return;
+    const empty = list.querySelector('.scheduled-empty-note');
+    if (empty) empty.remove();
+    list.appendChild(createRow(item));
+  }
 
   function collectRows(){
     return [...document.querySelectorAll('.scheduled-row')].map((row) => {
       const start = clean(row.querySelector('.scheduledStart')?.value);
       const end = clean(row.querySelector('.scheduledEnd')?.value) || start;
-      return { id:row.dataset.id || String(Date.now()), title:clean(row.querySelector('.scheduledTitle')?.value), tickerText:clean(row.querySelector('.scheduledTickerText')?.value), rightText:clean(row.querySelector('.scheduledRightText')?.value), leftText:clean(row.querySelector('.scheduledLeftText')?.value), start, end, annual:!!row.querySelector('.scheduledAnnual')?.checked, active:!!row.querySelector('.scheduledActive')?.checked };
-    }).filter((item) => (item.title || item.tickerText || item.rightText || item.leftText) && item.start && item.end);
+      const item = { id:row.dataset.id || String(Date.now()), title:clean(row.querySelector('.scheduledTitle')?.value), tickerText:clean(row.querySelector('.scheduledTickerText')?.value), rightText:clean(row.querySelector('.scheduledRightText')?.value), leftText:clean(row.querySelector('.scheduledLeftText')?.value), start, end, annual:!!row.querySelector('.scheduledAnnual')?.checked, active:!!row.querySelector('.scheduledActive')?.checked };
+      return sanitizeItem(item);
+    }).filter((item) => item && (item.title || item.tickerText || item.rightText || item.leftText) && item.start && item.end);
   }
 
   async function loadAnnouncements(){
+    clearOldScheduledCaches();
     const list = document.getElementById('scheduledAnnouncementsList');
     if (!list) return;
     list.replaceChildren();
-    const example = { title:'اليوم الوطني', tickerText:'كل عام وعماننا بخير', rightText:'اليوم الوطني المجيد', leftText:'دامت عمان عزًا وفخرًا', start:todayKey(), end:todayKey(), annual:true };
     const client = getClient();
-    if (!client) { addRow(example); return; }
+    if (!client) {
+      addRow();
+      return;
+    }
     try {
       const { data, error } = await client.from('school_messages').select('message_text,sort_order').eq('school_slug', getSchoolSlug()).eq('is_active', true).order('sort_order', { ascending:true });
       if (error) return;
-      const items = (data || []).map((row) => decode(row.message_text)).filter(Boolean);
-      if (!items.length) { addRow(example); return; }
+      const items = (data || []).map((row) => sanitizeItem(decode(row.message_text))).filter(Boolean);
+      if (!items.length) {
+        const note = document.createElement('div');
+        note.className = 'scheduled-empty-note';
+        note.textContent = 'لا توجد إعلانات مجدولة محفوظة لهذه المدرسة حتى الآن. أضف مناسبة جديدة ثم اضغط حفظ.';
+        list.appendChild(note);
+        addRow();
+        return;
+      }
       items.forEach((item) => addRow(item));
     } catch (error) {}
   }
@@ -233,6 +277,7 @@
   }
 
   function start(){
+    clearOldScheduledCaches();
     addButton();
     hideAddPeriodButton();
     setTimeout(addButton, 400);
