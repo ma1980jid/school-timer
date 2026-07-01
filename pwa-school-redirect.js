@@ -35,11 +35,17 @@
     if (next.href !== location.href) location.replace(next.href);
   }
 
+  const preferred = getPreferredSchool();
+
   if (currentSchool) {
-    rememberSchool(currentSchool);
+    const normalizedCurrent = safeSlug(currentSchool);
+    if (preferred && preferred !== normalizedCurrent && normalizedCurrent === 'alsheikh-saif') {
+      redirectTo(preferred);
+      return;
+    }
+    rememberSchool(normalizedCurrent);
     return;
   }
 
-  const preferred = getPreferredSchool();
   if (preferred) redirectTo(preferred);
 })();
