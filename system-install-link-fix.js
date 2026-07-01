@@ -68,6 +68,19 @@
     } catch (error) {}
   }
 
+  async function callDeleteRpc(client, slug, code){
+    try {
+      const result = await client.rpc('delete_school_cascade', {
+        p_school_slug: slug,
+        p_confirm_slug: slug,
+        p_system_code: code.trim()
+      });
+      return result || { error: null, data: null };
+    } catch (error) {
+      return { error: error, data: null };
+    }
+  }
+
   async function verifiedDelete(){
     const slug = selectedSlug();
     const name = selectedName() || slug;
@@ -83,14 +96,16 @@
 
     try {
       const code = prompt('أدخل رمز مدير النظام لتنفيذ الحذف النهائي:') || '';
-      await client.rpc('delete_school_cascade', { p_school_slug: slug, p_confirm_slug: slug, p_system_code: code.trim() }).catch(() => null);
+      const rpcResult = await callDeleteRpc(client, slug, code);
+      if (rpcResult.error) console.warn('تعذر تنفيذ دالة الحذف:', rpcResult.error);
+
       let exists = await schoolExists(client, slug);
       if (exists) {
         await client.from('schools').delete().eq('school_slug', slug).select('school_slug');
         exists = await schoolExists(client, slug);
       }
       if (exists) {
-        status('لم يتم حذف المدرسة فعليًا من قاعدة البيانات. شغّل ملف SQL: database/delete_school_cascade.sql من Supabase ثم جرّب مرة أخرى.', 'err');
+        status('لم يتم حذف المدرسة فعليًا من قاعدة البيانات. شغّل ملف SQL: database/delete_school_cascade.sql من Supabase ثم جرّب مرة أخرى، وتأكد من إدخال رمز الحذف الصحيح.', 'err');
         return;
       }
       cleanLocal(slug);
