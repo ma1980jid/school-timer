@@ -2,12 +2,11 @@
   if (window.__viewerMultischoolIdentityLoaded) return;
   window.__viewerMultischoolIdentityLoaded = true;
 
-  const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+  const urlParams = new URLSearchParams(location.search);
+  const slug = urlParams.get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_identity_' + slug;
   const isDefaultSchool = slug === 'alsheikh-saif';
   let identity = null;
-  let observerStarted = false;
-  let applying = false;
 
   function getClient(){
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
@@ -24,7 +23,7 @@
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (!cached || !cached.data) return null;
-      if (Date.now() - Number(cached.savedAt || 0) > 24 * 60 * 60 * 1000) return null;
+      if (Date.now() - Number(cached.savedAt || 0) > 6 * 60 * 60 * 1000) return null;
       return cached.data;
     } catch (error) { return null; }
   }
@@ -34,38 +33,24 @@
     catch (error) {}
   }
 
-  function cleanOtherSchoolSessionHints(){
+  function cleanDefaultSchoolCache(){
     if (isDefaultSchool) return;
     try {
       ['school_timer_settings_alsheikh-saif','school_timer_identity_alsheikh-saif','school_timer_messages_alsheikh-saif','school_timer_middle_cards_alsheikh-saif','school_timer_scheduled_alsheikh-saif'].forEach((key) => localStorage.removeItem(key));
     } catch (error) {}
   }
 
-  function earlyReset(){
+  function hideDefaultLogoUntilReady(){
     if (isDefaultSchool) return;
-    const nameEl = document.getElementById('schoolName');
-    const visionEl = document.getElementById('visionText');
     const logo = document.getElementById('schoolLogo');
-    const ticker = document.getElementById('tickerTrack');
-
-    if (nameEl && (!identity || !identity.school_name)) nameEl.textContent = '--';
-    if (visionEl && (visionEl.textContent || '').includes('الشيخ سيف')) visionEl.textContent = '--';
-    if (logo && (!identity || !getLogo(identity))) {
-      logo.removeAttribute('src');
-      logo.style.display = 'none';
-    }
-    if (ticker && (ticker.textContent || '').includes('مدرسة الشيخ سيف بن حمد الأغبري')) ticker.replaceChildren();
+    if (!logo || identity) return;
+    logo.removeAttribute('src');
+    logo.style.display = 'none';
   }
 
   function setIconLinks(iconUrl){
     if (!iconUrl) return;
     document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach((link) => { link.href = iconUrl; });
-    if (!document.querySelector('link[rel="icon"]')) {
-      const link = document.createElement('link'); link.rel = 'icon'; link.href = iconUrl; document.head.appendChild(link);
-    }
-    if (!document.querySelector('link[rel="apple-touch-icon"]')) {
-      const link = document.createElement('link'); link.rel = 'apple-touch-icon'; link.href = iconUrl; document.head.appendChild(link);
-    }
   }
 
   function setDynamicManifest(data){
@@ -88,16 +73,15 @@
     };
     try {
       const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-      const url = URL.createObjectURL(blob);
+      const manifestUrl = URL.createObjectURL(blob);
       let link = document.querySelector('link[rel="manifest"]');
       if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
-      link.href = url;
+      link.href = manifestUrl;
     } catch (error) {}
   }
 
   function applyIdentity(data){
     if (!data) return;
-    applying = true;
     identity = data;
     const schoolName = safeText(data.school_name);
     const logoUrl = getLogo(data);
@@ -105,14 +89,14 @@
     if (schoolName) {
       document.title = schoolName + ' - مؤقت الحصص';
       const nameEl = document.getElementById('schoolName');
-      if (nameEl && nameEl.textContent !== schoolName) nameEl.textContent = schoolName;
+      if (nameEl) nameEl.textContent = schoolName;
       try { if (window.settings) window.settings.schoolName = schoolName; } catch (error) {}
     }
 
     const logo = document.getElementById('schoolLogo');
     if (logo) {
       if (logoUrl) {
-        if (logo.src !== logoUrl) logo.src = logoUrl;
+        logo.src = logoUrl;
         logo.style.display = '';
       } else if (!isDefaultSchool) {
         logo.removeAttribute('src');
@@ -123,7 +107,6 @@
     if (logoUrl) setIconLinks(logoUrl);
     setDynamicManifest(data);
     cleanWrongSchoolText();
-    applying = false;
   }
 
   function cleanWrongSchoolText(){
@@ -135,28 +118,16 @@
     });
   }
 
-  function startObserver(){
-    if (observerStarted || !window.MutationObserver) return;
-    observerStarted = true;
-    const target = document.body || document.documentElement;
-    const observer = new MutationObserver(function(){
-      if (applying) return;
-      if (identity) applyIdentity(identity);
-      else earlyReset();
-      cleanWrongSchoolText();
-    });
-    observer.observe(target, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['src','style'] });
-    setTimeout(() => observer.disconnect(), 30000);
-  }
-
   async function loadIdentity(){
-    cleanOtherSchoolSessionHints();
+    cleanDefaultSchoolCache();
+    hideDefaultLogoUntilReady();
+
     const cached = readCache();
     if (cached) applyIdentity(cached);
-    else earlyReset();
 
     const db = getClient();
     if (!db) return;
+
     try {
       const { data, error } = await db
         .from('schools')
@@ -170,17 +141,11 @@
   }
 
   function start(){
-    earlyReset();
-    startObserver();
+    hideDefaultLogoUntilReady();
     loadIdentity();
-    let runs = 0;
-    const timer = setInterval(function(){
-      if (identity) applyIdentity(identity);
-      else earlyReset();
-      cleanWrongSchoolText();
-      runs += 1;
-      if (runs >= 80) clearInterval(timer);
-    }, 150);
+    setTimeout(loadIdentity, 700);
+    setTimeout(function(){ if (identity) applyIdentity(identity); cleanWrongSchoolText(); }, 1400);
+    setTimeout(function(){ if (identity) applyIdentity(identity); cleanWrongSchoolText(); }, 3000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
