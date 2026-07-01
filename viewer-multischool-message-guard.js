@@ -40,14 +40,9 @@
   function start(){
     cleanCache();
     cleanTickerText();
-    let runs = 0;
-    const fast = setInterval(function(){
-      cleanCache();
-      cleanTickerText();
-      runs += 1;
-      if (runs >= 80) clearInterval(fast);
-    }, 150);
-    setInterval(cleanTickerText, 2500);
+    setTimeout(function(){ cleanCache(); cleanTickerText(); }, 700);
+    setTimeout(cleanTickerText, 1600);
+    setTimeout(cleanTickerText, 3200);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
