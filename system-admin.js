@@ -1,13 +1,14 @@
 (function(){
   const $ = (id) => document.getElementById(id);
   const state = { schools: [], selected: null, client: null };
+  const RELATED_TABLES = ['school_display_messages','school_messages','school_timer_settings','school_schedule_rows','school_alert_settings','school_devices','device_activations'];
 
   function schoolKey(school){ return String((school && school.school_slug) || ''); }
   function errorText(error){ return error ? [error.message, error.details, error.hint, error.code].filter(Boolean).join(' | ') : ''; }
 
   function showStatus(message, type='ok', sticky=false){
     const box = $('systemStatus');
-    if (!box) return;
+    if (!box) return alert(message);
     box.style.display = 'block';
     box.className = type === 'err' ? 'notice err' : type === 'warn' ? 'notice warn' : 'notice';
     box.textContent = message;
@@ -24,6 +25,7 @@
       .qr-wrap img{width:124px;height:124px;object-fit:contain;display:block}
       .qr-note{text-align:center;color:#64748b;font-size:12px;font-weight:900;margin-top:2px}
       .qr-copy{height:30px!important;min-height:30px!important;border-radius:10px!important;font-size:12px!important;padding:0 10px!important;background:#f8fafc!important;color:#0f172a!important;border:1px solid #cbd5e1!important;font-weight:900!important;cursor:pointer!important}
+      #deleteSchoolBtn{margin-top:8px!important;width:100%!important}
     `;
     document.head.appendChild(style);
   }
@@ -52,8 +54,8 @@
     const s = encodeURIComponent(slug || '');
     return {
       dashboard: `${base}dashboard-v2.html?school=${s}`,
-      desktop: `${base}index.html?school=${s}&view=desktop`,
-      mobile: `${base}index.html?school=${s}&view=mobile`,
+      desktop: `${base}index.html?school=${s}&view=desktop&v=no-default-logo-01`,
+      mobile: `${base}index.html?school=${s}&view=mobile&v=no-default-logo-01`,
       app: `${base}install.html?school=${s}`
     };
   }
@@ -188,6 +190,8 @@
     updateLogoPreview(school.logo_url || school.app_icon_url || '');
     $('toggleSchoolBtn').style.display = 'block';
     $('toggleSchoolBtn').textContent = school.is_active ? 'إيقاف المدرسة' : 'تفعيل المدرسة';
+    const del = $('deleteSchoolBtn');
+    if (del) del.style.display = 'block';
     renderLinks(school);
     renderSchools();
   }
@@ -198,6 +202,8 @@
     $('isActive').value = 'true';
     $('logoFile').value = '';
     $('toggleSchoolBtn').style.display = 'none';
+    const del = $('deleteSchoolBtn');
+    if (del) del.style.display = 'none';
     updateLogoPreview('');
     renderLinks(null);
     renderSchools();
@@ -287,8 +293,69 @@
     await loadSchools();
   }
 
+  function cleanLocalSchoolCaches(slug){
+    try {
+      ['school_timer_messages_','school_timer_middle_cards_','school_timer_scheduled_','school_timer_settings_','school_timer_identity_','school_timer_admin_code_'].forEach((prefix) => {
+        localStorage.removeItem(prefix + slug);
+        sessionStorage.removeItem(prefix + slug);
+      });
+    } catch (error) {}
+  }
+
+  async function deleteRelatedRows(db, slug){
+    for (const table of RELATED_TABLES) {
+      try { await db.from(table).delete().eq('school_slug', slug); }
+      catch (error) {}
+    }
+  }
+
+  async function deleteSelectedSchool(){
+    if (!state.selected) return showStatus('اختر مدرسة أولًا.', 'warn');
+    const slug = schoolKey(state.selected);
+    const name = state.selected.school_name || slug;
+    const ok = confirm('سيتم حذف المدرسة وبياناتها المرتبطة:\n\n' + name + '\n' + slug + '\n\nهل تريد المتابعة؟');
+    if (!ok) return;
+    const typed = prompt('للتأكيد اكتب الرابط المختصر للمدرسة كما هو:\n' + slug);
+    if (String(typed || '').trim() !== slug) return showStatus('تم إلغاء الحذف؛ لم يتم إدخال الرابط المختصر بشكل صحيح.', 'warn');
+
+    const db = getClient();
+    if (!db) return;
+    const button = $('deleteSchoolBtn');
+    if (button) { button.disabled = true; button.textContent = 'جارٍ الحذف...'; }
+
+    try {
+      await deleteRelatedRows(db, slug);
+      const { error } = await db.from('schools').delete().eq('school_slug', slug);
+      if (error) throw error;
+      cleanLocalSchoolCaches(slug);
+      showStatus('تم حذف المدرسة بنجاح: ' + name, 'ok', true);
+      resetForm();
+      await loadSchools();
+    } catch (error) {
+      console.warn('تعذر حذف المدرسة:', error);
+      showStatus('تعذر حذف المدرسة: ' + errorText(error), 'err', true);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = 'حذف المدرسة'; }
+    }
+  }
+
+  function ensureDeleteButton(){
+    if ($('deleteSchoolBtn')) return;
+    const toggle = $('toggleSchoolBtn');
+    if (!toggle || !toggle.parentElement) return;
+    const button = document.createElement('button');
+    button.id = 'deleteSchoolBtn';
+    button.type = 'button';
+    button.className = 'btn red';
+    button.style.display = 'none';
+    button.textContent = 'حذف المدرسة';
+    button.onclick = deleteSelectedSchool;
+    toggle.insertAdjacentElement('afterend', button);
+  }
+
   function init(){
     ensureQrStyle();
+    ensureDeleteButton();
     $('refreshBtn').onclick = loadSchools;
     $('saveSchoolBtn').onclick = saveSchool;
     $('newSchoolBtn').onclick = resetForm;
