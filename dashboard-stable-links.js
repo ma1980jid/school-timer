@@ -2,14 +2,23 @@
   if (window.__schoolTimerStableLinksLoaded) return;
   window.__schoolTimerStableLinksLoaded = true;
 
+  const VIEWER_VERSION = 'no-default-logo-01';
+
   function getSchoolSlug(){
     return new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   }
 
+  function baseFolder(){
+    return location.origin + location.pathname.replace(/[^/]*$/, '');
+  }
+
   function buildStableUrl(view){
-    const basePath = location.pathname.replace(/dashboard-v2\.html$/, 'index.html');
-    const params = new URLSearchParams({ school: getSchoolSlug(), view: view });
-    return `${location.origin}${basePath}?${params.toString()}`;
+    const params = new URLSearchParams({
+      school: getSchoolSlug(),
+      view: view,
+      v: VIEWER_VERSION
+    });
+    return `${baseFolder()}index.html?${params.toString()}`;
   }
 
   function qrSrc(url){
@@ -121,6 +130,7 @@
 
   function start(){
     setStableLinks();
+    setTimeout(setStableLinks, 50);
     setTimeout(setStableLinks, 300);
     setTimeout(setStableLinks, 1000);
     setTimeout(setStableLinks, 2500);
