@@ -2,11 +2,17 @@
   if (window.__schoolTimerTickerMessagesLoaded) return;
   window.__schoolTimerTickerMessagesLoaded = true;
 
-  const DEFAULT_MESSAGES = [
+  const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+  const isDefaultSchool = schoolSlug === 'alsheikh-saif';
+  const DEFAULT_MESSAGES = isDefaultSchool ? [
     'مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري',
     'العلم نور',
     'الانضباط طريق النجاح',
     'نسعى لبناء مستقبل تعليمي متميز'
+  ] : [
+    'مرحبًا بكم في مدرستكم',
+    'العلم نور',
+    'الانضباط طريق النجاح'
   ];
 
   const RIGHT_PREFIX = '__CARD_RIGHT__:';
@@ -18,7 +24,6 @@
   const AUTO_THEME_PREFIX = '__AUTO_THEME__:';
   const CACHE_TTL = 10 * 60 * 1000;
   const REFRESH_INTERVAL = 10 * 60 * 1000;
-  const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_messages_' + schoolSlug;
   const cardsCacheKey = 'school_timer_middle_cards_' + schoolSlug;
   const scheduledCacheKey = 'school_timer_scheduled_' + schoolSlug;
@@ -42,6 +47,10 @@
       || isAlertSettingsMessage(message)
       || isGlobalEventThemeMessage(message)
       || isAutoThemeMessage(message);
+  }
+
+  function isWrongSchoolText(message){
+    return !isDefaultSchool && String(message || '').includes('مدرسة الشيخ سيف بن حمد الأغبري');
   }
 
   function getClient(){
@@ -69,7 +78,8 @@
     return (Array.isArray(messages) ? messages : [])
       .map((message) => String(message || '').trim())
       .filter(Boolean)
-      .filter((message) => !isSystemMessage(message));
+      .filter((message) => !isSystemMessage(message))
+      .filter((message) => !isWrongSchoolText(message));
   }
 
   function mergeMessages(){
@@ -77,11 +87,29 @@
     const merged = [];
     Array.from(arguments).flat().forEach((message) => {
       const text = String(message || '').trim();
-      if (!text || seen.has(text) || isSystemMessage(text)) return;
+      if (!text || seen.has(text) || isSystemMessage(text) || isWrongSchoolText(text)) return;
       seen.add(text);
       merged.push(text);
     });
     return merged;
+  }
+
+  function clearWrongSchoolCaches(){
+    try {
+      if (!isDefaultSchool) {
+        localStorage.removeItem('school_timer_messages_alsheikh-saif');
+        localStorage.removeItem('school_timer_middle_cards_alsheikh-saif');
+        localStorage.removeItem('school_timer_scheduled_alsheikh-saif');
+      }
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && Array.isArray(cached.messages) && cached.messages.some(isWrongSchoolText)) {
+        localStorage.removeItem(cacheKey);
+      }
+      const cards = JSON.parse(localStorage.getItem(cardsCacheKey) || 'null');
+      if (cards && cards.cards && Object.values(cards.cards).some(isWrongSchoolText)) {
+        localStorage.removeItem(cardsCacheKey);
+      }
+    } catch (error) {}
   }
 
   function getTodayKey(){
@@ -171,9 +199,9 @@
     const cardOverrides = {};
     active.forEach((item) => {
       const { tickerText, rightText, leftText } = getScheduledSlotTexts(item);
-      if (tickerText) tickerMessages.push(`📌 ${tickerText}`);
-      if (rightText) cardOverrides.right = rightText;
-      if (leftText) cardOverrides.left = leftText;
+      if (tickerText && !isWrongSchoolText(tickerText)) tickerMessages.push(`📌 ${tickerText}`);
+      if (rightText && !isWrongSchoolText(rightText)) cardOverrides.right = rightText;
+      if (leftText && !isWrongSchoolText(leftText)) cardOverrides.left = leftText;
     });
     if (cardOverrides.right || cardOverrides.left) applyCards(cardOverrides);
     return tickerMessages;
@@ -197,6 +225,7 @@
     const cards = {};
     (Array.isArray(rows) ? rows : []).forEach((row) => {
       const text = String(row && row.message_text || '');
+      if (isWrongSchoolText(text)) return;
       if (text.startsWith(RIGHT_PREFIX)) cards.right = text.slice(RIGHT_PREFIX.length).trim();
       if (text.startsWith(LEFT_PREFIX)) cards.left = text.slice(LEFT_PREFIX.length).trim();
     });
@@ -207,12 +236,12 @@
     if (!cards) return;
     const rightText = String(cards.right || '').trim();
     const leftText = String(cards.left || '').trim();
-    if (rightText) {
+    if (rightText && !isWrongSchoolText(rightText)) {
       try { settings.schoolName = rightText; } catch (error) {}
       const rightEl = document.getElementById('schoolName');
       if (rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
     }
-    if (leftText) {
+    if (leftText && !isWrongSchoolText(leftText)) {
       try {
         settings.visionMessages = [leftText];
         if (typeof visionIndex !== 'undefined') visionIndex = 0;
@@ -227,6 +256,7 @@
       const cached = JSON.parse(localStorage.getItem(cardsCacheKey) || 'null');
       if (!cached || !cached.cards) return null;
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
+      if (Object.values(cached.cards).some(isWrongSchoolText)) return null;
       return cached.cards;
     } catch (error) { return null; }
   }
@@ -273,6 +303,7 @@
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (!cached || !Array.isArray(cached.messages)) return null;
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return null;
+      if (cached.messages.some(isWrongSchoolText)) return null;
       return clean(cached.messages);
     } catch (error) { return null; }
   }
@@ -288,7 +319,7 @@
       .filter((row) => isDisplayMessageActive(row))
       .filter((row) => ['ticker', 'all'].includes(String(row.target_area || 'ticker')))
       .map((row) => row.message_text)
-      .filter((message) => !isSystemMessage(message));
+      .filter((message) => !isSystemMessage(message) && !isWrongSchoolText(message));
   }
 
   async function fetchNewDisplayMessages(db){
@@ -341,7 +372,7 @@
 
       const legacyMessages = (Array.isArray(legacyRows) ? legacyRows : [])
         .map((row) => row.message_text)
-        .filter((message) => !isSystemMessage(message));
+        .filter((message) => !isSystemMessage(message) && !isWrongSchoolText(message));
 
       const baseMessages = mergeMessages(newMessages, legacyMessages);
       const finalMessages = [...baseMessages, ...scheduledMessages];
@@ -362,10 +393,11 @@
   }
 
   function start(){
+    clearWrongSchoolCaches();
     applyCards(readCardsCache());
     const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
     renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
-    setTimeout(loadTickerMessages, 1200);
+    setTimeout(loadTickerMessages, 300);
     scheduleRefresh();
   }
 
