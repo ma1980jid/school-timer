@@ -2,8 +2,8 @@
   if (window.__schoolTimerPwaRegisterLoaded) return;
   window.__schoolTimerPwaRegisterLoaded = true;
 
-  const SAFARI_CLEAN_VERSION = 'safari-clean-03';
-  const SW_URL = './sw.js?v=pwa-fast-04';
+  const SAFARI_CLEAN_VERSION = 'safari-clean-04';
+  const SW_URL = './sw.js?v=pwa-fast-05';
 
   function isSafari(){
     const ua = navigator.userAgent || '';
