@@ -23,7 +23,7 @@
   <link rel="icon" sizes="192x192" href="icons/school_logo.png">
   <link rel="apple-touch-icon" href="icons/school_logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/school_logo.png">
-  <link rel="manifest" href="manifest.json?v=pwa-speed-01">
+  <link rel="manifest" href="manifest.json?v=pwa-cache-fix-01">
 
   <link rel="stylesheet" href="style.css?v=optimized-02">
   <style>
@@ -68,8 +68,8 @@
       <div class="clock-area"><div id="digitalClock" class="digital-clock">--:--</div><div id="countLabel" class="count-label">متبقي من الحصة الحالية</div><div id="remainingTime" class="remaining-time">--:--</div></div>
     </section>
     <section class="middle-cards">
-      <div class="mini-card school-name-card"><p id="schoolName">--</p></div>
-      <div class="mini-card vision-card"><p id="visionText">--</p></div>
+      <div class="mini-card school-name-card"><p id="schoolName">مؤقت الحصص</p></div>
+      <div class="mini-card vision-card"><p id="visionText">مؤقت الحصص</p></div>
     </section>
     <script>
       (function(){
@@ -82,13 +82,13 @@
           var leftEl = document.getElementById('visionText');
           if (rightText && rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
           if (leftText && leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
-          if (!rightText && rightEl && rightEl.textContent === defaultSchoolName) rightEl.textContent = '--';
-          if (!leftText && leftEl && leftEl.textContent === defaultVision) leftEl.textContent = '--';
+          if (!rightText && rightEl && (rightEl.textContent === defaultSchoolName || rightEl.textContent === '--')) rightEl.textContent = 'مؤقت الحصص';
+          if (!leftText && leftEl && (leftEl.textContent === defaultVision || leftEl.textContent === '--')) leftEl.textContent = 'مؤقت الحصص';
         }
         try {
           var slug = new URLSearchParams(location.search).get('school') || 'alsheikh-saif';
           var cached = JSON.parse(localStorage.getItem('school_timer_middle_cards_' + slug) || 'null');
-          if (cached && cached.cards) {
+          if (cached && cached.cards && Date.now() - Number(cached.savedAt || 0) < 120000) {
             rightText = String(cached.cards.right || '').trim();
             leftText = String(cached.cards.left || '').trim();
           }
@@ -107,15 +107,15 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="supabase-config.js?v=optimized-03" defer></script>
-  <script src="viewer-multischool-identity.js?v=multi-identity-03" defer></script>
+  <script src="supabase-config.js?v=optimized-04" defer></script>
+  <script src="viewer-multischool-identity.js?v=multi-identity-04" defer></script>
   <script src="script.js?v=optimized-02" defer></script>
   <script src="script-optimizations.js?v=no-default-school-01" defer></script>
-  <script src="ticker-messages.js?v=optimized-10" defer></script>
+  <script src="ticker-messages.js?v=optimized-11" defer></script>
   <script src="viewer-multischool-message-guard.js?v=multi-message-03" defer></script>
   <script src="text-corrections.js?v=text-corrections-05" defer></script>
   <script src="viewer-alerts-external-fix.js?v=external-alerts-02" defer></script>
   <script src="viewer-phone-notification-android-fix.js?v=android-phone-alerts-01" defer></script>
-  <script src="pwa-register.js?v=pwa-02" defer></script>
+  <script src="pwa-register.js?v=pwa-03" defer></script>
 </body>
 </html>
