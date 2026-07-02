@@ -9,6 +9,12 @@
     return location.origin + location.pathname.replace(/[^/]*$/, '');
   }
 
+  function withVersion(url, label){
+    const next = new URL(url);
+    next.searchParams.set('v', label + '-' + Date.now());
+    return next.toString();
+  }
+
   function buildUrls(){
     const base = baseUrl();
     const s = encodeURIComponent(slug);
@@ -16,7 +22,8 @@
       mobile: `${base}index.html?school=${s}&view=mobile`,
       desktop: `${base}index.html?school=${s}&view=desktop`,
       dashboard: `${base}dashboard-v2.html?school=${s}`,
-      install: `${base}install.html?school=${s}`
+      install: `${base}install.html?school=${s}`,
+      reset: `${base}reset.html?school=${s}&view=mobile`
     };
   }
 
@@ -66,18 +73,22 @@
   function start(){
     const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
     const links = buildUrls();
+    const mobileForOpen = withVersion(links.mobile, 'page-shortcut');
+    const resetForOpen = withVersion(links.reset, 'clean');
 
     $('schoolName').textContent = name;
     document.title = name + ' - تثبيت مؤقت الحصص';
-    $('mobileUrl').textContent = links.mobile;
-    $('desktopUrl').textContent = links.desktop;
-    drawQr('mobileQr', links.mobile);
-    drawQr('desktopQr', links.desktop);
+    $('mobileUrl').textContent = mobileForOpen;
+    $('desktopUrl').textContent = withVersion(links.desktop, 'desktop');
+    drawQr('mobileQr', mobileForOpen);
+    drawQr('desktopQr', withVersion(links.desktop, 'desktop'));
 
-    $('openMobile').onclick = () => location.href = links.mobile;
-    $('openDesktop').onclick = () => location.href = links.desktop;
-    $('copyMobile').onclick = () => copy(links.mobile);
-    $('copyDesktop').onclick = () => copy(links.desktop);
+    $('openMobile').onclick = () => location.href = mobileForOpen;
+    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'desktop');
+    $('copyMobile').onclick = () => copy(mobileForOpen);
+    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'desktop'));
+    const cleanButton = $('cleanAndOpen');
+    if (cleanButton) cleanButton.onclick = () => location.href = resetForOpen;
 
     const all = shareMessage(name, links);
     $('shareText').textContent = all;
