@@ -1,4 +1,4 @@
-const CACHE_NAME = 'school-timer-v4-pwa-startup-fast';
+const CACHE_NAME = 'school-timer-v5-school-cache-fix';
 
 const CORE_ASSETS = [
   './index.html',
@@ -14,6 +14,7 @@ const CORE_ASSETS = [
   './ticker-messages.js',
   './viewer-multischool-message-guard.js',
   './viewer-schedule-sync.js',
+  './viewer-schedule-direct.js',
   './viewer-alerts-v2.js',
   './viewer-alerts-external-fix.js',
   './viewer-phone-notification-android-fix.js',
