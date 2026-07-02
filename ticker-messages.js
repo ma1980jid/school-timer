@@ -3,17 +3,9 @@
   window.__schoolTimerTickerMessagesLoaded = true;
 
   const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
-  const isDefaultSchool = schoolSlug === 'alsheikh-saif';
-  const DEFAULT_MESSAGES = isDefaultSchool ? [
-    'مرحبًا بكم في مدرسة الشيخ سيف بن حمد الأغبري',
-    'العلم نور',
-    'الانضباط طريق النجاح',
-    'نسعى لبناء مستقبل تعليمي متميز'
-  ] : [
-    'مرحبًا بكم في مدرستكم',
-    'العلم نور',
-    'الانضباط طريق النجاح'
-  ];
+  const DEFAULT_TEXT = 'مؤقت الحصص';
+  const DEFAULT_MESSAGES = [DEFAULT_TEXT];
+  const DEFAULT_CARDS = { right: DEFAULT_TEXT, left: DEFAULT_TEXT };
 
   const RIGHT_PREFIX = '__CARD_RIGHT__:';
   const LEFT_PREFIX = '__CARD_LEFT__:';
@@ -22,8 +14,9 @@
   const ALERT_SETTINGS_PREFIX = '__ALERT_SETTINGS__:';
   const GLOBAL_EVENT_THEME_PREFIX = '__GLOBAL_EVENT_THEME__:';
   const AUTO_THEME_PREFIX = '__AUTO_THEME__:';
-  const CACHE_TTL = 10 * 60 * 1000;
-  const REFRESH_INTERVAL = 10 * 60 * 1000;
+  const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || new URLSearchParams(location.search).get('pwa') === '1';
+  const CACHE_TTL = isStandalone ? 15 * 1000 : 2 * 60 * 1000;
+  const REFRESH_INTERVAL = isStandalone ? 20 * 1000 : 60 * 1000;
   const cacheKey = 'school_timer_messages_' + schoolSlug;
   const cardsCacheKey = 'school_timer_middle_cards_' + schoolSlug;
   const scheduledCacheKey = 'school_timer_scheduled_' + schoolSlug;
@@ -50,7 +43,7 @@
   }
 
   function isWrongSchoolText(message){
-    return !isDefaultSchool && String(message || '').includes('مدرسة الشيخ سيف بن حمد الأغبري');
+    return String(message || '').includes('مدرسة الشيخ سيف بن حمد الأغبري') && schoolSlug !== 'alsheikh-saif';
   }
 
   function getClient(){
@@ -96,27 +89,22 @@
 
   function clearWrongSchoolCaches(){
     try {
-      if (!isDefaultSchool) {
+      if (schoolSlug !== 'alsheikh-saif') {
         localStorage.removeItem('school_timer_messages_alsheikh-saif');
         localStorage.removeItem('school_timer_middle_cards_alsheikh-saif');
         localStorage.removeItem('school_timer_scheduled_alsheikh-saif');
+        localStorage.removeItem('school_timer_direct_schedule_alsheikh-saif');
       }
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && Array.isArray(cached.messages) && cached.messages.some(isWrongSchoolText)) {
-        localStorage.removeItem(cacheKey);
-      }
+      if (cached && Array.isArray(cached.messages) && cached.messages.some(isWrongSchoolText)) localStorage.removeItem(cacheKey);
       const cards = JSON.parse(localStorage.getItem(cardsCacheKey) || 'null');
-      if (cards && cards.cards && Object.values(cards.cards).some(isWrongSchoolText)) {
-        localStorage.removeItem(cardsCacheKey);
-      }
+      if (cards && cards.cards && Object.values(cards.cards).some(isWrongSchoolText)) localStorage.removeItem(cardsCacheKey);
     } catch (error) {}
   }
 
   function getTodayKey(){
     try {
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit'
-      }).formatToParts(new Date());
+      const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
       const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
       return `${map.year}-${map.month}-${map.day}`;
     } catch (error) {
@@ -137,10 +125,7 @@
     let start = String(item.start || '').trim();
     let end = String(item.end || item.start || '').trim();
     if (!start) return false;
-    if (item.annual) {
-      start = normalizeAnnualDate(start, currentYear);
-      end = normalizeAnnualDate(end || start, currentYear);
-    }
+    if (item.annual) { start = normalizeAnnualDate(start, currentYear); end = normalizeAnnualDate(end || start, currentYear); }
     return today >= start && today <= end;
   }
 
@@ -152,10 +137,7 @@
     if (!start && !end) return true;
     if (!start) start = end;
     if (!end) end = start;
-    if (row.is_annual) {
-      start = normalizeAnnualDate(start, currentYear);
-      end = normalizeAnnualDate(end, currentYear);
-    }
+    if (row.is_annual) { start = normalizeAnnualDate(start, currentYear); end = normalizeAnnualDate(end, currentYear); }
     return today >= start && today <= end;
   }
 
@@ -163,10 +145,7 @@
     return (Array.isArray(rows) ? rows : [])
       .map((row) => String(row && row.message_text || ''))
       .filter((text) => text.startsWith(SCHEDULED_PREFIX))
-      .map((text) => {
-        try { return JSON.parse(text.slice(SCHEDULED_PREFIX.length)); }
-        catch (error) { return null; }
-      })
+      .map((text) => { try { return JSON.parse(text.slice(SCHEDULED_PREFIX.length)); } catch (error) { return null; } })
       .filter(Boolean)
       .filter((item) => isAnnouncementActive(item));
   }
@@ -185,11 +164,7 @@
     if (tickerText || rightText || leftText) return { tickerText, rightText, leftText };
     const legacyText = legacyAnnouncementText(item);
     const target = String(item && item.target || 'ticker');
-    return {
-      tickerText: target === 'ticker' || target === 'all' ? legacyText : '',
-      rightText: target === 'right' || target === 'all' ? legacyText : '',
-      leftText: target === 'left' || target === 'all' ? legacyText : ''
-    };
+    return { tickerText: target === 'ticker' || target === 'all' ? legacyText : '', rightText: target === 'right' || target === 'all' ? legacyText : '', leftText: target === 'left' || target === 'all' ? legacyText : '' };
   }
 
   function applyScheduledAnnouncements(items){
@@ -203,7 +178,7 @@
       if (rightText && !isWrongSchoolText(rightText)) cardOverrides.right = rightText;
       if (leftText && !isWrongSchoolText(leftText)) cardOverrides.left = leftText;
     });
-    if (cardOverrides.right || cardOverrides.left) applyCards(cardOverrides);
+    if (cardOverrides.right || cardOverrides.left) applyCards(cardOverrides, true);
     return tickerMessages;
   }
 
@@ -232,20 +207,19 @@
     return cards;
   }
 
-  function applyCards(cards){
-    if (!cards) return;
-    const rightText = String(cards.right || '').trim();
-    const leftText = String(cards.left || '').trim();
+  function applyCards(cards, custom){
+    const data = cards || DEFAULT_CARDS;
+    const rightText = String(data.right || DEFAULT_TEXT).trim();
+    const leftText = String(data.left || DEFAULT_TEXT).trim();
     if (rightText && !isWrongSchoolText(rightText)) {
-      try { settings.schoolName = rightText; } catch (error) {}
+      window.__schoolTimerCardsApplied = true;
+      try { if (custom) settings.schoolName = rightText; } catch (error) {}
       const rightEl = document.getElementById('schoolName');
       if (rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
     }
     if (leftText && !isWrongSchoolText(leftText)) {
-      try {
-        settings.visionMessages = [leftText];
-        if (typeof visionIndex !== 'undefined') visionIndex = 0;
-      } catch (error) {}
+      window.__schoolTimerCardsApplied = true;
+      try { if (custom) { settings.visionMessages = [leftText]; if (typeof visionIndex !== 'undefined') visionIndex = 0; } } catch (error) {}
       const leftEl = document.getElementById('visionText');
       if (leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
     }
@@ -264,6 +238,10 @@
   function writeCardsCache(cards){
     try { localStorage.setItem(cardsCacheKey, JSON.stringify({ savedAt: Date.now(), cards })); }
     catch (error) {}
+  }
+
+  function clearCardsCache(){
+    try { localStorage.removeItem(cardsCacheKey); } catch (error) {}
   }
 
   function setupTickerMotion(){
@@ -289,10 +267,7 @@
     const cleaned = clean(messages);
     const finalMessages = cleaned.length ? cleaned : DEFAULT_MESSAGES;
     const signature = finalMessages.join('||');
-    if (signature === lastSignature && track.children.length) {
-      requestAnimationFrame(setupTickerMotion);
-      return;
-    }
+    if (signature === lastSignature && track.children.length) { requestAnimationFrame(setupTickerMotion); return; }
     lastSignature = signature;
     track.replaceChildren(createGroup(finalMessages), createGroup(finalMessages), createGroup(finalMessages));
     requestAnimationFrame(setupTickerMotion);
@@ -309,9 +284,8 @@
   }
 
   function writeCache(messages){
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), messages: clean(messages) }));
-    } catch (error) {}
+    try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), messages: clean(messages) })); }
+    catch (error) {}
   }
 
   function extractDisplayMessages(rows){
@@ -323,23 +297,13 @@
   }
 
   async function fetchNewDisplayMessages(db){
-    const { data, error } = await db
-      .from('school_display_messages')
-      .select('message_text,message_type,target_area,sort_order,is_active,start_date,end_date,is_annual')
-      .eq('school_slug', schoolSlug)
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
+    const { data, error } = await db.from('school_display_messages').select('message_text,message_type,target_area,sort_order,is_active,start_date,end_date,is_annual').eq('school_slug', schoolSlug).eq('is_active', true).order('sort_order', { ascending: true });
     if (error || !data) return [];
     return extractDisplayMessages(data);
   }
 
   async function fetchLegacyMessages(db){
-    const { data, error } = await db
-      .from('school_messages')
-      .select('message_text,sort_order')
-      .eq('school_slug', schoolSlug)
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
+    const { data, error } = await db.from('school_messages').select('message_text,sort_order').eq('school_slug', schoolSlug).eq('is_active', true).order('sort_order', { ascending: true });
     if (error || !data) return [];
     return data;
   }
@@ -349,21 +313,22 @@
     const db = getClient();
     if (!db) {
       const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
+      applyCards(readCardsCache() || DEFAULT_CARDS, !!readCardsCache());
       renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
       return;
     }
 
     isLoading = true;
     try {
-      const [newMessages, legacyRows] = await Promise.all([
-        fetchNewDisplayMessages(db),
-        fetchLegacyMessages(db)
-      ]);
+      const [newMessages, legacyRows] = await Promise.all([fetchNewDisplayMessages(db), fetchLegacyMessages(db)]);
 
       const cards = parseCards(legacyRows);
       if (cards.right || cards.left) {
         writeCardsCache(cards);
-        applyCards(cards);
+        applyCards(cards, true);
+      } else {
+        clearCardsCache();
+        applyCards(DEFAULT_CARDS, false);
       }
 
       const scheduledItems = parseScheduledAnnouncements(legacyRows);
@@ -379,7 +344,7 @@
       writeCache(finalMessages);
       renderTicker(finalMessages);
     } catch (error) {
-      applyCards(readCardsCache());
+      applyCards(readCardsCache() || DEFAULT_CARDS, !!readCardsCache());
       const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
       renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
     } finally {
@@ -394,19 +359,19 @@
 
   function start(){
     clearWrongSchoolCaches();
-    applyCards(readCardsCache());
+    applyCards(readCardsCache() || DEFAULT_CARDS, !!readCardsCache());
     const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
     renderTicker([...(readCache() || DEFAULT_MESSAGES), ...scheduledMessages]);
-    setTimeout(loadTickerMessages, 300);
+    setTimeout(loadTickerMessages, 150);
+    setTimeout(loadTickerMessages, 1200);
     scheduleRefresh();
   }
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      loadTickerMessages();
-      requestAnimationFrame(setupTickerMotion);
-    }
+    if (!document.hidden) { loadTickerMessages(); requestAnimationFrame(setupTickerMotion); }
   });
+
+  addEventListener('focus', loadTickerMessages);
 
   addEventListener('resize', () => {
     clearTimeout(resizeTimer);
