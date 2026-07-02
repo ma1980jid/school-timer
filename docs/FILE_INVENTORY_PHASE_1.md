@@ -80,6 +80,8 @@ docs/PRODUCTION_1.0_CLEANUP_PLAN.md
 ```text
 school-settings.html
 messages.html
+admin.html
+system.html
 ```
 
 ملاحظة: ظهرت هذه الملفات في نتائج أو إصدارات سابقة، لكنها غير موجودة في فرع cleanup-production-1.0 وقت الفحص.
@@ -100,14 +102,18 @@ archive/experimental-fixes/
 | system-admin-delete-school.js | archive/experimental-fixes/system-admin-delete-school.js | ملف حذف مرحلي تم تجاوزه |
 | system-admin-delete-verify.js | archive/experimental-fixes/system-admin-delete-verify.js | ملف تحقق حذف مرحلي تم تجاوزه |
 
-## 4. ملفات ما زالت مرشحة للفحص لاحقًا
+## 4. نتيجة فحص الصفحات القديمة
+
+تم الانتهاء من فحص صفحات الإدارة القديمة المرشحة. لا توجد في فرع التنظيف الحالي:
 
 ```text
+school-settings.html
+messages.html
 admin.html
 system.html
 ```
 
-يجب التأكد من وجودها في فرع التنظيف قبل اتخاذ أي إجراء.
+لذلك لا توجد صفحات قديمة إضافية تحتاج نقلًا في هذه المرحلة.
 
 ## 5. سبب ترشيح الملفات للأرشفة
 
@@ -121,7 +127,7 @@ system.html
 
 ### admin.html و system.html
 
-ظهرت كصفحات قديمة في نتائج البحث أو الإصدارات السابقة، ويجب التأكد من وجودها في الفرع الحالي قبل نقلها.
+ظهرت كصفحات قديمة في نتائج البحث أو الإصدارات السابقة، لكنها غير موجودة في فرع cleanup-production-1.0.
 
 ### viewer-no-default-school.js
 
@@ -150,4 +156,4 @@ system.html
 
 ## 8. المرحلة القادمة
 
-فحص بقية الملفات القديمة إن وجدت، ثم الانتقال إلى تنظيم الملفات الأساسية أو دمج بعض ملفات الإصلاح بعد الاختبار.
+فحص ملفات CSS والصور والملفات المتكررة، ثم الانتقال إلى تنظيم الملفات الأساسية أو دمج بعض ملفات الإصلاح بعد الاختبار.
