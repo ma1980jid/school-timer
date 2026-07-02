@@ -4,8 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
-  <script src="pwa-school-redirect.js?v=school-redirect-03"></script>
-  <link rel="manifest" href="manifest.json?v=pwa-speed-01">
   <link rel="icon" href="icons/school_logo.png">
   <link rel="apple-touch-icon" href="icons/school_logo.png">
   <title>تثبيت مؤقت الحصص</title>
@@ -22,9 +20,9 @@
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card{background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 14px 36px rgba(15,23,42,.08);display:grid;gap:12px}.card h2{margin:0;text-align:center;font-size:25px;color:var(--teal)}
     .qr{min-height:250px;border-radius:20px;background:#fff;border:1px dashed #cbd5e1;display:grid;place-items:center;padding:12px}.qr img{width:min(230px,70vw);height:min(230px,70vw);object-fit:contain}.qr span{color:var(--muted);font-weight:900;text-align:center;line-height:1.8}
     .url{direction:ltr;text-align:left;word-break:break-all;background:#f8fafc;border:1px solid #dbe3ea;border-radius:14px;padding:10px;font-size:13px;color:#334155}
-    .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:0;border-radius:14px;min-height:44px;padding:10px 12px;background:var(--teal);color:#fff;font-family:Tahoma,Arial,sans-serif;font-weight:900;cursor:pointer}.btn.light{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.gold{background:var(--gold)}
+    .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:0;border-radius:14px;min-height:44px;padding:10px 12px;background:var(--teal);color:#fff;font-family:Tahoma,Arial,sans-serif;font-weight:900;cursor:pointer}.btn.light{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.gold{background:var(--gold)}.btn.red{background:#b91c1c}
     .steps{counter-reset:step;display:grid;gap:10px}.step{position:relative;background:#f8fafc;border:1px solid #dbe3ea;border-radius:16px;padding:12px 46px 12px 12px;font-weight:900;line-height:1.8}.step:before{counter-increment:step;content:counter(step);position:absolute;right:12px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:900}
-    .note{background:#ecfeff;border:1px solid #99f6e4;color:#0f766e;border-radius:18px;padding:12px;font-weight:900;line-height:1.9}.footer{text-align:center;color:var(--muted);font-weight:900;padding:10px}
+    .note{background:#ecfeff;border:1px solid #99f6e4;color:#0f766e;border-radius:18px;padding:12px;font-weight:900;line-height:1.9}.warn{background:#fff7ed;border-color:#fdba74;color:#9a3412}.footer{text-align:center;color:var(--muted);font-weight:900;padding:10px}
     @media(max-width:850px){.grid{grid-template-columns:1fr}.btns{grid-template-columns:1fr}.hero{padding:22px 14px}.logo{width:92px;height:92px}}
   </style>
 </head>
@@ -34,6 +32,12 @@
       <div class="logo"><img id="schoolLogo" src="icons/school_logo.png" alt="شعار المدرسة"></div>
       <h1 id="schoolName">تثبيت مؤقت الحصص</h1>
       <p class="sub">صفحة خاصة بروابط المدرسة وQR Code للهاتف وشاشة الحاسوب</p>
+    </section>
+
+    <section class="card">
+      <h2>تنبيه مهم قبل التثبيت</h2>
+      <div class="note warn">طريقة التثبيت الحالية تعتمد على اختصار الصفحة نفسها، وليس تطبيق PWA. افتح رابط الهاتف أولًا وتأكد أن بيانات المدرسة صحيحة، ثم أضفه إلى الشاشة الرئيسية.</div>
+      <button class="btn red" id="cleanAndOpen" type="button">تنظيف الكاش وفتح رابط الهاتف</button>
     </section>
 
     <section class="grid">
@@ -54,11 +58,11 @@
     <section class="grid">
       <article class="card">
         <h2>طريقة التثبيت على iPhone / iPad</h2>
-        <div class="steps"><div class="step">افتح رابط الهاتف في Safari.</div><div class="step">اضغط زر المشاركة.</div><div class="step">اختر: إضافة إلى الشاشة الرئيسية.</div><div class="step">اضغط إضافة، وسيظهر المؤقت كتطبيق.</div></div>
+        <div class="steps"><div class="step">اضغط زر: تنظيف الكاش وفتح رابط الهاتف.</div><div class="step">تأكد أن صفحة المدرسة ظهرت صحيحة.</div><div class="step">اضغط زر المشاركة في Safari.</div><div class="step">اختر: إضافة إلى الشاشة الرئيسية.</div></div>
       </article>
       <article class="card">
         <h2>طريقة التثبيت على Android / Chrome</h2>
-        <div class="steps"><div class="step">افتح رابط الهاتف في Chrome.</div><div class="step">اضغط القائمة ⋮.</div><div class="step">اختر: إضافة إلى الشاشة الرئيسية أو تثبيت التطبيق.</div><div class="step">افتحه لاحقًا من أيقونة الشاشة الرئيسية.</div></div>
+        <div class="steps"><div class="step">اضغط زر: تنظيف الكاش وفتح رابط الهاتف.</div><div class="step">تأكد أن صفحة المدرسة ظهرت صحيحة.</div><div class="step">اضغط القائمة ⋮.</div><div class="step">اختر: إضافة إلى الشاشة الرئيسية.</div></div>
       </article>
     </section>
 
@@ -73,8 +77,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=optimized-03"></script>
-  <script src="install-page.js?v=install-01"></script>
+  <script src="install-page.js?v=install-02"></script>
   <script src="viewer-multischool-identity.js?v=multi-identity-03"></script>
-  <script src="pwa-register.js?v=pwa-02"></script>
 </body>
 </html>
