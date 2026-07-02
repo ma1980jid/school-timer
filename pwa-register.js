@@ -2,7 +2,8 @@
   if (window.__schoolTimerPwaRegisterLoaded) return;
   window.__schoolTimerPwaRegisterLoaded = true;
 
-  const SAFARI_CLEAN_VERSION = 'safari-clean-02';
+  const SAFARI_CLEAN_VERSION = 'safari-clean-03';
+  const SW_URL = './sw.js?v=pwa-fast-04';
 
   function isSafari(){
     const ua = navigator.userAgent || '';
@@ -19,35 +20,32 @@
     catch (error) {}
   }
 
-  async function unregisterForSafariOnce(){
+  async function cleanupOldSafariCacheOnce(){
+    if (!isSafari()) return;
     if (safariAlreadyCleaned()) return;
-    if (!('serviceWorker' in navigator)) {
-      markSafariCleaned();
-      return;
-    }
+
     try {
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map((reg) => reg.unregister()));
     } catch (error) {}
+
     try {
       if ('caches' in window) {
         const keys = await caches.keys();
         await Promise.all(keys.filter((key) => key.indexOf('school-timer') !== -1).map((key) => caches.delete(key)));
       }
     } catch (error) {}
+
     markSafariCleaned();
   }
 
-  function register(){
+  async function register(){
     if (!('serviceWorker' in navigator)) return;
     if (!window.isSecureContext) return;
 
-    if (isSafari()) {
-      unregisterForSafariOnce();
-      return;
-    }
+    await cleanupOldSafariCacheOnce();
 
-    navigator.serviceWorker.register('./sw.js?v=pwa-fast-02', { scope: './' }).catch(function(error){
+    navigator.serviceWorker.register(SW_URL, { scope: './' }).catch(function(error){
       console.warn('تعذر تسجيل Service Worker:', error);
     });
   }
