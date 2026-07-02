@@ -1,3 +1,8 @@
+// ARCHIVED FILE
+// Original path: viewer-no-default-school.js
+// Archived during cleanup-production-1.0 phase 1.
+// Reason: old defensive patch; current viewer flow uses viewer-multischool-identity.js and message guards.
+
 (function(){
   if (window.__viewerNoDefaultSchoolLoaded) return;
   window.__viewerNoDefaultSchoolLoaded = true;

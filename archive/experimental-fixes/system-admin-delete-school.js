@@ -1,3 +1,8 @@
+// ARCHIVED FILE
+// Original path: system-admin-delete-school.js
+// Archived during cleanup-production-1.0 phase 1.
+// Reason: temporary delete-school implementation; replaced by verified delete flow through system-install-link-fix.js and Supabase RPC.
+
 (function(){
   if (window.__systemAdminDeleteSchoolLoaded) return;
   window.__systemAdminDeleteSchoolLoaded = true;

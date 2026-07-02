@@ -1,3 +1,8 @@
+// ARCHIVED FILE
+// Original path: system-admin-delete-verify.js
+// Archived during cleanup-production-1.0 phase 1.
+// Reason: temporary verified delete implementation; replaced by current delete verification patch.
+
 (function(){
   if (window.__systemAdminDeleteVerifyLoaded) return;
   window.__systemAdminDeleteVerifyLoaded = true;
