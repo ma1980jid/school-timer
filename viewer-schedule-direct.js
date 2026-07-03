@@ -139,7 +139,7 @@
     if (s.current) { markNoStart(false); set('currentName', s.current.name); time('currentTime', s.current); }
     else if (first && s.currentMinutes < first.startMinutes) { markNoStart(true); set('currentName', '--'); time('currentTime', null); }
     else if (s.next) { markNoStart(false); set('currentName', 'الحصة\nالخالية'); time('currentTime', s.next); }
-    else { markNoStart(false); set('currentName', 'انتهى\nالدوام'); time('currentTime', null); }
+    else { markNoStart(false); set('currentName', '--'); time('currentTime', null); }
   }
 
   function updateRemaining(s = schedule()){
