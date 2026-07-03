@@ -7,14 +7,16 @@
   const cacheKey = 'school_timer_identity_' + slug;
   const isDefaultSchool = slug === 'alsheikh-saif';
   const DEFAULT_CARD_TEXT = 'مؤقت الحصص';
+  const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
   let identity = null;
+  let identityLoading = false;
 
   function getClient(){
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
-    if (!window.__viewerIdentityClient) {
-      window.__viewerIdentityClient = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
+    if (!window[SHARED_CLIENT_KEY]) {
+      window[SHARED_CLIENT_KEY] = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
     }
-    return window.__viewerIdentityClient;
+    return window[SHARED_CLIENT_KEY];
   }
 
   function safeText(value){ return String(value || '').trim(); }
@@ -157,17 +159,20 @@
   }
 
   async function loadIdentity(){
-    cleanDefaultSchoolCache();
-    hideDefaultLogoUntilReady();
-
-    const cached = readCache();
-    if (cached) applyIdentity(cached);
-    else applyDefaultMiddleCards();
-
-    const db = getClient();
-    if (!db) return;
+    if (identityLoading) return;
+    identityLoading = true;
 
     try {
+      cleanDefaultSchoolCache();
+      hideDefaultLogoUntilReady();
+
+      const cached = readCache();
+      if (cached) applyIdentity(cached);
+      else applyDefaultMiddleCards();
+
+      const db = getClient();
+      if (!db) return;
+
       const { data, error } = await db
         .from('schools')
         .select('school_name,school_slug,logo_url,app_icon_url,is_active,created_at')
@@ -177,16 +182,24 @@
       if (hasIdentityChanged(cached, data)) clearCurrentSchoolRuntimeCaches();
       writeCache(data);
       applyIdentity(data);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      identityLoading = false;
+    }
+  }
+
+  function reapplyIdentitySoon(){
+    if (identity) applyIdentity(identity);
+    cleanWrongSchoolText();
   }
 
   function start(){
     hideDefaultLogoUntilReady();
     applyDefaultMiddleCards();
     loadIdentity();
-    setTimeout(loadIdentity, 700);
-    setTimeout(function(){ if (identity) applyIdentity(identity); cleanWrongSchoolText(); }, 1400);
-    setTimeout(function(){ if (identity) applyIdentity(identity); cleanWrongSchoolText(); }, 3000);
+    setTimeout(reapplyIdentitySoon, 700);
+    setTimeout(reapplyIdentitySoon, 1400);
+    setTimeout(reapplyIdentitySoon, 3000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
