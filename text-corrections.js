@@ -5,7 +5,8 @@
   const corrections = new Map([
     ['الحصة الحاليه', 'الحصة الحالية'],
     ['الحصه الحالية', 'الحصة الحالية'],
-    ['الحصه الحاليه', 'الحصة الحالية']
+    ['الحصه الحاليه', 'الحصة الحالية'],
+    ['انتهى الدوام', '--']
   ]);
 
   function normalizeTextNode(node){
@@ -23,7 +24,15 @@
     while ((node = walker.nextNode())) normalizeTextNode(node);
   }
 
-  function apply(){ walk(document.body); }
+  function removeAfterSchoolText(){
+    const currentName = document.getElementById('currentName');
+    if (currentName && currentName.textContent.trim() === 'انتهى الدوام') currentName.textContent = '--';
+  }
+
+  function apply(){
+    walk(document.body);
+    removeAfterSchoolText();
+  }
 
   function ensureMobileSchoolHeadingStyle(){
     if (document.getElementById('mobileSchoolHeadingStyle')) return;
@@ -87,15 +96,18 @@
     loadScriptOnce('viewer-theme-manager.js?v=theme-01', 'viewer-theme-manager.js');
     loadScriptOnce('viewer-db-schedule-loader.js?v=db-schedule-01', 'viewer-db-schedule-loader.js');
     setInterval(ensureMobileSchoolHeading, 3000);
+    setInterval(removeAfterSchoolText, 1000);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
+        if (mutation.type === 'characterData') normalizeTextNode(mutation.target);
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.TEXT_NODE) normalizeTextNode(node);
           else if (node.nodeType === Node.ELEMENT_NODE) walk(node);
         });
       });
+      removeAfterSchoolText();
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
