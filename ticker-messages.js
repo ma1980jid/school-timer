@@ -14,6 +14,8 @@
   const ALERT_SETTINGS_PREFIX = '__ALERT_SETTINGS__:';
   const GLOBAL_EVENT_THEME_PREFIX = '__GLOBAL_EVENT_THEME__:';
   const AUTO_THEME_PREFIX = '__AUTO_THEME__:';
+  const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
+  const MIN_REMOTE_RELOAD = 5000;
   const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || new URLSearchParams(location.search).get('pwa') === '1';
   const CACHE_TTL = isStandalone ? 15 * 1000 : 2 * 60 * 1000;
   const REFRESH_INTERVAL = isStandalone ? 20 * 1000 : 60 * 1000;
@@ -24,6 +26,7 @@
   let lastSignature = '';
   let refreshTimer = null;
   let isLoading = false;
+  let lastSuccessfulRemoteLoadAt = 0;
   let resizeTimer = null;
 
   function isCardConfigMessage(message){ return String(message || '').startsWith('__CARD_'); }
@@ -49,7 +52,10 @@
   function getClient(){
     if (client) return client;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
-    client = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
+    if (!window[SHARED_CLIENT_KEY]) {
+      window[SHARED_CLIENT_KEY] = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
+    }
+    client = window[SHARED_CLIENT_KEY];
     return client;
   }
 
@@ -318,6 +324,8 @@
       return;
     }
 
+    if (Date.now() - lastSuccessfulRemoteLoadAt < MIN_REMOTE_RELOAD) return;
+
     isLoading = true;
     try {
       const [newMessages, legacyRows] = await Promise.all([fetchNewDisplayMessages(db), fetchLegacyMessages(db)]);
@@ -343,6 +351,7 @@
       const finalMessages = [...baseMessages, ...scheduledMessages];
       writeCache(finalMessages);
       renderTicker(finalMessages);
+      lastSuccessfulRemoteLoadAt = Date.now();
     } catch (error) {
       applyCards(readCardsCache() || DEFAULT_CARDS, !!readCardsCache());
       const scheduledMessages = applyScheduledAnnouncements(readScheduledCache());
