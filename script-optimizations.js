@@ -48,6 +48,21 @@
     setTimeout(neutralize, 2500);
   }
 
+  function normalizeTimerText(id, value){
+    const text = value === undefined || value === null ? '' : String(value);
+    if (id === 'currentName' && text.trim() === 'انتهى الدوام') return '--';
+    if (id === 'countLabel' && text.trim() === 'انتهى اليوم الدراسي') return '--';
+    return text;
+  }
+
+  function clearAfterSchoolText(){
+    const currentName = document.getElementById('currentName');
+    if (currentName && currentName.textContent.trim() === 'انتهى الدوام') currentName.textContent = '--';
+
+    const countLabel = document.getElementById('countLabel');
+    if (countLabel && countLabel.textContent.trim() === 'انتهى اليوم الدراسي') countLabel.textContent = '--';
+  }
+
   preventDefaultSchoolForOtherSchools();
 
   const originalSetText = window.setText;
@@ -56,10 +71,49 @@
       const element = document.getElementById(id);
       if (!element) return;
 
-      const nextValue = value === undefined || value === null ? "" : String(value);
+      const nextValue = normalizeTimerText(id, value);
       if (element.textContent !== nextValue) {
         element.textContent = nextValue;
       }
+    };
+  }
+
+  const originalUpdateCards = window.updateCards;
+  if (typeof originalUpdateCards === "function") {
+    window.updateCards = function(scheduleState) {
+      const s = scheduleState || (typeof window.getSchedule === 'function' ? window.getSchedule() : null);
+      if (!s) return originalUpdateCards(scheduleState);
+
+      window.setText('previousName', s.previous ? s.previous.name : '--');
+      window.setTimeRange('previousTime', s.previous);
+
+      if (s.current) {
+        window.setText('currentName', s.current.name);
+        window.setTimeRange('currentTime', s.current);
+      } else if (s.beforeSchool) {
+        window.setText('currentName', 'لم يبدأ الدوام');
+        window.setTimeRange('currentTime', s.first);
+      } else if (s.afterSchool) {
+        window.setText('currentName', '--');
+        window.setTimeRange('currentTime', null);
+      } else {
+        window.setText('currentName', 'لا توجد حصة');
+        window.setTimeRange('currentTime', null);
+      }
+
+      window.setText('nextName', s.next ? s.next.name : '--');
+      window.setTimeRange('nextTime', s.next);
+    };
+  }
+
+  const originalUpdateRemaining = window.updateRemaining;
+  if (typeof originalUpdateRemaining === "function") {
+    window.updateRemaining = function(scheduleState) {
+      const s = scheduleState || (typeof window.getSchedule === 'function' ? window.getSchedule() : null);
+      if (!s || !s.afterSchool) return originalUpdateRemaining(scheduleState);
+
+      window.setText('countLabel', '--');
+      window.setText('remainingTime', '00:00');
     };
   }
 
@@ -97,4 +151,9 @@
       return cachedPeriods;
     };
   }
+
+  clearAfterSchoolText();
+  setTimeout(clearAfterSchoolText, 50);
+  setTimeout(clearAfterSchoolText, 250);
+  setTimeout(clearAfterSchoolText, 1000);
 })();
