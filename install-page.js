@@ -19,11 +19,11 @@
     const base = baseUrl();
     const s = encodeURIComponent(slug);
     return {
-      mobile: `${base}viewer-old-design.html?school=${s}&view=mobile`,
-      desktop: `${base}viewer-old-design.html?school=${s}&view=desktop`,
+      mobile: `${base}viewer-clean2.html?school=${s}&view=mobile`,
+      desktop: `${base}viewer-clean2.html?school=${s}&view=desktop`,
       dashboard: `${base}dashboard-v2.html?school=${s}`,
       install: `${base}install.html?school=${s}`,
-      reset: `${base}viewer-old-design.html?school=${s}&view=mobile`
+      reset: `${base}viewer-clean2.html?school=${s}&view=mobile`
     };
   }
 
@@ -73,20 +73,20 @@
   function start(){
     const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
     const links = buildUrls();
-    const mobileForOpen = withVersion(links.mobile, 'old-design');
-    const resetForOpen = withVersion(links.reset, 'old-design');
+    const mobileForOpen = withVersion(links.mobile, 'stable-clean');
+    const resetForOpen = withVersion(links.reset, 'stable-clean');
 
     $('schoolName').textContent = name;
     document.title = name + ' - تثبيت مؤقت الحصص';
     $('mobileUrl').textContent = mobileForOpen;
-    $('desktopUrl').textContent = withVersion(links.desktop, 'old-design-desktop');
+    $('desktopUrl').textContent = withVersion(links.desktop, 'stable-clean-desktop');
     drawQr('mobileQr', mobileForOpen);
-    drawQr('desktopQr', withVersion(links.desktop, 'old-design-desktop'));
+    drawQr('desktopQr', withVersion(links.desktop, 'stable-clean-desktop'));
 
     $('openMobile').onclick = () => location.href = mobileForOpen;
-    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'old-design-desktop');
+    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'stable-clean-desktop');
     $('copyMobile').onclick = () => copy(mobileForOpen);
-    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'old-design-desktop'));
+    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'stable-clean-desktop'));
     const cleanButton = $('cleanAndOpen');
     if (cleanButton) cleanButton.onclick = () => location.href = resetForOpen;
 
