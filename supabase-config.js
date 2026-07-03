@@ -16,7 +16,10 @@ function loadStyle(href){
   document.head.appendChild(link);
 }
 
-if (location.pathname.includes('dashboard-v2.html')) {
+const isDashboardPage = location.pathname.includes('dashboard-v2.html');
+const isInstallPage = location.pathname.includes('install.html');
+
+if (isDashboardPage) {
   loadScript('dashboard-messages.js?v=messages-admin-08');
   loadScript('dashboard-v2-fixes.js?v=dashboard-fixes-07');
   loadScript('dashboard-title-layout-fix.js?v=title-layout-05');
@@ -26,7 +29,7 @@ if (location.pathname.includes('dashboard-v2.html')) {
   loadScript('dashboard-schedule-sync.js?v=schedule-sync-03');
   loadScript('dashboard-alert-settings.js?v=alerts-dashboard-03');
   loadScript('dashboard-single-design-lock.js?v=single-design-01');
-} else {
+} else if (!isInstallPage) {
   loadStyle('mobile-current-row-clean.css?v=mobile-row-01');
   loadScript('viewer-schedule-sync.js?v=schedule-sync-05');
   window.addEventListener('load', function(){
