@@ -693,7 +693,7 @@ function updateCards(s = getSchedule()) {
     setText("currentName", "لم يبدأ الدوام");
     setTimeRange("currentTime", s.first);
   } else if (s.afterSchool) {
-    setText("currentName", "انتهى الدوام");
+    setText("currentName", "--");
     setTimeRange("currentTime", null);
   } else {
     setText("currentName", "لا توجد حصة");
