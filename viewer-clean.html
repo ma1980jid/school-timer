@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f2e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>مؤقت الحصص</title>
+  <link rel="icon" href="icons/school_logo.png">
+  <link rel="apple-touch-icon" href="icons/school_logo.png">
+  <link rel="stylesheet" href="viewer-clean.css?v=clean-01">
+</head>
+<body>
+  <main class="page" id="app" hidden>
+    <header class="header">
+      <div class="logo"><img id="schoolLogo" alt="شعار المدرسة"></div>
+      <div class="title">
+        <h1 id="schoolName">مؤقت الحصص</h1>
+        <p id="loadStatus">تحميل بيانات المدرسة...</p>
+      </div>
+      <div class="live-clock" id="digitalClock">--:--:--</div>
+    </header>
+
+    <section class="top-cards">
+      <article class="period-card"><div class="label">الحصة السابقة</div><div class="name" id="previousName">--</div><div class="time" id="previousTime">--</div></article>
+      <article class="period-card"><div class="label">الحصة الحالية</div><div class="name" id="currentName">--</div><div class="time" id="currentTime">--</div></article>
+      <article class="period-card"><div class="label">الحصة القادمة</div><div class="name" id="nextName">--</div><div class="time" id="nextTime">--</div></article>
+    </section>
+
+    <section class="main">
+      <section class="center-panel">
+        <div class="big-remaining"><div class="label" id="countLabel">متبقي من الحصة الحالية</div><div class="value" id="remainingTime">--:--</div></div>
+        <div class="middle-cards"><div class="mini" id="rightCard">مؤقت الحصص</div><div class="mini" id="leftCard">مؤقت الحصص</div></div>
+        <div class="date-box"><div id="weekday">--</div><div id="gregorianDate">--</div><div id="hijriDate">--</div></div>
+      </section>
+      <section class="schedule-panel">
+        <h2 class="schedule-title">جدول اليوم الدراسي</h2>
+        <div class="schedule-grid"><div class="schedule-col" id="scheduleCol1"></div><div class="schedule-col" id="scheduleCol2"></div></div>
+      </section>
+    </section>
+
+    <footer class="ticker"><div class="ticker-track" id="tickerTrack"><span class="ticker-item">مؤقت الحصص</span></div></footer>
+  </main>
+
+  <section class="error" id="errorBox" hidden>
+    <h1>تعذر فتح مؤقت الحصص</h1>
+    <p id="errorText">الرابط غير صحيح.</p>
+    <code id="errorCode">--</code>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=clean-01"></script>
+  <script src="viewer-clean.js?v=clean-01"></script>
+</body>
+</html>
