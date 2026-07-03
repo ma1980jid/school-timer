@@ -4,14 +4,15 @@
   const knownNames = {
     'alsheikh-saif': 'مدرسة الشيخ سيف بن حمد الأغبري (5-12) بنين'
   };
+  const VIEW_VERSION = 'no-default-logo-01';
 
   function baseUrl(){
     return location.origin + location.pathname.replace(/[^/]*$/, '');
   }
 
-  function withVersion(url, label){
+  function withFixedVersion(url){
     const next = new URL(url);
-    next.searchParams.set('v', label + '-' + Date.now());
+    next.searchParams.set('v', VIEW_VERSION);
     return next.toString();
   }
 
@@ -19,11 +20,11 @@
     const base = baseUrl();
     const s = encodeURIComponent(slug);
     return {
-      mobile: `${base}index.html?school=${s}&view=mobile`,
-      desktop: `${base}index.html?school=${s}&view=desktop`,
+      mobile: `${base}index.html?school=${s}&view=mobile&v=${VIEW_VERSION}`,
+      desktop: `${base}index.html?school=${s}&view=desktop&v=${VIEW_VERSION}`,
       dashboard: `${base}dashboard-v2.html?school=${s}`,
       install: `${base}install.html?school=${s}`,
-      reset: `${base}index.html?school=${s}&view=mobile`
+      reset: `${base}index.html?school=${s}&view=mobile&v=${VIEW_VERSION}`
     };
   }
 
@@ -73,20 +74,20 @@
   function start(){
     const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
     const links = buildUrls();
-    const mobileForOpen = withVersion(links.mobile, 'no-default-logo');
-    const resetForOpen = withVersion(links.reset, 'no-default-logo');
+    const mobileForOpen = links.mobile;
+    const resetForOpen = links.reset;
 
     $('schoolName').textContent = name;
     document.title = name + ' - تثبيت مؤقت الحصص';
     $('mobileUrl').textContent = mobileForOpen;
-    $('desktopUrl').textContent = withVersion(links.desktop, 'no-default-logo-desktop');
+    $('desktopUrl').textContent = links.desktop;
     drawQr('mobileQr', mobileForOpen);
-    drawQr('desktopQr', withVersion(links.desktop, 'no-default-logo-desktop'));
+    drawQr('desktopQr', links.desktop);
 
     $('openMobile').onclick = () => location.href = mobileForOpen;
-    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'no-default-logo-desktop');
+    $('openDesktop').onclick = () => location.href = links.desktop;
     $('copyMobile').onclick = () => copy(mobileForOpen);
-    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'no-default-logo-desktop'));
+    $('copyDesktop').onclick = () => copy(links.desktop);
     const cleanButton = $('cleanAndOpen');
     if (cleanButton) cleanButton.onclick = () => location.href = resetForOpen;
 
