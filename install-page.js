@@ -19,11 +19,11 @@
     const base = baseUrl();
     const s = encodeURIComponent(slug);
     return {
-      mobile: `${base}viewer-old-design.html?school=${s}&view=mobile`,
-      desktop: `${base}viewer-old-design.html?school=${s}&view=desktop`,
+      mobile: `${base}index.html?school=${s}&view=mobile`,
+      desktop: `${base}index.html?school=${s}&view=desktop`,
       dashboard: `${base}dashboard-v2.html?school=${s}`,
       install: `${base}install.html?school=${s}`,
-      reset: `${base}viewer-old-design.html?school=${s}&view=mobile`
+      reset: `${base}index.html?school=${s}&view=mobile`
     };
   }
 
@@ -73,20 +73,20 @@
   function start(){
     const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
     const links = buildUrls();
-    const mobileForOpen = withVersion(links.mobile, 'old-design-restored');
-    const resetForOpen = withVersion(links.reset, 'old-design-restored');
+    const mobileForOpen = withVersion(links.mobile, 'no-default-logo');
+    const resetForOpen = withVersion(links.reset, 'no-default-logo');
 
     $('schoolName').textContent = name;
     document.title = name + ' - تثبيت مؤقت الحصص';
     $('mobileUrl').textContent = mobileForOpen;
-    $('desktopUrl').textContent = withVersion(links.desktop, 'old-design-restored-desktop');
+    $('desktopUrl').textContent = withVersion(links.desktop, 'no-default-logo-desktop');
     drawQr('mobileQr', mobileForOpen);
-    drawQr('desktopQr', withVersion(links.desktop, 'old-design-restored-desktop'));
+    drawQr('desktopQr', withVersion(links.desktop, 'no-default-logo-desktop'));
 
     $('openMobile').onclick = () => location.href = mobileForOpen;
-    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'old-design-restored-desktop');
+    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'no-default-logo-desktop');
     $('copyMobile').onclick = () => copy(mobileForOpen);
-    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'old-design-restored-desktop'));
+    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'no-default-logo-desktop'));
     const cleanButton = $('cleanAndOpen');
     if (cleanButton) cleanButton.onclick = () => location.href = resetForOpen;
 
