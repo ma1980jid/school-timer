@@ -6,6 +6,7 @@
   const slug = urlParams.get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const cacheKey = 'school_timer_identity_' + slug;
   const isDefaultSchool = slug === 'alsheikh-saif';
+  const isInstallPage = location.pathname.includes('install.html');
   const DEFAULT_CARD_TEXT = 'مؤقت الحصص';
   const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
   let identity = null;
@@ -112,6 +113,7 @@
   }
 
   function applyDefaultMiddleCards(){
+    if (isInstallPage) return;
     if (window.__schoolTimerCardsApplied) return;
     const rightEl = document.getElementById('schoolName');
     const leftEl = document.getElementById('visionText');
@@ -151,6 +153,7 @@
   }
 
   function cleanWrongSchoolText(){
+    if (isInstallPage) return;
     const replacement = DEFAULT_CARD_TEXT;
     document.querySelectorAll('.ticker-item, #tickerTrack span, #schoolName, #visionText').forEach((el) => {
       const text = el.textContent || '';
