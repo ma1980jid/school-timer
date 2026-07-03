@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f2e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>مؤقت الحصص</title>
+  <script>
+    (function(){var s=new URLSearchParams(location.search).get('school')||'';if(s&&s!=='alsheikh-saif')document.documentElement.setAttribute('data-non-default-school','1');})();
+  </script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preload" as="image" href="desktop-bg.webp" type="image/webp" media="(min-width: 769px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mobile-bg.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
+  <link rel="icon" href="icons/school_logo.png">
+  <link rel="apple-touch-icon" href="icons/school_logo.png">
+  <link rel="stylesheet" href="style.css?v=optimized-02">
+  <link rel="stylesheet" href="ticker-fix.css?v=loop-10">
+  <style>[hidden]{display:none!important}html[data-non-default-school="1"] #schoolLogo[src*="icons/school_logo"]{display:none!important}</style>
+</head>
+<body>
+  <main class="timer-app">
+    <div class="school-logo-wrap"><img id="schoolLogo" alt="شعار المدرسة" decoding="async" fetchpriority="high"></div>
+    <section class="top-cards">
+      <div class="period-card next-card"><div class="period-title">الحصة القادمة</div><div id="nextName" class="period-name">--</div><div class="period-line"></div><div id="nextTime" class="period-time">--</div></div>
+      <div class="period-card current-card"><div class="period-title">الحصة الحالية</div><div id="currentName" class="period-name">--</div><div class="period-line"></div><div id="currentTime" class="period-time">--</div></div>
+      <div class="period-card previous-card"><div class="period-title">الحصة السابقة</div><div id="previousName" class="period-name">--</div><div class="period-line"></div><div id="previousTime" class="period-time">--</div></div>
+    </section>
+    <section class="clock-panel">
+      <div class="date-box"><strong id="weekday">--</strong><span id="gregorianDate">--</span><span id="hijriDate">--</span></div>
+      <div class="clock-area"><div id="digitalClock" class="digital-clock">--:--</div><div id="countLabel" class="count-label">متبقي من الحصة الحالية</div><div id="remainingTime" class="remaining-time">--:--</div></div>
+    </section>
+    <section class="middle-cards"><div class="mini-card school-name-card"><p id="schoolName">مؤقت الحصص</p></div><div class="mini-card vision-card"><p id="visionText">مؤقت الحصص</p></div></section>
+    <section class="schedule-section"><div class="schedule-grid"><table><tbody id="scheduleCol1"></tbody></table><table><tbody id="scheduleCol2"></tbody></table></div></section>
+    <footer class="ticker"><div id="tickerTrack" class="ticker-track"></div></footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js?v=old-design-01" defer></script>
+  <script src="viewer-multischool-identity.js?v=multi-identity-04" defer></script>
+  <script src="script.js?v=optimized-02" defer></script>
+  <script src="script-optimizations.js?v=no-default-school-01" defer></script>
+  <script src="ticker-messages.js?v=optimized-11" defer></script>
+  <script src="viewer-multischool-message-guard.js?v=multi-message-03" defer></script>
+  <script src="text-corrections.js?v=text-corrections-05" defer></script>
+  <script src="viewer-alerts-external-fix.js?v=external-alerts-02" defer></script>
+  <script src="viewer-phone-notification-android-fix.js?v=android-phone-alerts-01" defer></script>
+</body>
+</html>
