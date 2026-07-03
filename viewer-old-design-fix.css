@@ -1,0 +1,11 @@
+.schedule-grid table{table-layout:fixed!important;width:100%!important;border-collapse:collapse!important}
+.schedule-grid tbody{width:100%!important}
+.schedule-grid tr{display:grid!important;grid-template-columns:34% 43% 23%!important;align-items:center!important;min-height:44px!important}
+.schedule-grid td{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;white-space:nowrap!important;line-height:1.15!important;padding:2px 4px!important;overflow:visible!important}
+.schedule-grid td:nth-child(1){font-weight:900!important;color:#064b35!important;font-size:clamp(12px,2.8vw,18px)!important;justify-content:flex-end!important;padding-inline-end:8px!important}
+.schedule-grid td:nth-child(2),.schedule-grid .time-cell{direction:ltr!important;font-weight:900!important;color:#111!important;font-size:clamp(13px,3.1vw,20px)!important;justify-content:center!important}
+.schedule-grid td:nth-child(3),.schedule-grid .status-cell{font-weight:900!important;color:#0f766e!important;font-size:clamp(10px,2.4vw,15px)!important;justify-content:center!important;display:flex!important;flex-direction:column!important;gap:1px!important;padding-inline:2px!important}
+.schedule-grid .status-text{display:block!important;line-height:1!important}
+.schedule-grid .period-duration{display:block!important;font-size:.95em!important;font-weight:900!important;color:#8a6a18!important;line-height:1.05!important;margin:0!important}
+.schedule-grid tr.current-row td{color:#7f1d1d!important}
+@media(max-width:768px){.schedule-section{overflow:hidden!important}.schedule-grid{grid-template-columns:1fr 1fr!important;gap:3.5%!important}.schedule-grid tr{grid-template-columns:35% 43% 22%!important;min-height:38px!important}.schedule-grid td:nth-child(1){font-size:clamp(11px,3.05vw,16px)!important}.schedule-grid td:nth-child(2),.schedule-grid .time-cell{font-size:clamp(11px,3.18vw,17px)!important}.schedule-grid td:nth-child(3),.schedule-grid .status-cell{font-size:clamp(9px,2.55vw,13px)!important}.schedule-grid .period-duration{font-size:.9em!important}}
