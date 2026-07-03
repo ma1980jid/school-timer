@@ -51,16 +51,12 @@
   function normalizeTimerText(id, value){
     const text = value === undefined || value === null ? '' : String(value);
     if (id === 'currentName' && text.trim() === 'انتهى الدوام') return '--';
-    if (id === 'countLabel' && text.trim() === 'انتهى اليوم الدراسي') return '--';
     return text;
   }
 
   function clearAfterSchoolText(){
     const currentName = document.getElementById('currentName');
     if (currentName && currentName.textContent.trim() === 'انتهى الدوام') currentName.textContent = '--';
-
-    const countLabel = document.getElementById('countLabel');
-    if (countLabel && countLabel.textContent.trim() === 'انتهى اليوم الدراسي') countLabel.textContent = '--';
   }
 
   preventDefaultSchoolForOtherSchools();
@@ -112,7 +108,7 @@
       const s = scheduleState || (typeof window.getSchedule === 'function' ? window.getSchedule() : null);
       if (!s || !s.afterSchool) return originalUpdateRemaining(scheduleState);
 
-      window.setText('countLabel', '--');
+      window.setText('countLabel', 'انتهى اليوم الدراسي');
       window.setText('remainingTime', '00:00');
     };
   }
