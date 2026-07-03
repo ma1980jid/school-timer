@@ -19,11 +19,11 @@
     const base = baseUrl();
     const s = encodeURIComponent(slug);
     return {
-      mobile: `${base}index.html?school=${s}&view=mobile`,
-      desktop: `${base}index.html?school=${s}&view=desktop`,
+      mobile: `${base}viewer-clean.html?school=${s}&view=mobile`,
+      desktop: `${base}viewer-clean.html?school=${s}&view=desktop`,
       dashboard: `${base}dashboard-v2.html?school=${s}`,
       install: `${base}install.html?school=${s}`,
-      reset: `${base}reset.html?school=${s}&view=mobile`
+      reset: `${base}viewer-clean.html?school=${s}&view=mobile`
     };
   }
 
@@ -73,20 +73,20 @@
   function start(){
     const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
     const links = buildUrls();
-    const mobileForOpen = withVersion(links.mobile, 'page-shortcut');
-    const resetForOpen = withVersion(links.reset, 'clean');
+    const mobileForOpen = withVersion(links.mobile, 'viewer-clean');
+    const resetForOpen = withVersion(links.reset, 'viewer-clean');
 
     $('schoolName').textContent = name;
     document.title = name + ' - تثبيت مؤقت الحصص';
     $('mobileUrl').textContent = mobileForOpen;
-    $('desktopUrl').textContent = withVersion(links.desktop, 'desktop');
+    $('desktopUrl').textContent = withVersion(links.desktop, 'viewer-clean-desktop');
     drawQr('mobileQr', mobileForOpen);
-    drawQr('desktopQr', withVersion(links.desktop, 'desktop'));
+    drawQr('desktopQr', withVersion(links.desktop, 'viewer-clean-desktop'));
 
     $('openMobile').onclick = () => location.href = mobileForOpen;
-    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'desktop');
+    $('openDesktop').onclick = () => location.href = withVersion(links.desktop, 'viewer-clean-desktop');
     $('copyMobile').onclick = () => copy(mobileForOpen);
-    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'desktop'));
+    $('copyDesktop').onclick = () => copy(withVersion(links.desktop, 'viewer-clean-desktop'));
     const cleanButton = $('cleanAndOpen');
     if (cleanButton) cleanButton.onclick = () => location.href = resetForOpen;
 
