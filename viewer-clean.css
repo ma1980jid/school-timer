@@ -1,3 +1,4 @@
+[hidden]{display:none!important}
 :root{--bg:#f8f2e8;--card:#ffffffcc;--ink:#12312a;--muted:#64748b;--green:#0f766e;--gold:#b7791f;--red:#b91c1c;--line:#d8e1da;--shadow:0 18px 42px rgba(15,23,42,.13)}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
