@@ -12,12 +12,46 @@
   let loadTries = 0;
   let loading = false;
 
+  function isValidTime(value){
+    return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(value || '').trim());
+  }
+
+  function isValidRow(row){
+    return !!row
+      && typeof row === 'object'
+      && !Array.isArray(row)
+      && !!String(row.name || '').trim()
+      && isValidTime(row.start)
+      && isValidTime(row.end);
+  }
+
+  function normalizeRows(value){
+    if (!Array.isArray(value) || !value.length || !value.every(isValidRow)) return null;
+    return value.map((row) => ({
+      ...row,
+      name: String(row.name).trim(),
+      start: String(row.start).trim(),
+      end: String(row.end).trim(),
+      duration: String(row.duration || '').trim(),
+      type: String(row.type || '').trim()
+    }));
+  }
+
+  function hasValidRows(value){
+    return Array.isArray(value) && value.length > 0 && value.every(isValidRow);
+  }
+
   function readCache(){
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
       if (!cached || !Array.isArray(cached.rows) || !cached.rows.length) return false;
       if (Date.now() - Number(cached.savedAt || 0) > CACHE_TTL) return false;
-      rows = cached.rows;
+      const validRows = normalizeRows(cached.rows);
+      if (!validRows) {
+        localStorage.removeItem(CACHE_KEY);
+        return false;
+      }
+      rows = validRows;
       return true;
     } catch (error) { return false; }
   }
@@ -151,7 +185,15 @@
   }
 
   function paint(){ const s = schedule(); if (!s.list.length) return; updateCards(s); updateRemaining(s); renderTable(s); }
-  function patch(){ window.getSchedule = schedule; window.updateCards = updateCards; window.updateRemaining = updateRemaining; window.renderTable = renderTable; window.getActivePeriods = list; }
+  function patch(){
+    if (!hasValidRows(rows)) return false;
+    window.getSchedule = schedule;
+    window.updateCards = updateCards;
+    window.updateRemaining = updateRemaining;
+    window.renderTable = renderTable;
+    window.getActivePeriods = list;
+    return true;
+  }
 
   async function load(){
     if (loading) return;
@@ -163,14 +205,17 @@
       const result = await client.from('school_messages').select('message_text,created_at').eq('school_slug', slug).eq('is_active', true).like('message_text', PREFIX + '%').order('created_at', { ascending: false }).limit(1);
       if (result.data && result.data[0]) {
         const parsed = JSON.parse(String(result.data[0].message_text).slice(PREFIX.length));
-        const nextRows = Array.isArray(parsed.rows) ? parsed.rows : [];
-        const old = JSON.stringify(rows);
-        rows = nextRows;
-        writeCache(rows);
-        if (JSON.stringify(rows) !== old) sig = '';
-        patch();
-        paint();
-      } else if (!rows.length) {
+        const validRows = normalizeRows(parsed.rows);
+        if (validRows) {
+          const old = JSON.stringify(rows);
+          rows = validRows;
+          writeCache(rows);
+          if (JSON.stringify(rows) !== old) sig = '';
+          if (patch()) paint();
+        } else if (!hasValidRows(rows)) {
+          clearCache();
+        }
+      } else if (!hasValidRows(rows)) {
         clearCache();
       }
     } catch (error) {
@@ -180,8 +225,7 @@
   }
 
   function start(){
-    patch();
-    if (readCache()) paint();
+    if (readCache() && patch()) paint();
     load();
     setInterval(paint, 1000);
     setInterval(load, LOAD_INTERVAL);
