@@ -1,5 +1,5 @@
 const settings = {
-  schoolName: "مدرسة الشيخ سيف بن حمد الأغبري",
+  schoolName: "مؤقت الحصص",
   schoolLogo: "icons/school_logo.png",
   timeZone: "Asia/Muscat",
   activeSchedule: "oneShift_scheduleFirst",
@@ -41,7 +41,7 @@ function applyUrlSettings() {
 applyUrlSettings();
 document.documentElement.setAttribute("data-theme", settings.designTheme);
 
-settings.schoolSlug = new URLSearchParams(location.search).get("school") || window.SCHOOL_TIMER_SLUG || "alsheikh-saif";
+settings.schoolSlug = new URLSearchParams(location.search).get("school") || window.SCHOOL_TIMER_SLUG || "__neutral__";
 
 let supabaseClient = null;
 const settingsCacheKey = "school_timer_settings_" + settings.schoolSlug;
@@ -63,17 +63,29 @@ function applyRemoteSettingsData(data) {
 }
 
 function loadCachedSettings() {
+  if (settings.schoolSlug === "__neutral__") return;
+
   try {
     const cached = JSON.parse(localStorage.getItem(settingsCacheKey) || "null");
-    if (cached && cached.data) {
-      applyRemoteSettingsData(cached.data);
+    if (!cached || !cached.data) return;
+
+    if (!cached.data._school_slug || cached.data._school_slug !== settings.schoolSlug) {
+      localStorage.removeItem(settingsCacheKey);
+      return;
     }
+
+    applyRemoteSettingsData(cached.data);
   } catch (error) {}
 }
 
 function saveCachedSettings(data) {
+  if (settings.schoolSlug === "__neutral__") return;
+
   try {
-    localStorage.setItem(settingsCacheKey, JSON.stringify({ savedAt: Date.now(), data }));
+    localStorage.setItem(settingsCacheKey, JSON.stringify({
+      savedAt: Date.now(),
+      data: { ...data, _school_slug: settings.schoolSlug }
+    }));
   } catch (error) {}
 }
 
@@ -87,7 +99,7 @@ function initSupabaseClient() {
 }
 
 async function loadRemoteSettings() {
-  if (!supabaseClient) return false;
+  if (settings.schoolSlug === "__neutral__" || !supabaseClient) return false;
 
   try {
     const [schoolResult, settingsResult] = await Promise.all([
