@@ -48,11 +48,12 @@
 
   function readSchoolNameFromCache(){
     try {
-      const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+      const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || '__neutral__';
+      if (slug === '__neutral__') return 'مؤقت الحصص';
       const cached = JSON.parse(localStorage.getItem('school_timer_settings_' + slug) || 'null');
       if (cached && cached.data && cached.data.school_name) return cached.data.school_name;
     } catch (error) {}
-    return 'مدرسة الشيخ سيف بن حمد الأغبري (5-12) بنين';
+    return 'مؤقت الحصص';
   }
 
   function ensureMobileSchoolHeading(){
