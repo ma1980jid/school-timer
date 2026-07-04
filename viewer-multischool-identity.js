@@ -3,9 +3,9 @@
   window.__viewerMultischoolIdentityLoaded = true;
 
   const urlParams = new URLSearchParams(location.search);
-  const slug = urlParams.get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+  const slug = urlParams.get('school') || window.SCHOOL_TIMER_SLUG || '__neutral__';
+  const isNeutralSchool = slug === '__neutral__';
   const cacheKey = 'school_timer_identity_' + slug;
-  const isDefaultSchool = slug === 'alsheikh-saif';
   const isInstallPage = location.pathname.includes('install.html');
   const DEFAULT_CARD_TEXT = 'مؤقت الحصص';
   const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
@@ -13,6 +13,7 @@
   let identityLoading = false;
 
   function getClient(){
+    if (isNeutralSchool) return null;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
     if (!window[SHARED_CLIENT_KEY]) {
       window[SHARED_CLIENT_KEY] = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
@@ -24,20 +25,31 @@
   function getLogo(data){ return safeText(data && (data.app_icon_url || data.logo_url)); }
 
   function readCache(){
+    if (isNeutralSchool) return null;
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (!cached || !cached.data) return null;
       if (Date.now() - Number(cached.savedAt || 0) > 15 * 60 * 1000) return null;
+      if (!cached.data._school_slug || cached.data._school_slug !== slug) {
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
       return cached.data;
     } catch (error) { return null; }
   }
 
   function writeCache(data){
-    try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data })); }
-    catch (error) {}
+    if (isNeutralSchool || !data) return;
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        savedAt: Date.now(),
+        data: { ...data, _school_slug: slug }
+      }));
+    } catch (error) {}
   }
 
   function clearCurrentSchoolRuntimeCaches(){
+    if (isNeutralSchool) return;
     try {
       [
         'school_timer_settings_',
@@ -56,22 +68,8 @@
       || safeText(oldData.created_at) !== safeText(newData.created_at);
   }
 
-  function cleanDefaultSchoolCache(){
-    if (isDefaultSchool) return;
-    try {
-      [
-        'school_timer_settings_alsheikh-saif',
-        'school_timer_identity_alsheikh-saif',
-        'school_timer_messages_alsheikh-saif',
-        'school_timer_middle_cards_alsheikh-saif',
-        'school_timer_scheduled_alsheikh-saif',
-        'school_timer_direct_schedule_alsheikh-saif'
-      ].forEach((key) => localStorage.removeItem(key));
-    } catch (error) {}
-  }
-
   function hideDefaultLogoUntilReady(){
-    if (isDefaultSchool) return;
+    if (isNeutralSchool) return;
     const logo = document.getElementById('schoolLogo');
     if (!logo || identity) return;
     logo.removeAttribute('src');
@@ -84,6 +82,7 @@
   }
 
   function setDynamicManifest(data){
+    if (isNeutralSchool) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
     const icon = getLogo(data);
     const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
@@ -122,7 +121,7 @@
   }
 
   function applyIdentity(data){
-    if (!data) return;
+    if (!data || data._school_slug !== slug || isNeutralSchool) return;
     identity = data;
     const schoolName = safeText(data.school_name);
     const logoUrl = getLogo(data);
@@ -141,7 +140,7 @@
       if (logoUrl) {
         logo.src = logoUrl;
         logo.style.display = '';
-      } else if (!isDefaultSchool) {
+      } else {
         logo.removeAttribute('src');
         logo.style.display = 'none';
       }
@@ -149,24 +148,13 @@
 
     if (logoUrl) setIconLinks(logoUrl);
     setDynamicManifest(data);
-    cleanWrongSchoolText();
-  }
-
-  function cleanWrongSchoolText(){
-    if (isInstallPage) return;
-    const replacement = DEFAULT_CARD_TEXT;
-    document.querySelectorAll('.ticker-item, #tickerTrack span, #schoolName, #visionText').forEach((el) => {
-      const text = el.textContent || '';
-      if (text.includes('مدرسة الشيخ سيف بن حمد الأغبري')) el.textContent = replacement;
-    });
   }
 
   async function loadIdentity(){
-    if (identityLoading) return;
+    if (isNeutralSchool || identityLoading) return;
     identityLoading = true;
 
     try {
-      cleanDefaultSchoolCache();
       hideDefaultLogoUntilReady();
 
       const cached = readCache();
@@ -182,9 +170,10 @@
         .eq('school_slug', slug)
         .maybeSingle();
       if (error || !data) return;
-      if (hasIdentityChanged(cached, data)) clearCurrentSchoolRuntimeCaches();
-      writeCache(data);
-      applyIdentity(data);
+      const taggedData = { ...data, _school_slug: slug };
+      if (hasIdentityChanged(cached, taggedData)) clearCurrentSchoolRuntimeCaches();
+      writeCache(taggedData);
+      applyIdentity(taggedData);
     } catch (error) {
     } finally {
       identityLoading = false;
@@ -193,12 +182,12 @@
 
   function reapplyIdentitySoon(){
     if (identity) applyIdentity(identity);
-    cleanWrongSchoolText();
   }
 
   function start(){
     hideDefaultLogoUntilReady();
     applyDefaultMiddleCards();
+    if (isNeutralSchool) return;
     loadIdentity();
     setTimeout(reapplyIdentitySoon, 700);
     setTimeout(reapplyIdentitySoon, 1400);

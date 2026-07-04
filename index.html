@@ -71,7 +71,6 @@
     </section>
     <script>
       (function(){
-        var defaultSchoolName = 'مدرسة الشيخ سيف بن حمد الأغبري';
         var defaultVision = 'رؤيتنا: تعليم ملهم لمستقبل مشرق';
         var rightText = '';
         var leftText = '';
@@ -80,11 +79,11 @@
           var leftEl = document.getElementById('visionText');
           if (rightText && rightEl && rightEl.textContent !== rightText) rightEl.textContent = rightText;
           if (leftText && leftEl && leftEl.textContent !== leftText) leftEl.textContent = leftText;
-          if (!rightText && rightEl && (rightEl.textContent === defaultSchoolName || rightEl.textContent === '--')) rightEl.textContent = 'مؤقت الحصص';
+          if (!rightText && rightEl && rightEl.textContent === '--') rightEl.textContent = 'مؤقت الحصص';
           if (!leftText && leftEl && (leftEl.textContent === defaultVision || leftEl.textContent === '--')) leftEl.textContent = 'مؤقت الحصص';
         }
         try {
-          var slug = new URLSearchParams(location.search).get('school') || 'alsheikh-saif';
+          var slug = new URLSearchParams(location.search).get('school') || '__neutral__';
           var cached = JSON.parse(localStorage.getItem('school_timer_middle_cards_' + slug) || 'null');
           if (cached && cached.cards && Date.now() - Number(cached.savedAt || 0) < 120000) {
             rightText = String(cached.cards.right || '').trim();
