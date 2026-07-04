@@ -2,13 +2,15 @@
   if (window.__viewerSchoolIdentityLoaded) return;
   window.__viewerSchoolIdentityLoaded = true;
 
-  const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
+  const schoolSlug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || '__neutral__';
+  const isNeutralSchool = schoolSlug === '__neutral__';
   const cacheKey = 'school_timer_identity_' + schoolSlug;
   const settingsCacheKey = 'school_timer_settings_' + schoolSlug;
   const DEFAULT_LOGO = 'icons/school_logo.png';
   let client = null;
 
   function getClient(){
+    if (isNeutralSchool) return null;
     if (client) return client;
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
     client = window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL, window.SCHOOL_TIMER_SUPABASE_ANON_KEY);
@@ -16,21 +18,29 @@
   }
 
   function writeCache(data){
-    try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data })); } catch (error) {}
+    if (isNeutralSchool || !data) return;
+    const taggedData = { ...data, _school_slug: schoolSlug };
+    try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data: taggedData })); } catch (error) {}
     try {
       const old = JSON.parse(localStorage.getItem(settingsCacheKey) || 'null') || {};
       const oldData = old.data || {};
       localStorage.setItem(settingsCacheKey, JSON.stringify({
         savedAt: Date.now(),
-        data: { ...oldData, ...data }
+        data: { ...oldData, ...taggedData }
       }));
     } catch (error) {}
   }
 
   function readCache(){
+    if (isNeutralSchool) return null;
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (!cached || !cached.data) return null;
+      if (!cached.data._school_slug || cached.data._school_slug !== schoolSlug) {
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(settingsCacheKey);
+        return null;
+      }
       return cached.data;
     } catch (error) {
       return null;
@@ -79,7 +89,7 @@
 
   function applySchoolName(name){
     const cleanName = String(name || '').trim();
-    if (!cleanName) return;
+    if (!cleanName || isNeutralSchool) return;
     try { if (window.settings) window.settings.schoolName = cleanName; } catch (error) {}
     setText('schoolName', cleanName);
     setText('mobileSchoolHeading', cleanName);
@@ -108,7 +118,7 @@
   }
 
   function applyIdentity(data){
-    if (!data) return;
+    if (!data || data._school_slug !== schoolSlug || isNeutralSchool) return;
     applyLogo(data.logo_url || data.app_icon_url || DEFAULT_LOGO);
     applySchoolName(data.school_name || '');
     if (data.is_active === false) showDisabledOverlay(data);
@@ -116,6 +126,7 @@
   }
 
   async function loadIdentity(){
+    if (isNeutralSchool) return;
     const db = getClient();
     if (!db) {
       const cached = readCache();
@@ -135,8 +146,9 @@
         return;
       }
 
-      writeCache(data);
-      applyIdentity(data);
+      const taggedData = { ...data, _school_slug: schoolSlug };
+      writeCache(taggedData);
+      applyIdentity(taggedData);
     } catch (error) {
       const cached = readCache();
       if (cached) applyIdentity(cached);
@@ -146,6 +158,7 @@
   function start(){
     ensureStyle();
     loadScriptOnce('viewer-auto-theme.js?v=auto-theme-01', 'viewer-auto-theme.js');
+    if (isNeutralSchool) return;
     const cached = readCache();
     if (cached) applyIdentity(cached);
     loadIdentity();
