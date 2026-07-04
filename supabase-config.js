@@ -1,6 +1,6 @@
 window.SCHOOL_TIMER_SUPABASE_URL = ['https://kzhxmwejyfsuorcdvujb','supabase','co'].join('.');
 window.SCHOOL_TIMER_SUPABASE_ANON_KEY = ['sb','publishable','SMJPGEWFq0B0nCyMvu9Sbg','kt7N5hd5'].join('_');
-window.SCHOOL_TIMER_SLUG = 'alsheikh-saif';
+window.SCHOOL_TIMER_SLUG = new URLSearchParams(location.search).get('school') || '__neutral__';
 
 function loadScript(src){
   const script = document.createElement('script');
