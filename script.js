@@ -702,7 +702,7 @@ function updateCards(s = getSchedule()) {
     setText("currentName", s.current.name);
     setTimeRange("currentTime", s.current);
   } else if (s.beforeSchool) {
-    setText("currentName", "لم يبدأ الدوام");
+    setText("currentName", "--");
     setTimeRange("currentTime", s.first);
   } else if (s.afterSchool) {
     setText("currentName", "--");
