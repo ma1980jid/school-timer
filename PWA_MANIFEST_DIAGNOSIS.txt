@@ -1,0 +1,2 @@
+Diagnosis: manifest.json needs explicit start_url and id for installability.
+Do not merge this file; a proper branch will update manifest.json only.
