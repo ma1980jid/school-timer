@@ -81,80 +81,34 @@
     document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach((link) => { link.href = iconUrl; });
   }
 
-  function makeSquareIcon(iconUrl){
-    const src = safeText(iconUrl);
-    if (!src) return Promise.resolve('');
-    return new Promise((resolve) => {
-      const img = new Image();
-      if (!src.startsWith('data:')) img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const size = 512;
-          const padding = 44;
-          const maxDraw = size - padding * 2;
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, size, size);
-          const width = Number(img.naturalWidth || img.width || 1);
-          const height = Number(img.naturalHeight || img.height || 1);
-          const scale = Math.min(maxDraw / width, maxDraw / height);
-          const drawWidth = Math.max(1, Math.round(width * scale));
-          const drawHeight = Math.max(1, Math.round(height * scale));
-          const x = Math.round((size - drawWidth) / 2);
-          const y = Math.round((size - drawHeight) / 2);
-          ctx.drawImage(img, x, y, drawWidth, drawHeight);
-          resolve(canvas.toDataURL('image/png'));
-        } catch (error) {
-          resolve(src);
-        }
-      };
-      img.onerror = () => resolve(src);
-      img.decoding = 'async';
-      img.src = src;
-    });
-  }
-
   function setDynamicManifest(data){
     if (isNeutralSchool) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
     const icon = getLogo(data);
     const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
-
-    function applyManifest(iconSrc){
-      const manifest = {
-        id: './school-timer-' + slug,
-        name: 'مؤقت الحصص - ' + name,
-        short_name: 'مؤقت الحصص',
-        start_url: startUrl,
-        scope: './',
-        display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#0f766e',
-        dir: 'rtl',
-        lang: 'ar',
-        icons: iconSrc ? [
-          { src: iconSrc, sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: iconSrc, sizes: '512x512', type: 'image/png', purpose: 'any' }
-        ] : []
-      };
-      try {
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-        const manifestUrl = URL.createObjectURL(blob);
-        let link = document.querySelector('link[rel="manifest"]');
-        if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
-        link.href = manifestUrl;
-      } catch (error) {}
-    }
-
-    if (!icon) {
-      applyManifest('');
-      return;
-    }
-
-    makeSquareIcon(icon).then(applyManifest).catch(() => applyManifest(icon));
+    const manifest = {
+      id: './school-timer-' + slug,
+      name: 'مؤقت الحصص - ' + name,
+      short_name: 'مؤقت الحصص',
+      start_url: startUrl,
+      scope: './',
+      display: 'standalone',
+      background_color: '#f8f2e8',
+      theme_color: '#0f766e',
+      dir: 'rtl',
+      lang: 'ar',
+      icons: icon ? [
+        { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ] : []
+    };
+    try {
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestUrl = URL.createObjectURL(blob);
+      let link = document.querySelector('link[rel="manifest"]');
+      if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+      link.href = manifestUrl;
+    } catch (error) {}
   }
 
   function applyDefaultMiddleCards(){
