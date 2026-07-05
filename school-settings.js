@@ -7,6 +7,7 @@ const supabaseClient = supabase.createClient(
 
 const params = new URLSearchParams(window.location.search);
 const schoolSlug = params.get("school");
+const schoolId = params.get("id");
 
 let currentSchool = null;
 
@@ -18,11 +19,20 @@ loadSchool();
 // =========================
 async function loadSchool() {
 
-  const { data, error } = await supabaseClient
+  let query = supabaseClient
     .from("schools")
-    .select("*")
-    .eq("school_slug", schoolSlug)
-    .single();
+    .select("*");
+
+  if (schoolSlug) {
+    query = query.eq("school_slug", schoolSlug);
+  } else if (schoolId) {
+    query = query.eq("id", schoolId);
+  } else {
+    alert("رابط المدرسة غير مكتمل");
+    return;
+  }
+
+  const { data, error } = await query.single();
 
   if (error || !data) {
     alert("تعذر تحميل بيانات المدرسة");
@@ -61,14 +71,15 @@ async function loadSchool() {
   document.getElementById("isActiveInput").checked =
     data.is_active;
 
-  if (data.logo_url) {
-    document.getElementById("logoPreview").src =
-      data.logo_url;
+  const logoPreview = document.getElementById("logoPreview");
+  const iconPreview = document.getElementById("iconPreview");
+
+  if (data.logo_url && logoPreview) {
+    logoPreview.src = data.logo_url;
   }
 
-  if (data.app_icon_url) {
-    document.getElementById("iconPreview").src =
-      data.app_icon_url;
+  if (iconPreview) {
+    iconPreview.src = data.app_icon_url || data.logo_url || "";
   }
 }
 
@@ -86,7 +97,8 @@ async function uploadImage(file, folder) {
   const { error } = await supabaseClient.storage
     .from("school-logos")
     .upload(fileName, file, {
-      upsert: true
+      upsert: true,
+      contentType: file.type || "image/png"
     });
 
   if (error) {
@@ -103,6 +115,101 @@ async function uploadImage(file, folder) {
 
 
 // =========================
+// إنشاء أيقونة مربعة من الشعار
+// =========================
+function createAppIconFromLogo(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      reject(new Error("لم يتم اختيار شعار"));
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        try {
+          const size = 512;
+          const padding = 48;
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, size, size);
+
+          const width = Number(img.naturalWidth || img.width || 1);
+          const height = Number(img.naturalHeight || img.height || 1);
+          const maxDraw = size - padding * 2;
+          const scale = Math.min(maxDraw / width, maxDraw / height);
+          const drawWidth = Math.max(1, Math.round(width * scale));
+          const drawHeight = Math.max(1, Math.round(height * scale));
+          const x = Math.round((size - drawWidth) / 2);
+          const y = Math.round((size - drawHeight) / 2);
+
+          ctx.drawImage(img, x, y, drawWidth, drawHeight);
+
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error("تعذر إنشاء أيقونة التطبيق"));
+              return;
+            }
+
+            const safeName = (file.name || "school-logo.png")
+              .replace(/\.[^.]+$/, "")
+              .replace(/[^a-zA-Z0-9-_ء-ي]/g, "-");
+
+            const iconFile = new File(
+              [blob],
+              safeName + "-app-icon-512.png",
+              { type: "image/png" }
+            );
+
+            resolve(iconFile);
+          }, "image/png");
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      img.onerror = () => reject(new Error("تعذر قراءة الشعار"));
+      img.src = reader.result;
+    };
+
+    reader.onerror = () => reject(new Error("تعذر قراءة ملف الشعار"));
+    reader.readAsDataURL(file);
+  });
+}
+
+
+// =========================
+// معاينة مباشرة للشعار والأيقونة
+// =========================
+const logoFileInput = document.getElementById("logoFile");
+if (logoFileInput) {
+  logoFileInput.addEventListener("change", async () => {
+    const file = logoFileInput.files[0];
+    if (!file) return;
+
+    const localUrl = URL.createObjectURL(file);
+    const logoPreview = document.getElementById("logoPreview");
+    if (logoPreview) logoPreview.src = localUrl;
+
+    try {
+      const iconFile = await createAppIconFromLogo(file);
+      const iconPreview = document.getElementById("iconPreview");
+      if (iconPreview) iconPreview.src = URL.createObjectURL(iconFile);
+    } catch (error) {
+      console.warn(error);
+    }
+  });
+}
+
+
+// =========================
 // حفظ البيانات
 // =========================
 async function saveSchoolSettings() {
@@ -110,13 +217,10 @@ async function saveSchoolSettings() {
   const logoFile =
     document.getElementById("logoFile").files[0];
 
-  const iconFile =
-    document.getElementById("iconFile").files[0];
-
   let logoUrl = currentSchool.logo_url;
-  let iconUrl = currentSchool.app_icon_url;
+  let iconUrl = currentSchool.app_icon_url || currentSchool.logo_url;
 
-  // رفع شعار المدرسة
+  // رفع شعار المدرسة مرة واحدة، وإنشاء أيقونة التطبيق تلقائيًا منه
   if (logoFile) {
 
     const uploadedLogo =
@@ -125,16 +229,17 @@ async function saveSchoolSettings() {
     if (uploadedLogo) {
       logoUrl = uploadedLogo;
     }
-  }
 
-  // رفع أيقونة التطبيق
-  if (iconFile) {
+    try {
+      const generatedIconFile = await createAppIconFromLogo(logoFile);
+      const uploadedIcon = await uploadImage(generatedIconFile, "icons");
 
-    const uploadedIcon =
-      await uploadImage(iconFile, "icons");
-
-    if (uploadedIcon) {
-      iconUrl = uploadedIcon;
+      if (uploadedIcon) {
+        iconUrl = uploadedIcon;
+      }
+    } catch (error) {
+      console.warn("تعذر إنشاء أيقونة التطبيق تلقائيًا، سيتم استخدام الشعار نفسه.", error);
+      iconUrl = uploadedLogo || logoUrl;
     }
   }
 
@@ -190,7 +295,7 @@ async function saveSchoolSettings() {
     return;
   }
 
-  alert("تم حفظ بيانات المدرسة بنجاح");
+  alert("تم حفظ بيانات المدرسة بنجاح، وتم تحديث شعار الصفحة وأيقونة التطبيق تلقائيًا");
 
   loadSchool();
 
