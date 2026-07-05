@@ -13,15 +13,44 @@
       var requestedSlug = new URLSearchParams(location.search).get('school');
       var slug = requestedSlug && requestedSlug.trim() ? requestedSlug.trim() : '__neutral__';
       var appBase = new URL('./', location.href);
-      var appId = new URL('index.html', appBase);
       var startUrl = new URL('index.html', appBase);
-      appId.searchParams.set('school', slug);
       startUrl.searchParams.set('school', slug);
       startUrl.searchParams.set('view', 'mobile');
       startUrl.searchParams.set('pwa', '1');
 
+      function fallbackIcons(){
+        return [
+          { src: new URL('icons/pwa-192.png', appBase).href, sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: new URL('icons/pwa-512.png', appBase).href, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ];
+      }
+
+      function readCachedSchoolIcon(){
+        if (slug === '__neutral__') return null;
+        try {
+          var cached = JSON.parse(localStorage.getItem('school_timer_pwa_icon_' + slug) || 'null');
+          if (!cached || cached._school_slug !== slug || !cached.src) return null;
+          var size = Number(cached.size || cached.width || 0);
+          if (!Number.isFinite(size) || size < 192) return null;
+          return { src: cached.src, size: size };
+        } catch (error) { return null; }
+      }
+
+      function manifestIcons(){
+        var cachedIcon = readCachedSchoolIcon();
+        if (!cachedIcon) return fallbackIcons();
+        var icons = [
+          { src: cachedIcon.src, sizes: '192x192', type: 'image/png', purpose: 'any' }
+        ];
+        icons.push(cachedIcon.size >= 512
+          ? { src: cachedIcon.src, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          : fallbackIcons()[1]
+        );
+        return icons;
+      }
+
       var manifest = {
-        id: appId.href,
+        id: new URL('school-timer-' + encodeURIComponent(slug), appBase).href,
         name: 'مؤقت الحصص',
         short_name: 'مؤقت الحصص',
         start_url: startUrl.href,
@@ -31,10 +60,7 @@
         theme_color: '#0f766e',
         dir: 'rtl',
         lang: 'ar',
-        icons: [
-          { src: new URL('icons/pwa-192.png', appBase).href, sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: new URL('icons/pwa-512.png', appBase).href, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-        ]
+        icons: manifestIcons()
       };
 
       try {
