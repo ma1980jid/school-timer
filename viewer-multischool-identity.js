@@ -81,26 +81,39 @@
     document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach((link) => { link.href = iconUrl; });
   }
 
+  function isHttpUrl(value){
+    return /^https?:\/\//i.test(safeText(value));
+  }
+
   function setDynamicManifest(data){
     if (isNeutralSchool) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
     const icon = getLogo(data);
-    const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
+    const baseUrl = new URL('./', location.href).href;
+    const startUrl = new URL('index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1', baseUrl).href;
+    const appId = new URL('index.html?school=' + encodeURIComponent(slug), baseUrl).href;
+    const genericIcon192 = new URL('icons/pwa-192.png?v=absolute-manifest-01', baseUrl).href;
+    const genericIcon512 = new URL('icons/pwa-512.png?v=absolute-manifest-01', baseUrl).href;
+    const iconEntries = isHttpUrl(icon) ? [
+      { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any' }
+    ] : [
+      { src: genericIcon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: genericIcon512, sizes: '512x512', type: 'image/png', purpose: 'any' }
+    ];
+
     const manifest = {
-      id: './school-timer-' + slug,
+      id: appId,
       name: 'مؤقت الحصص - ' + name,
       short_name: 'مؤقت الحصص',
       start_url: startUrl,
-      scope: './',
+      scope: baseUrl,
       display: 'standalone',
       background_color: '#f8f2e8',
       theme_color: '#0f766e',
       dir: 'rtl',
       lang: 'ar',
-      icons: icon ? [
-        { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-      ] : []
+      icons: iconEntries
     };
     try {
       const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
