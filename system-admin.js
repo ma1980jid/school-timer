@@ -2,6 +2,7 @@
   const $ = (id) => document.getElementById(id);
   const state = { schools: [], selected: null, client: null };
   const RELATED_TABLES = ['school_display_messages','school_messages','school_timer_settings','school_schedule_rows','school_alert_settings','school_devices','device_activations'];
+  const ICON_BACKGROUND = '#f8f2e8';
 
   function schoolKey(school){ return String((school && school.school_slug) || ''); }
   function errorText(error){ return error ? [error.message, error.details, error.hint, error.code].filter(Boolean).join(' | ') : ''; }
@@ -88,29 +89,61 @@
     });
   }
 
+  function loadImageFromFile(file){
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('invalid-image')); };
+      img.src = url;
+    });
+  }
+
   async function logoFileToCompactDataUrl(file){
     const raw = await fileToDataUrl(file);
     if (!file || !file.type || !file.type.startsWith('image/') || file.type.includes('svg')) return raw;
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const max = 512;
-          const scale = Math.min(1, max / Math.max(img.width || max, img.height || max));
-          const w = Math.max(1, Math.round((img.width || max) * scale));
-          const h = Math.max(1, Math.round((img.height || max) * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/png'));
-        } catch (error) { resolve(raw); }
-      };
-      img.onerror = () => resolve(raw);
-      img.src = raw;
-    });
+    try {
+      const img = await loadImageFromFile(file);
+      const max = 512;
+      const scale = Math.min(1, max / Math.max(img.width || max, img.height || max));
+      const w = Math.max(1, Math.round((img.width || max) * scale));
+      const h = Math.max(1, Math.round((img.height || max) * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      return canvas.toDataURL('image/png');
+    } catch (error) { return raw; }
+  }
+
+  async function createSquareIconBlob(file, size){
+    const img = await loadImageFromFile(file);
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = ICON_BACKGROUND;
+    ctx.fillRect(0, 0, size, size);
+    const padding = Math.round(size * 0.12);
+    const available = size - (padding * 2);
+    const scale = Math.min(available / img.width, available / img.height);
+    const width = Math.max(1, Math.round(img.width * scale));
+    const height = Math.max(1, Math.round(img.height * scale));
+    ctx.drawImage(img, Math.round((size - width) / 2), Math.round((size - height) / 2), width, height);
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('icon-conversion-failed')), 'image/png'));
+  }
+
+  async function uploadPublicFile(db, path, file, contentType){
+    if (!db || !db.storage) throw new Error('storage-not-available');
+    const options = { upsert:true };
+    if (contentType) options.contentType = contentType;
+    const { error } = await db.storage.from('school-logos').upload(path, file, options);
+    if (error) throw error;
+    const { data } = db.storage.from('school-logos').getPublicUrl(path);
+    if (!data || !data.publicUrl) throw new Error('public-url-not-available');
+    return data.publicUrl;
   }
 
   function linksText(school){
@@ -175,6 +208,13 @@
     }
   }
 
+  function updatePreview(id, url){
+    const img = $(id);
+    if (!img) return;
+    if (url) { img.src = url; img.style.display = 'block'; }
+    else { img.removeAttribute('src'); img.style.display = 'none'; }
+  }
+
   function selectSchool(slug){
     const school = state.schools.find((item) => schoolKey(item) === String(slug));
     if (!school) return;
@@ -186,8 +226,10 @@
     $('wilayat').value = school.wilayat || '';
     $('adminCode').value = school.admin_code || '';
     $('isActive').value = school.is_active ? 'true' : 'false';
-    $('logoUrl').value = school.logo_url || school.app_icon_url || '';
-    updateLogoPreview(school.logo_url || school.app_icon_url || '');
+    $('logoUrl').value = school.logo_url || '';
+    $('appIconUrl').value = school.app_icon_url || '';
+    updatePreview('logoPreview', school.logo_url || '');
+    updatePreview('appIconPreview', school.app_icon_url || school.app_icon_512_url || school.app_icon_192_url || '');
     $('toggleSchoolBtn').style.display = 'block';
     $('toggleSchoolBtn').textContent = school.is_active ? 'إيقاف المدرسة' : 'تفعيل المدرسة';
     const del = $('deleteSchoolBtn');
@@ -198,22 +240,17 @@
 
   function resetForm(){
     state.selected = null;
-    ['schoolId','schoolName','schoolSlug','governorate','wilayat','adminCode','logoUrl'].forEach((id) => { const el=$(id); if (el) el.value=''; });
+    ['schoolId','schoolName','schoolSlug','governorate','wilayat','adminCode','logoUrl','appIconUrl'].forEach((id) => { const el=$(id); if (el) el.value=''; });
     $('isActive').value = 'true';
     $('logoFile').value = '';
+    $('appIconFile').value = '';
     $('toggleSchoolBtn').style.display = 'none';
     const del = $('deleteSchoolBtn');
     if (del) del.style.display = 'none';
-    updateLogoPreview('');
+    updatePreview('logoPreview', '');
+    updatePreview('appIconPreview', '');
     renderLinks(null);
     renderSchools();
-  }
-
-  function updateLogoPreview(url){
-    const img = $('logoPreview');
-    if (!img) return;
-    if (url) { img.src = url; img.style.display = 'block'; }
-    else { img.removeAttribute('src'); img.style.display = 'none'; }
   }
 
   async function uploadLogoIfNeeded(slug){
@@ -221,30 +258,35 @@
     if (!file) return $('logoUrl').value.trim();
     const db = getClient();
     const safeName = `${slug || 'school'}-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9._\-]/g, '-');
-    const path = `logos/${safeName}`;
-
-    if (db && db.storage) {
-      try {
-        const { error } = await db.storage.from('school-logos').upload(path, file, { upsert:true });
-        if (!error) {
-          const { data } = db.storage.from('school-logos').getPublicUrl(path);
-          if (data && data.publicUrl) return data.publicUrl;
-        }
-        if (error) showStatus('لم يتم الرفع إلى Storage، سيتم حفظ الشعار داخل بيانات المدرسة. السبب: ' + errorText(error), 'warn', true);
-      } catch (error) {
-        showStatus('لم يتم الرفع إلى Storage، سيتم حفظ الشعار داخل بيانات المدرسة.', 'warn', true);
-      }
-    }
-
     try {
+      return await uploadPublicFile(db, `logos/${safeName}`, file, file.type || undefined);
+    } catch (error) {
+      showStatus('لم يتم رفع شعار الواجهة إلى Storage، سيتم حفظ نسخة مضغوطة داخل بيانات المدرسة. السبب: ' + errorText(error), 'warn', true);
       const dataUrl = await logoFileToCompactDataUrl(file);
-      if (dataUrl) {
-        showStatus('تم تجهيز الشعار للحفظ داخل بيانات المدرسة. اضغط حفظ المدرسة لإكمال العملية.', 'warn', false);
-        return dataUrl;
-      }
-    } catch (error) {}
+      return dataUrl || $('logoUrl').value.trim();
+    }
+  }
 
-    return $('logoUrl').value.trim();
+  async function uploadAppIconIfNeeded(slug){
+    const file = $('appIconFile').files && $('appIconFile').files[0];
+    const current = state.selected || {};
+    if (!file) {
+      return {
+        original: $('appIconUrl').value.trim(),
+        icon192: current.app_icon_192_url || null,
+        icon512: current.app_icon_512_url || null
+      };
+    }
+    if (!file.type || !file.type.startsWith('image/')) throw new Error('اختر ملف صورة صالحًا لأيقونة التطبيق.');
+    const db = getClient();
+    const stamp = Date.now();
+    const safeOriginal = `${slug || 'school'}-${stamp}-${file.name}`.replace(/[^a-zA-Z0-9._\-]/g, '-');
+    const icon192 = await createSquareIconBlob(file, 192);
+    const icon512 = await createSquareIconBlob(file, 512);
+    const originalUrl = await uploadPublicFile(db, `app-icons/${slug}/original-${safeOriginal}`, file, file.type || undefined);
+    const icon192Url = await uploadPublicFile(db, `app-icons/${slug}/pwa-192-${stamp}.png`, icon192, 'image/png');
+    const icon512Url = await uploadPublicFile(db, `app-icons/${slug}/pwa-512-${stamp}.png`, icon512, 'image/png');
+    return { original: originalUrl, icon192: icon192Url, icon512: icon512Url };
   }
 
   async function saveSchool(){
@@ -255,7 +297,15 @@
     const slug = cleanSlug($('schoolSlug').value.trim() || slugFromName(name));
     if (!name || !slug) return showStatus('أدخل اسم المدرسة والرابط المختصر.', 'err');
     $('schoolSlug').value = slug;
-    const logo = await uploadLogoIfNeeded(slug);
+    let logo;
+    let appIcon;
+    try {
+      logo = await uploadLogoIfNeeded(slug);
+      appIcon = await uploadAppIconIfNeeded(slug);
+    } catch (error) {
+      console.error(error);
+      return showStatus('تعذر تجهيز أو رفع أيقونة التطبيق: ' + errorText(error), 'err', true);
+    }
     const payload = {
       school_name: name,
       school_slug: slug,
@@ -263,7 +313,9 @@
       wilayat: $('wilayat').value.trim(),
       admin_code: $('adminCode').value.trim(),
       logo_url: logo || null,
-      app_icon_url: logo || null,
+      app_icon_url: appIcon.original || null,
+      app_icon_192_url: appIcon.icon192 || null,
+      app_icon_512_url: appIcon.icon512 || null,
       is_active: $('isActive').value === 'true',
       primary_color: '#0f766e',
       secondary_color: '#b7791f',
@@ -363,11 +415,18 @@
     $('copySelectedBtn').onclick = () => state.selected ? copyText(linksText(state.selected), 'تم نسخ روابط المدرسة') : showStatus('اختر مدرسة أولًا.', 'warn');
     $('searchBox').addEventListener('input', renderSchools);
     $('schoolName').addEventListener('input', () => { if (!$('schoolSlug').value.trim() && !state.selected) $('schoolSlug').value = slugFromName($('schoolName').value); });
-    $('logoUrl').addEventListener('input', () => updateLogoPreview($('logoUrl').value.trim()));
+    $('logoUrl').addEventListener('input', () => updatePreview('logoPreview', $('logoUrl').value.trim()));
+    $('appIconUrl').addEventListener('input', () => updatePreview('appIconPreview', $('appIconUrl').value.trim()));
     $('logoFile').addEventListener('change', async () => {
       const file = $('logoFile').files && $('logoFile').files[0];
       if (!file) return;
-      try { updateLogoPreview(await logoFileToCompactDataUrl(file)); }
+      try { updatePreview('logoPreview', await logoFileToCompactDataUrl(file)); }
+      catch (error) {}
+    });
+    $('appIconFile').addEventListener('change', async () => {
+      const file = $('appIconFile').files && $('appIconFile').files[0];
+      if (!file) return;
+      try { updatePreview('appIconPreview', await fileToDataUrl(file)); }
       catch (error) {}
     });
     renderLinks(null);
