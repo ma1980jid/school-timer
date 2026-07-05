@@ -7,16 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>مؤقّت الحصص</title>
-  <script>
-    (function(){
-      var requestedSlug = new URLSearchParams(location.search).get('school');
-      var slug = requestedSlug && requestedSlug.trim() ? requestedSlug.trim() : '__neutral__';
-      var link = document.createElement('link');
-      link.rel = 'manifest';
-      link.href = 'manifest.json?school=' + encodeURIComponent(slug) + '&v=static-pwa-02';
-      document.head.appendChild(link);
-    })();
-  </script>
+  <link rel="manifest" href="manifest.json?v=school-logo-icon-01">
   <script>
     (function(){
       var s = new URLSearchParams(location.search).get('school') || '';
