@@ -81,6 +81,36 @@
     document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach((link) => { link.href = iconUrl; });
   }
 
+  function setDynamicManifest(data){
+    if (isNeutralSchool) return;
+    const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
+    const icon = getLogo(data);
+    const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
+    const manifest = {
+      id: './school-timer-' + slug,
+      name: 'مؤقت الحصص - ' + name,
+      short_name: 'مؤقت الحصص',
+      start_url: startUrl,
+      scope: './',
+      display: 'standalone',
+      background_color: '#f8f2e8',
+      theme_color: '#0f766e',
+      dir: 'rtl',
+      lang: 'ar',
+      icons: icon ? [
+        { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ] : []
+    };
+    try {
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestUrl = URL.createObjectURL(blob);
+      let link = document.querySelector('link[rel="manifest"]');
+      if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+      link.href = manifestUrl;
+    } catch (error) {}
+  }
+
   function applyDefaultMiddleCards(){
     if (isInstallPage) return;
     if (window.__schoolTimerCardsApplied) return;
@@ -117,6 +147,7 @@
     }
 
     if (logoUrl) setIconLinks(logoUrl);
+    setDynamicManifest(data);
   }
 
   async function loadIdentity(){
