@@ -6,6 +6,7 @@
   const slug = urlParams.get('school') || window.SCHOOL_TIMER_SLUG || '__neutral__';
   const isNeutralSchool = slug === '__neutral__';
   const cacheKey = 'school_timer_identity_' + slug;
+  const pwaIconCacheKey = 'school_timer_pwa_icon_' + slug;
   const isInstallPage = location.pathname.includes('install.html');
   const DEFAULT_CARD_TEXT = 'مؤقت الحصص';
   const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
@@ -81,6 +82,92 @@
     document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach((link) => { link.href = iconUrl; });
   }
 
+  function fallbackManifestIcons(appBase){
+    return [
+      { src: new URL('icons/pwa-192.png', appBase).href, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: new URL('icons/pwa-512.png', appBase).href, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ];
+  }
+
+  function buildManifestIcons(iconData, appBase){
+    if (!iconData || !iconData.src || Number(iconData.size || 0) < 192) return fallbackManifestIcons(appBase);
+    const fallback = fallbackManifestIcons(appBase);
+    return [
+      { src: iconData.src, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      Number(iconData.size || 0) >= 512
+        ? { src: iconData.src, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        : fallback[1]
+    ];
+  }
+
+  function updateManifestWithIcon(iconData){
+    if (isNeutralSchool) return;
+    try {
+      const appBase = new URL('./', location.href);
+      const startUrl = new URL('index.html', appBase);
+      startUrl.searchParams.set('school', slug);
+      startUrl.searchParams.set('view', 'mobile');
+      startUrl.searchParams.set('pwa', '1');
+
+      const manifest = {
+        id: new URL('school-timer-' + encodeURIComponent(slug), appBase).href,
+        name: 'مؤقت الحصص',
+        short_name: 'مؤقت الحصص',
+        start_url: startUrl.href,
+        scope: appBase.href,
+        display: 'standalone',
+        background_color: '#f8f2e8',
+        theme_color: '#0f766e',
+        dir: 'rtl',
+        lang: 'ar',
+        icons: buildManifestIcons(iconData, appBase)
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      let link = document.getElementById('schoolTimerManifest') || document.querySelector('link[rel="manifest"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'manifest';
+        link.id = 'schoolTimerManifest';
+        document.head.appendChild(link);
+      }
+      link.href = URL.createObjectURL(blob);
+    } catch (error) {}
+  }
+
+  function validatePwaIcon(url){
+    const src = safeText(url);
+    if (!src) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = Number(img.naturalWidth || 0);
+        const height = Number(img.naturalHeight || 0);
+        const diff = Math.abs(width - height);
+        const tolerance = Math.max(2, Math.round(Math.max(width, height) * 0.02));
+        if (width >= 192 && height >= 192 && diff <= tolerance) resolve({ src, width, height, size: Math.min(width, height), _school_slug: slug });
+        else resolve(null);
+      };
+      img.onerror = () => resolve(null);
+      img.decoding = 'async';
+      img.src = src;
+    });
+  }
+
+  async function updatePwaIconFromIdentity(data){
+    if (isNeutralSchool || !data) return;
+    const candidates = [safeText(data.app_icon_url), safeText(data.logo_url)].filter(Boolean);
+    for (const candidate of candidates) {
+      const valid = await validatePwaIcon(candidate);
+      if (valid) {
+        try { localStorage.setItem(pwaIconCacheKey, JSON.stringify(valid)); } catch (error) {}
+        updateManifestWithIcon(valid);
+        return;
+      }
+    }
+    try { localStorage.removeItem(pwaIconCacheKey); } catch (error) {}
+    updateManifestWithIcon(null);
+  }
+
   function applyDefaultMiddleCards(){
     if (isInstallPage) return;
     if (window.__schoolTimerCardsApplied) return;
@@ -117,6 +204,7 @@
     }
 
     if (logoUrl) setIconLinks(logoUrl);
+    updatePwaIconFromIdentity(data);
   }
 
   async function loadIdentity(){
