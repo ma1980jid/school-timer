@@ -1,0 +1,26 @@
+{
+  "id": "https://ma1980jid.github.io/school-timer/?school=school-mr7hmic2",
+  "name": "مؤقت الحصص - المدرسة التجريبية",
+  "short_name": "مؤقت الحصص",
+  "start_url": "https://ma1980jid.github.io/school-timer/index.html?school=school-mr7hmic2&view=mobile&pwa=1",
+  "scope": "https://ma1980jid.github.io/school-timer/",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#f8f2e8",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "https://ma1980jid.github.io/school-timer/icons/pwa-192.png?v=stable-proof-02",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://ma1980jid.github.io/school-timer/icons/pwa-512.png?v=stable-proof-02",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

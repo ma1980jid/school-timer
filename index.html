@@ -9,6 +9,16 @@
   <title>مؤقّت الحصص</title>
   <script>
     (function(){
+      var school = new URLSearchParams(location.search).get('school') || '';
+      if (school !== 'school-mr7hmic2') return;
+      var link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = 'manifests/school-mr7hmic2.webmanifest?v=stable-proof-02';
+      document.head.appendChild(link);
+    })();
+  </script>
+  <script>
+    (function(){
       var s = new URLSearchParams(location.search).get('school') || '';
       if (s && s !== 'alsheikh-saif') document.documentElement.setAttribute('data-non-default-school','1');
     })();
@@ -113,5 +123,6 @@
   <script src="text-corrections.js?v=text-corrections-06" defer></script>
   <script src="viewer-alerts-external-fix.js?v=external-alerts-02" defer></script>
   <script src="viewer-phone-notification-android-fix.js?v=android-phone-alerts-01" defer></script>
+  <script src="pwa-register.js?v=stable-proof-01" defer></script>
 </body>
 </html>
