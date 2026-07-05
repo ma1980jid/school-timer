@@ -29,6 +29,30 @@
     if (btn) btn.onclick = function(){ copy(next); };
   }
 
+  function shareUrl(slug){
+    const base = String(window.SCHOOL_TIMER_SUPABASE_URL || 'https://kzhxmwejyfsuorcdvujb.supabase.co').replace(/\/$/, '');
+    return base + '/functions/v1/school-share?school=' + encodeURIComponent(slug || '');
+  }
+
+  function patchShareLink(){
+    const slug = selectedSlug();
+    const box = document.getElementById('linksBox');
+    if (!slug || !box || !box.querySelector('.linkbox')) return;
+    const url = shareUrl(slug);
+    let item = document.getElementById('schoolShareLinkBox');
+    if (!item) {
+      item = document.createElement('div');
+      item.id = 'schoolShareLinkBox';
+      item.className = 'linkbox';
+      item.innerHTML = '<b>رابط المشاركة في واتساب</b><div class="url" id="url_share"></div><button class="btn light" type="button" id="copyShareLinkBtn">نسخ رابط المشاركة</button>';
+      box.appendChild(item);
+    }
+    const urlBox = document.getElementById('url_share');
+    const button = document.getElementById('copyShareLinkBtn');
+    if (urlBox) urlBox.textContent = url;
+    if (button) button.onclick = function(){ copy(url); status('تم نسخ رابط المشاركة', 'ok'); };
+  }
+
   function status(message, type){
     const box = document.getElementById('systemStatus');
     if (!box) return alert(message);
@@ -128,14 +152,17 @@
     button.dataset.verifiedDelete = '1';
   }
 
-  function start(){
+  function patchAll(){
     patchInstallLink();
+    patchShareLink();
     patchDelete();
-    setTimeout(patchInstallLink, 1200);
-    setTimeout(patchInstallLink, 3000);
-    setTimeout(patchDelete, 1200);
-    setTimeout(patchDelete, 3000);
-    setInterval(patchDelete, 1500);
+  }
+
+  function start(){
+    patchAll();
+    setTimeout(patchAll, 1200);
+    setTimeout(patchAll, 3000);
+    setInterval(function(){ patchShareLink(); patchDelete(); }, 1500);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
