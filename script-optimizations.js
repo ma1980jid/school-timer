@@ -87,7 +87,7 @@
         window.setText('currentName', s.current.name);
         window.setTimeRange('currentTime', s.current);
       } else if (s.beforeSchool) {
-        window.setText('currentName', 'لم يبدأ الدوام');
+        window.setText('currentName', '--');
         window.setTimeRange('currentTime', s.first);
       } else if (s.afterSchool) {
         window.setText('currentName', '--');
