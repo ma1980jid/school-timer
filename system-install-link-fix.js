@@ -30,8 +30,7 @@
   }
 
   function shareUrl(slug){
-    const base = String(window.SCHOOL_TIMER_SUPABASE_URL || 'https://kzhxmwejyfsuorcdvujb.supabase.co').replace(/\/$/, '');
-    return base + '/functions/v1/school-share?school=' + encodeURIComponent(slug || '');
+    return 'https://ma1980jid.github.io/school-timer/index.html?school=' + encodeURIComponent(slug || '') + '&view=mobile&v=no-default-logo-01';
   }
 
   function patchShareLink(){
@@ -44,13 +43,13 @@
       item = document.createElement('div');
       item.id = 'schoolShareLinkBox';
       item.className = 'linkbox';
-      item.innerHTML = '<b>رابط المشاركة في واتساب</b><div class="url" id="url_share"></div><button class="btn light" type="button" id="copyShareLinkBtn">نسخ رابط المشاركة</button>';
+      item.innerHTML = '<b>نسخ رابط المدرسة</b><div class="url" id="url_share"></div><button class="btn light" type="button" id="copyShareLinkBtn">نسخ رابط المدرسة</button>';
       box.appendChild(item);
     }
     const urlBox = document.getElementById('url_share');
     const button = document.getElementById('copyShareLinkBtn');
     if (urlBox) urlBox.textContent = url;
-    if (button) button.onclick = function(){ copy(url); status('تم نسخ رابط المشاركة', 'ok'); };
+    if (button) button.onclick = function(){ copy(url); status('تم نسخ رابط المدرسة', 'ok'); };
   }
 
   function status(message, type){
