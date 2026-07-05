@@ -1,9 +1,7 @@
 (function(){
   const $ = (id) => document.getElementById(id);
-  const slug = new URLSearchParams(location.search).get('school') || 'alsheikh-saif';
-  const knownNames = {
-    'alsheikh-saif': 'مدرسة الشيخ سيف بن حمد الأغبري (5-12) بنين'
-  };
+  const rawSlug = new URLSearchParams(location.search).get('school');
+  const slug = rawSlug && rawSlug.trim() ? rawSlug.trim() : '__neutral__';
   const VIEW_VERSION = 'no-default-logo-01';
 
   function baseUrl(){
@@ -72,7 +70,7 @@
   }
 
   function start(){
-    const name = knownNames[slug] || 'تثبيت مؤقت الحصص';
+    const name = slug === '__neutral__' ? 'تثبيت مؤقت الحصص' : 'تثبيت مؤقت الحصص';
     const links = buildUrls();
     const mobileForOpen = links.mobile;
     const resetForOpen = links.reset;
