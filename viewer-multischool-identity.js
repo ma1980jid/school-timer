@@ -83,6 +83,8 @@
 
   function setDynamicManifest(data){
     if (isNeutralSchool) return;
+    const stableManifestLink = document.querySelector('link[rel="manifest"]');
+    if (stableManifestLink && stableManifestLink.href.includes('manifests/abdullahalarqam.webmanifest')) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
     const icon = getLogo(data);
     const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
