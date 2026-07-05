@@ -1,1 +1,1 @@
-ignore
+This temporary note is obsolete and can be deleted after the PWA manifest fix is merged.
