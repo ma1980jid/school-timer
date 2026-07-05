@@ -55,45 +55,44 @@
 
       <!-- شعار المدرسة -->
       <h3>شعار المدرسة</h3>
+      <p style="margin:0;color:#64748b;font-weight:700;line-height:1.8">
+        ارفع شعار المدرسة مرة واحدة فقط. سيستخدمه النظام تلقائيًا داخل صفحة المؤقت، وسيُنشئ منه أيقونة مربعة للتطبيق.
+      </p>
 
-      <img
-        id="logoPreview"
-        src=""
-        style="
-          width:130px;
-          height:130px;
-          object-fit:contain;
-          border:1px solid #ddd;
-          border-radius:16px;
-          background:white;
-          padding:10px">
+      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:900;margin-bottom:8px">الشعار داخل الصفحة</div>
+          <img
+            id="logoPreview"
+            src=""
+            style="
+              width:130px;
+              height:130px;
+              object-fit:contain;
+              border:1px solid #ddd;
+              border-radius:16px;
+              background:white;
+              padding:10px">
+        </div>
+
+        <div>
+          <div style="font-weight:900;margin-bottom:8px">أيقونة التطبيق التلقائية</div>
+          <img
+            id="iconPreview"
+            src=""
+            style="
+              width:90px;
+              height:90px;
+              object-fit:contain;
+              border:1px solid #ddd;
+              border-radius:16px;
+              background:white;
+              padding:10px">
+        </div>
+      </div>
 
       <input
         id="logoFile"
-        type="file"
-        accept="image/*">
-
-
-      <hr>
-
-
-      <!-- أيقونة التطبيق -->
-      <h3>أيقونة التطبيق</h3>
-
-      <img
-        id="iconPreview"
-        src=""
-        style="
-          width:90px;
-          height:90px;
-          object-fit:contain;
-          border:1px solid #ddd;
-          border-radius:16px;
-          background:white;
-          padding:10px">
-
-      <input
-        id="iconFile"
         type="file"
         accept="image/*">
 
