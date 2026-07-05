@@ -1,7 +1,8 @@
 {
-  "name": "مؤقت الحصص المدرسية",
+  "id": "index.html?school=__neutral__",
+  "name": "مؤقت الحصص",
   "short_name": "مؤقت الحصص",
-  "start_url": "index.html?view=mobile&pwa=1",
+  "start_url": "index.html?school=__neutral__&view=mobile&pwa=1",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f8f2e8",
@@ -10,13 +11,13 @@
   "lang": "ar",
   "icons": [
     {
-      "src": "icons/school_logo.png",
+      "src": "icons/pwa-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icons/school_logo.png",
+      "src": "icons/pwa-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
