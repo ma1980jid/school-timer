@@ -734,9 +734,9 @@ font-size: clamp(13px, 3.1vw, 19px) !important;
 
 #schoolName,
 .school-name-card p {
-font-family: "DecoType Thuluth", "Traditional Arabic", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
+font-family: "Aref Ruqaa", "Traditional Arabic", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
 font-weight: 700 !important;
-line-height: 1.35 !important;
+line-height: 1.45 !important;
 }
 
 .vision-card p {
