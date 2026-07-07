@@ -348,7 +348,7 @@ body {
 }
 
 .state-text,
-.duration-text {
+duration-text {
   display: block;
   font-weight: 900;
 }
@@ -581,6 +581,7 @@ color: #c91414 !important;
 
   .current-card .period-name {
   font-size: clamp(18px, 4.2vw, 29px) !important;
+  line-height: 1.05 !important;
 }
   
 .current-card .period-name {
