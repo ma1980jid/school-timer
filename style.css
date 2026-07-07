@@ -894,3 +894,23 @@ transform: translateX(100vw);
 }
 
 }
+
+/* تكبير شعار المدرسة في شاشة المؤقت */
+.school-logo-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#schoolLogo {
+  max-height: 120px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 768px) {
+  #schoolLogo {
+    max-height: 90px !important;
+  }
+}
