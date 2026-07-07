@@ -348,7 +348,7 @@ body {
 }
 
 .state-text,
-.duration-text {
+duration-text {
   display: block;
   font-weight: 900;
 }
@@ -730,6 +730,13 @@ margin: 0 !important;
 .school-name-card p {
 color: #064b35 !important;
 font-size: clamp(13px, 3.1vw, 19px) !important;
+}
+
+#schoolName,
+.school-name-card p {
+font-family: "DecoType Thuluth", "Traditional Arabic", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
+font-weight: 700 !important;
+line-height: 1.35 !important;
 }
 
 .vision-card p {
