@@ -348,7 +348,7 @@ body {
 }
 
 .state-text,
-duration-text {
+.duration-text {
   display: block;
   font-weight: 900;
 }
