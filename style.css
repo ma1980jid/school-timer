@@ -917,8 +917,8 @@ transform: translateX(100vw);
 /* الهاتف */
 @media (max-width: 768px) {
   .timer-app .school-logo-wrap {
-    top: 2% !important;
-    right: 13% !important;
+    top: 0.8% !important;
+    right: 16% !important;
     width: 21% !important;
     height: 10% !important;
     overflow: visible !important;
