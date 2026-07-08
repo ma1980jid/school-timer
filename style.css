@@ -895,22 +895,42 @@ transform: translateX(100vw);
 
 }
 
-/* تكبير شعار المدرسة في شاشة المؤقت */
-.school-logo-wrap {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+/* تكبير شعار المدرسة في شاشة المؤقت - نهائي */
+.timer-app .school-logo-wrap {
+  top: 2.2% !important;
+  right: 9.5% !important;
+  width: 17% !important;
+  height: 18% !important;
+  overflow: visible !important;
 }
 
-#schoolLogo {
-  max-height: 120px !important;
-  width: auto !important;
-  max-width: 100% !important;
+.timer-app .school-logo-wrap img,
+.timer-app .school-logo-wrap #schoolLogo {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
   object-fit: contain !important;
+  display: block !important;
 }
 
+/* الهاتف */
 @media (max-width: 768px) {
-  #schoolLogo {
-    max-height: 90px !important;
+  .timer-app .school-logo-wrap {
+    top: 0.3% !important;
+    right: 8% !important;
+    width: 34% !important;
+    height: 16% !important;
+    overflow: visible !important;
+  }
+
+  .timer-app .school-logo-wrap img,
+  .timer-app .school-logo-wrap #schoolLogo {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    display: block !important;
   }
 }
