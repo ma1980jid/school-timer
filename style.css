@@ -917,10 +917,10 @@ transform: translateX(100vw);
 /* الهاتف */
 @media (max-width: 768px) {
   .timer-app .school-logo-wrap {
-    top: 0.3% !important;
-    right: 8% !important;
-    width: 34% !important;
-    height: 16% !important;
+    top: 2% !important;
+    right: 13% !important;
+    width: 24% !important;
+    height: 11.5% !important;
     overflow: visible !important;
   }
 
