@@ -1,25 +1,338 @@
-(function(){
-'use strict';
-const GRACE_DAYS=20,DAY=86400000,HOUR=3600000;
-const TABLES={schools:'schools',codes:'school_activation_codes',devices:'school_activated_devices'};
-const state={client:null,schools:[],codes:[],devices:[],selected:null};
-const $=id=>document.getElementById(id),txt=v=>String(v??'');
-const esc=v=>txt(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-function status(message,error=false){const el=$('status');el.textContent=message;el.className=error?'notice error':'notice'}
-function client(){if(state.client)return state.client;if(!window.supabase||!window.SCHOOL_TIMER_SUPABASE_URL||!window.SCHOOL_TIMER_SUPABASE_ANON_KEY)return null;state.client=window.supabase.createClient(window.SCHOOL_TIMER_SUPABASE_URL,window.SCHOOL_TIMER_SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});return state.client}
-function isDemo(s){const h=`${s?.school_slug||''} ${s?.school_name||''}`.toLowerCase();return /(^|[\s_-])(sample|demo|test|preview|default|example|trial)([\s_-]|$)/i.test(h)||/(تجريب|اختبار|افتراضي|نموذج|مثال)/.test(h)}
-function realSchools(){return state.schools.filter(s=>s&&s.school_slug&&!isDemo(s)).sort((a,b)=>Number(b.is_active!==false)-Number(a.is_active!==false)||txt(a.school_name).localeCompare(txt(b.school_name),'ar'))}
-function date(v){if(!v)return null;const d=new Date(v);return Number.isFinite(d.getTime())?d:null}
-function format(v){const d=date(v);return d?new Intl.DateTimeFormat('ar-OM',{dateStyle:'medium',timeStyle:'short'}).format(d):'—'}
-function today(v){const d=date(v),n=new Date();return !!d&&d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate()}
-function grace(v){const d=date(v);if(!d)return{label:'غير متوفر',cls:'expired'};const left=GRACE_DAYS*DAY-Math.max(0,Date.now()-d.getTime());if(left<=0)return{label:'انتهت المهلة',cls:'expired'};const days=Math.floor(left/DAY),hours=Math.floor(left%DAY/HOUR);return{label:days?`${days} يوم و${hours} ساعة`:`${Math.max(1,hours)} ساعة`,cls:left<=3*DAY?'warn':''}}
-function codeRows(slug){return state.codes.filter(x=>x.school_slug===slug)}
-function deviceRows(slug){return state.devices.filter(x=>x.school_slug===slug)}
-function renderStats(){const slugs=new Set(realSchools().map(s=>s.school_slug));const codes=state.codes.filter(x=>slugs.has(x.school_slug)&&x.is_active!==false);const devices=state.devices.filter(x=>slugs.has(x.school_slug)&&x.is_active!==false);$('schoolsStat').textContent=slugs.size;$('codesStat').textContent=codes.length;$('devicesStat').textContent=devices.length;$('todayStat').textContent=devices.filter(x=>today(x.last_seen_at)).length;$('schoolsCount').textContent=slugs.size}
-function renderSchools(){const q=txt($('search').value).trim().toLowerCase();const rows=realSchools().filter(s=>!q||`${s.school_name||''} ${s.school_slug||''} ${s.governorate||''} ${s.wilayat||''}`.toLowerCase().includes(q));$('schoolsList').innerHTML=rows.length?rows.map(s=>`<article class="school ${state.selected===s.school_slug?'active':''}" data-slug="${esc(s.school_slug)}"><div class="school-top"><div class="school-name">${esc(s.school_name||s.school_slug)}</div><span class="badge ${s.is_active===false?'off':'on'}">${s.is_active===false?'موقوفة':'مفعلة'}</span></div><div class="meta">${esc(s.school_slug)}<br>${codeRows(s.school_slug).filter(x=>x.is_active!==false).length} كود نشط · ${deviceRows(s.school_slug).filter(x=>x.is_active!==false).length} جهاز مفعل</div></article>`).join(''):'<div class="empty">لا توجد مدارس حقيقية مطابقة.</div>'}
-function renderDetails(){const school=realSchools().find(s=>s.school_slug===state.selected);if(!school){$('empty').hidden=false;$('details').hidden=true;return}$('empty').hidden=true;$('details').hidden=false;$('schoolName').textContent=school.school_name||school.school_slug;$('schoolMeta').textContent=[school.school_slug,school.governorate,school.wilayat].filter(Boolean).join(' · ');const codes=codeRows(school.school_slug).sort((a,b)=>Number(b.is_active!==false)-Number(a.is_active!==false));$('codesList').innerHTML=codes.length?codes.map(c=>`<article class="card"><div class="row"><div class="code">${esc(c.activation_code||'—')}</div><span class="badge ${c.is_active===false?'off':'on'}">${c.is_active===false?'موقوف':'نشط'}</span></div><div class="small">الأجهزة: ${deviceRows(school.school_slug).filter(d=>d.activation_code===c.activation_code&&d.is_active!==false).length} / ${Number(c.max_devices||1)}<br>تاريخ الإنشاء: ${format(c.created_at)}<br>الانتهاء: ${c.expires_at?format(c.expires_at):'بدون انتهاء'}</div></article>`).join(''):'<div class="empty">لا توجد أكواد تفعيل.</div>';const devices=deviceRows(school.school_slug).sort((a,b)=>txt(b.last_seen_at).localeCompare(txt(a.last_seen_at)));$('devicesBody').innerHTML=devices.length?devices.map(d=>{const g=grace(d.last_seen_at);return`<tr><td><div class="device">${esc(d.device_name||'جهاز بدون اسم')}</div><div class="device-id">${esc(d.device_id||'—')}</div></td><td><span class="badge ${d.is_active===false?'off':'on'}">${d.is_active===false?'موقوف':'مصرح'}</span></td><td>${format(d.last_seen_at)}</td><td><span class="grace ${g.cls}">${d.is_active===false?'الجهاز موقوف':g.label}</span></td><td>${esc(d.app_version||'—')}</td></tr>`}).join(''):'<tr><td colspan="5" class="empty">لا توجد أجهزة مسجلة.</td></tr>'}
-function select(slug){if(!realSchools().some(s=>s.school_slug===slug))return;state.selected=slug;renderSchools();renderDetails()}
-async function load(){const button=$('refreshBtn');button.disabled=true;status('جارٍ تحميل بيانات برنامج Windows…');try{const db=client();if(!db)throw new Error('تعذر تحميل اتصال Supabase.');const [s,c,d]=await Promise.all([db.from(TABLES.schools).select('*').order('school_name',{ascending:true}),db.from(TABLES.codes).select('*'),db.from(TABLES.devices).select('*')]);if(s.error)throw s.error;if(c.error)throw c.error;if(d.error)throw d.error;state.schools=s.data||[];state.codes=c.data||[];state.devices=d.data||[];const rows=realSchools();if(!rows.some(x=>x.school_slug===state.selected))state.selected=rows[0]?.school_slug||null;renderStats();renderSchools();renderDetails();status('تم تحميل البيانات الحقيقية بنجاح.')}catch(e){console.error(e);status(`تعذر تحميل البيانات: ${e.message||e}`,true);$('schoolsList').innerHTML='<div class="empty">تعذر تحميل المدارس.</div>';state.selected=null;renderDetails()}finally{button.disabled=false}}
-function init(){$('refreshBtn').addEventListener('click',load);$('search').addEventListener('input',renderSchools);$('schoolsList').addEventListener('click',e=>{const item=e.target.closest('[data-slug]');if(item)select(item.dataset.slug)});load()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+(function () {
+  "use strict";
+
+  const GRACE_DAYS = 20;
+  const DAY = 86400000;
+  const HOUR = 3600000;
+  const TABLES = {
+    schools: "schools",
+    codes: "school_activation_codes",
+    devices: "school_activated_devices",
+  };
+
+  const state = {
+    client: null,
+    schools: [],
+    codes: [],
+    devices: [],
+    selected: null,
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const text = (value) => String(value ?? "");
+  const escapeHtml = (value) =>
+    text(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  function setStatus(message, type = "success") {
+    const element = $("status");
+    element.textContent = message;
+    element.className = `notice${type === "error" ? " error" : type === "loading" ? " loading" : ""}`;
+  }
+
+  function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove("show"), 2300);
+  }
+
+  function getClient() {
+    if (state.client) return state.client;
+    if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
+
+    state.client = window.supabase.createClient(
+      window.SCHOOL_TIMER_SUPABASE_URL,
+      window.SCHOOL_TIMER_SUPABASE_ANON_KEY,
+      { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } },
+    );
+    return state.client;
+  }
+
+  function isDemoSchool(school) {
+    const haystack = `${school?.school_slug || ""} ${school?.school_name || ""}`.toLowerCase();
+    return (
+      /(^|[\s_-])(sample|demo|test|preview|default|example|trial)([\s_-]|$)/i.test(haystack) ||
+      /(تجريب|اختبار|افتراضي|نموذج|مثال)/.test(haystack)
+    );
+  }
+
+  function realSchools() {
+    return state.schools
+      .filter((school) => school && school.school_slug && !isDemoSchool(school))
+      .sort(
+        (a, b) =>
+          Number(b.is_active !== false) - Number(a.is_active !== false) ||
+          text(a.school_name).localeCompare(text(b.school_name), "ar"),
+      );
+  }
+
+  function toDate(value) {
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isFinite(parsed.getTime()) ? parsed : null;
+  }
+
+  function formatDate(value) {
+    const parsed = toDate(value);
+    return parsed
+      ? new Intl.DateTimeFormat("ar-OM", { dateStyle: "medium", timeStyle: "short" }).format(parsed)
+      : "—";
+  }
+
+  function connectedToday(value) {
+    const parsed = toDate(value);
+    const now = new Date();
+    return Boolean(
+      parsed &&
+        parsed.getFullYear() === now.getFullYear() &&
+        parsed.getMonth() === now.getMonth() &&
+        parsed.getDate() === now.getDate(),
+    );
+  }
+
+  function gracePeriod(value) {
+    const parsed = toDate(value);
+    if (!parsed) return { label: "لم يسجل اتصالًا", className: "expired" };
+
+    const left = GRACE_DAYS * DAY - Math.max(0, Date.now() - parsed.getTime());
+    if (left <= 0) return { label: "انتهت المهلة", className: "expired" };
+
+    const days = Math.floor(left / DAY);
+    const hours = Math.floor((left % DAY) / HOUR);
+    const label = days ? `${days} يوم و${hours} ساعة` : `${Math.max(1, hours)} ساعة`;
+    return { label, className: left <= 3 * DAY ? "warn" : "" };
+  }
+
+  const codesFor = (slug) => state.codes.filter((row) => row.school_slug === slug);
+  const devicesFor = (slug) => state.devices.filter((row) => row.school_slug === slug);
+  const activeCodesFor = (slug) => codesFor(slug).filter((row) => row.is_active !== false);
+  const activeDevicesFor = (slug) => devicesFor(slug).filter((row) => row.is_active !== false);
+
+  function pluralCount(count, singular, dual, plural) {
+    if (count === 1) return `1 ${singular}`;
+    if (count === 2) return `2 ${dual}`;
+    return `${count} ${plural}`;
+  }
+
+  function renderStats() {
+    const slugs = new Set(realSchools().map((school) => school.school_slug));
+    const activeCodes = state.codes.filter((row) => slugs.has(row.school_slug) && row.is_active !== false);
+    const activeDevices = state.devices.filter((row) => slugs.has(row.school_slug) && row.is_active !== false);
+
+    $("schoolsStat").textContent = slugs.size;
+    $("codesStat").textContent = activeCodes.length;
+    $("devicesStat").textContent = activeDevices.length;
+    $("todayStat").textContent = activeDevices.filter((row) => connectedToday(row.last_seen_at)).length;
+    $("schoolsCount").textContent = pluralCount(slugs.size, "مدرسة", "مدرستان", "مدارس");
+  }
+
+  function matchesFilter(school, filter) {
+    if (filter === "licensed") return activeCodesFor(school.school_slug).length > 0;
+    if (filter === "devices") return activeDevicesFor(school.school_slug).length > 0;
+    if (filter === "inactive") return school.is_active === false;
+    return true;
+  }
+
+  function renderSchools() {
+    const query = text($("search").value).trim().toLowerCase();
+    const filter = $("schoolFilter").value;
+    const rows = realSchools().filter((school) => {
+      const searchable = `${school.school_name || ""} ${school.school_slug || ""} ${school.governorate || ""} ${school.wilayat || ""}`.toLowerCase();
+      return (!query || searchable.includes(query)) && matchesFilter(school, filter);
+    });
+
+    $("schoolsList").innerHTML = rows.length
+      ? rows
+          .map((school) => {
+            const codes = activeCodesFor(school.school_slug).length;
+            const devices = activeDevicesFor(school.school_slug).length;
+            return `
+              <article class="school ${state.selected === school.school_slug ? "active" : ""}" data-slug="${escapeHtml(school.school_slug)}" tabindex="0" role="button">
+                <div class="school-top">
+                  <div class="school-name">${escapeHtml(school.school_name || school.school_slug)}</div>
+                  <span class="badge ${school.is_active === false ? "off" : "on"}">${school.is_active === false ? "موقوفة" : "مفعلة"}</span>
+                </div>
+                <div class="meta">${escapeHtml(school.school_slug)}<br>${codes} كود نشط · ${devices} جهاز مفعل</div>
+              </article>`;
+          })
+          .join("")
+      : '<div class="empty"><div class="empty-mark">⌕</div>لا توجد مدارس مطابقة للبحث أو التصفية.</div>';
+  }
+
+  function renderCodes(school) {
+    const codes = codesFor(school.school_slug).sort(
+      (a, b) => Number(b.is_active !== false) - Number(a.is_active !== false),
+    );
+    $("codesCount").textContent = pluralCount(codes.length, "كود", "كودان", "أكواد");
+
+    $("codesList").innerHTML = codes.length
+      ? codes
+          .map((code) => {
+            const activeDevices = devicesFor(school.school_slug).filter(
+              (device) => device.activation_code === code.activation_code && device.is_active !== false,
+            ).length;
+            const limit = Math.max(1, Number(code.max_devices || 1));
+            const usage = Math.min(100, Math.round((activeDevices / limit) * 100));
+            return `
+              <article class="card">
+                <div class="card-top">
+                  <div class="code">${escapeHtml(code.activation_code || "—")}</div>
+                  <span class="badge ${code.is_active === false ? "off" : "on"}">${code.is_active === false ? "موقوف" : "نشط"}</span>
+                </div>
+                <div class="usage" title="استخدام الأجهزة">
+                  <div class="usage-track"><div class="usage-bar" style="width:${usage}%"></div></div>
+                </div>
+                <div class="code-actions">
+                  <div class="small-text">الأجهزة: ${activeDevices} من ${limit}</div>
+                  <button class="btn small copy-code" type="button" data-code="${escapeHtml(code.activation_code || "")}">نسخ الكود</button>
+                </div>
+                <div class="small-text">الإنشاء: ${formatDate(code.created_at)}<br>الانتهاء: ${code.expires_at ? formatDate(code.expires_at) : "بدون تاريخ انتهاء"}</div>
+              </article>`;
+          })
+          .join("")
+      : '<div class="empty"><div class="empty-mark">#</div>لا توجد أكواد تفعيل لهذه المدرسة.</div>';
+  }
+
+  function renderDevices(school) {
+    const devices = devicesFor(school.school_slug).sort((a, b) =>
+      text(b.last_seen_at).localeCompare(text(a.last_seen_at)),
+    );
+    $("devicesCount").textContent = pluralCount(devices.length, "جهاز", "جهازان", "أجهزة");
+
+    $("devicesBody").innerHTML = devices.length
+      ? devices
+          .map((device) => {
+            const grace = gracePeriod(device.last_seen_at);
+            const stateLabel = device.is_active === false ? "موقوف" : connectedToday(device.last_seen_at) ? "متصل اليوم" : "مصرح";
+            const stateClass = device.is_active === false ? "off" : connectedToday(device.last_seen_at) ? "on" : "warn";
+            return `
+              <tr>
+                <td><div class="device">${escapeHtml(device.device_name || "جهاز بدون اسم")}</div><div class="device-id" title="${escapeHtml(device.device_id || "")}">${escapeHtml(device.device_id || "—")}</div></td>
+                <td><span class="badge ${stateClass}">${stateLabel}</span></td>
+                <td>${formatDate(device.last_seen_at)}</td>
+                <td><span class="grace ${grace.className}">${device.is_active === false ? "الجهاز موقوف" : grace.label}</span></td>
+                <td>${escapeHtml(device.app_version || "—")}</td>
+              </tr>`;
+          })
+          .join("")
+      : '<tr><td colspan="5" class="empty">لا توجد أجهزة مسجلة لهذه المدرسة.</td></tr>';
+  }
+
+  function renderDetails() {
+    const school = realSchools().find((row) => row.school_slug === state.selected);
+    if (!school) {
+      $("empty").hidden = false;
+      $("details").hidden = true;
+      return;
+    }
+
+    $("empty").hidden = true;
+    $("details").hidden = false;
+    $("schoolName").textContent = school.school_name || school.school_slug;
+    $("schoolMeta").textContent = [school.school_slug, school.governorate, school.wilayat].filter(Boolean).join(" · ");
+
+    const schoolState = $("schoolState");
+    schoolState.textContent = school.is_active === false ? "المدرسة موقوفة" : "المدرسة مفعلة";
+    schoolState.className = `badge school-state ${school.is_active === false ? "off" : "on"}`;
+
+    renderCodes(school);
+    renderDevices(school);
+  }
+
+  function selectSchool(slug) {
+    if (!realSchools().some((school) => school.school_slug === slug)) return;
+    state.selected = slug;
+    renderSchools();
+    renderDetails();
+  }
+
+  async function copyCode(code) {
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("تم نسخ كود التفعيل.");
+    } catch (_error) {
+      const input = document.createElement("textarea");
+      input.value = code;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+      showToast("تم نسخ كود التفعيل.");
+    }
+  }
+
+  async function loadData() {
+    const button = $("refreshBtn");
+    button.disabled = true;
+    setStatus("جارٍ تحميل بيانات برنامج Windows…", "loading");
+
+    try {
+      const database = getClient();
+      if (!database) throw new Error("تعذر تحميل إعدادات الاتصال بقاعدة البيانات.");
+
+      const [schoolsResponse, codesResponse, devicesResponse] = await Promise.all([
+        database.from(TABLES.schools).select("*").order("school_name", { ascending: true }),
+        database.from(TABLES.codes).select("*"),
+        database.from(TABLES.devices).select("*"),
+      ]);
+
+      if (schoolsResponse.error) throw schoolsResponse.error;
+      if (codesResponse.error) throw codesResponse.error;
+      if (devicesResponse.error) throw devicesResponse.error;
+
+      state.schools = schoolsResponse.data || [];
+      state.codes = codesResponse.data || [];
+      state.devices = devicesResponse.data || [];
+
+      const schools = realSchools();
+      if (!schools.some((school) => school.school_slug === state.selected)) {
+        state.selected = schools[0]?.school_slug || null;
+      }
+
+      renderStats();
+      renderSchools();
+      renderDetails();
+      setStatus(`تم تحديث البيانات بنجاح · ${new Intl.DateTimeFormat("ar-OM", { timeStyle: "short" }).format(new Date())}`);
+    } catch (error) {
+      console.error(error);
+      setStatus(`تعذر تحميل البيانات: ${error.message || error}`, "error");
+      $("schoolsList").innerHTML = '<div class="empty"><div class="empty-mark">!</div>تعذر تحميل المدارس. تحقق من الاتصال ثم حاول مرة أخرى.</div>';
+      state.selected = null;
+      renderDetails();
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function handleSchoolActivation(event) {
+    const item = event.target.closest("[data-slug]");
+    if (item) selectSchool(item.dataset.slug);
+  }
+
+  function init() {
+    $("refreshBtn").addEventListener("click", loadData);
+    $("search").addEventListener("input", renderSchools);
+    $("schoolFilter").addEventListener("change", renderSchools);
+    $("schoolsList").addEventListener("click", handleSchoolActivation);
+    $("schoolsList").addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") handleSchoolActivation(event);
+    });
+    $("codesList").addEventListener("click", (event) => {
+      const button = event.target.closest(".copy-code");
+      if (button) copyCode(button.dataset.code);
+    });
+    loadData();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 })();
