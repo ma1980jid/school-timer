@@ -274,6 +274,121 @@
     }
   }
 
+  function randomDigits(count) {
+    const values = new Uint32Array(count);
+    window.crypto.getRandomValues(values);
+    return Array.from(values, (value) => String(value % 10)).join("");
+  }
+
+  function generateActivationCode() {
+    return `ST-OM-${randomDigits(4)}-${randomDigits(4)}`;
+  }
+
+  function selectedSchool() {
+    return realSchools().find((school) => school.school_slug === state.selected) || null;
+  }
+
+  function openCreateCodeDialog() {
+    const school = selectedSchool();
+    if (!school) {
+      showToast("اختر مدرسة أولًا.");
+      return;
+    }
+    if (school.is_active === false) {
+      showToast("لا يمكن إنشاء كود لمدرسة موقوفة.");
+      return;
+    }
+
+    $("dialogSchoolName").textContent = school.school_name || school.school_slug;
+    $("newActivationCode").value = generateActivationCode();
+    $("newMaxDevices").value = "2";
+    $("newExpiresAt").value = "";
+    $("disableOldCodes").checked = false;
+    $("createCodeDialog").showModal();
+  }
+
+  function closeCreateCodeDialog() {
+    if ($("saveCodeBtn").disabled) return;
+    $("createCodeDialog").close();
+  }
+
+  async function createActivationCode(event) {
+    event.preventDefault();
+    const school = selectedSchool();
+    const database = getClient();
+    if (!school || !database) return;
+
+    const code = text($("newActivationCode").value).trim().toUpperCase();
+    const maxDevices = Math.max(1, Math.min(50, Number($("newMaxDevices").value || 2)));
+    const expiresValue = $("newExpiresAt").value;
+    const disableOld = $("disableOldCodes").checked;
+
+    if (!/^ST-[A-Z0-9]{2,8}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) {
+      showToast("صيغة الكود غير صحيحة.");
+      return;
+    }
+    if (state.codes.some((row) => text(row.activation_code).toUpperCase() === code)) {
+      showToast("هذا الكود موجود مسبقًا. ولّد كودًا آخر.");
+      return;
+    }
+
+    const confirmText = disableOld
+      ? `سيتم إنشاء الكود الجديد وإيقاف الأكواد القديمة النشطة لمدرسة «${school.school_name || school.school_slug}». هل تريد المتابعة؟`
+      : `هل تريد إنشاء كود جديد لمدرسة «${school.school_name || school.school_slug}»؟`;
+    if (!window.confirm(confirmText)) return;
+
+    const saveButton = $("saveCodeBtn");
+    saveButton.disabled = true;
+    saveButton.textContent = "جارٍ الحفظ…";
+
+    try {
+      const now = new Date().toISOString();
+      const payload = {
+        activation_code: code,
+        school_slug: school.school_slug,
+        max_devices: maxDevices,
+        is_active: true,
+        expires_at: expiresValue ? new Date(expiresValue).toISOString() : null,
+        updated_at: now,
+      };
+
+      const { error: insertError } = await database.from(TABLES.codes).insert(payload);
+      if (insertError) throw insertError;
+
+      let oldCodesStopped = true;
+      if (disableOld) {
+        const oldIds = state.codes
+          .filter((row) => row.school_slug === school.school_slug && row.is_active !== false)
+          .map((row) => row.id)
+          .filter(Boolean);
+        if (oldIds.length) {
+          const { error: updateError } = await database
+            .from(TABLES.codes)
+            .update({ is_active: false, updated_at: now })
+            .in("id", oldIds);
+          if (updateError) {
+            oldCodesStopped = false;
+            console.error(updateError);
+          }
+        }
+      }
+
+      $("createCodeDialog").close();
+      await loadData();
+      if (oldCodesStopped) {
+        showToast("تم إنشاء كود التفعيل بنجاح.");
+      } else {
+        setStatus("تم إنشاء الكود الجديد، لكن تعذر إيقاف الأكواد القديمة. راجعها قبل إرسال الكود للمدرسة.", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus(`تعذر إنشاء الكود: ${error.message || error}`, "error");
+    } finally {
+      saveButton.disabled = false;
+      saveButton.textContent = "حفظ الكود";
+    }
+  }
+
   async function loadData() {
     const button = $("refreshBtn");
     button.disabled = true;
@@ -333,6 +448,16 @@
     $("codesList").addEventListener("click", (event) => {
       const button = event.target.closest(".copy-code");
       if (button) copyCode(button.dataset.code);
+    });
+    $("createCodeBtn").addEventListener("click", openCreateCodeDialog);
+    $("generateCodeBtn").addEventListener("click", () => {
+      $("newActivationCode").value = generateActivationCode();
+    });
+    $("closeCodeDialog").addEventListener("click", closeCreateCodeDialog);
+    $("cancelCreateCode").addEventListener("click", closeCreateCodeDialog);
+    $("createCodeForm").addEventListener("submit", createActivationCode);
+    $("createCodeDialog").addEventListener("click", (event) => {
+      if (event.target === $("createCodeDialog")) closeCreateCodeDialog();
     });
     loadData();
   }

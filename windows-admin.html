@@ -329,6 +329,33 @@
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    .dialog {
+      width: min(540px, calc(100% - 24px));
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      color: var(--text);
+      background: #fff;
+      box-shadow: 0 28px 75px rgba(11,31,51,.28);
+    }
+
+    .dialog::backdrop { background: rgba(11,31,51,.58); backdrop-filter: blur(3px); }
+    .dialog-card { padding: 0; }
+    .dialog-head { padding: 19px 21px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .dialog-head h2 { margin: 0 0 5px; color: var(--navy); font-size: 22px; }
+    .dialog-head p { margin: 0; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .dialog-close { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--navy); cursor: pointer; font-size: 23px; }
+    .dialog-body { padding: 20px 21px; display: grid; gap: 14px; }
+    .field { display: grid; gap: 7px; color: #475467; font-size: 13px; font-weight: 900; }
+    .field input { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid #cfd8e3; border-radius: 12px; background: #fff; color: var(--text); font-weight: 800; outline: none; }
+    .field input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(8,127,114,.12); }
+    .code-field { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
+    .code-field input { direction: ltr; text-align: left; font-family: Consolas,monospace; font-weight: 900; }
+    .check-field { padding: 12px; border: 1px solid #f4d7a1; border-radius: 12px; background: #fffaf0; display: flex; align-items: flex-start; gap: 9px; color: #7a4b00; font-size: 12px; font-weight: 900; line-height: 1.7; }
+    .check-field input { width: 18px; height: 18px; margin-top: 1px; flex: 0 0 auto; }
+    .dialog-actions { padding: 15px 21px 20px; display: flex; justify-content: flex-end; gap: 9px; }
+    .dialog-actions .btn { min-width: 125px; }
+
     @media (max-width: 1000px) {
       .workspace { grid-template-columns: 1fr; }
       .schools { max-height: 340px; }
@@ -410,7 +437,10 @@
           </div>
 
           <section class="section">
-            <div class="section-title"><h3>أكواد التفعيل</h3><span id="codesCount" class="section-count">0 كود</span></div>
+            <div class="section-title">
+              <div><h3>أكواد التفعيل</h3><span id="codesCount" class="section-count">0 كود</span></div>
+              <button id="createCodeBtn" class="btn secondary" type="button">+ إنشاء كود جديد</button>
+            </div>
             <div id="codesList" class="cards"></div>
           </section>
 
@@ -430,11 +460,47 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <dialog id="createCodeDialog" class="dialog">
+    <form id="createCodeForm" class="dialog-card">
+      <div class="dialog-head">
+        <div><h2>إنشاء كود تفعيل</h2><p id="dialogSchoolName">—</p></div>
+        <button id="closeCodeDialog" class="dialog-close" type="button" aria-label="إغلاق">×</button>
+      </div>
+
+      <div class="dialog-body">
+        <label class="field">كود التفعيل
+          <span class="code-field">
+            <input id="newActivationCode" type="text" required maxlength="24" autocomplete="off">
+            <button id="generateCodeBtn" class="btn small" type="button">توليد كود</button>
+          </span>
+        </label>
+
+        <label class="field">عدد الأجهزة المسموح بها
+          <input id="newMaxDevices" type="number" min="1" max="50" value="2" required>
+        </label>
+
+        <label class="field">تاريخ الانتهاء — اختياري
+          <input id="newExpiresAt" type="datetime-local">
+        </label>
+
+        <label class="check-field">
+          <input id="disableOldCodes" type="checkbox">
+          <span>إيقاف الأكواد القديمة النشطة لهذه المدرسة بعد إنشاء الكود الجديد. اتركه غير محدد عند إضافة كود إضافي.</span>
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="cancelCreateCode" class="btn small" type="button">إلغاء</button>
+        <button id="saveCodeBtn" class="btn secondary" type="submit">حفظ الكود</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="supabase.min.js?v=2-local-01"></script>
   <script src="supabase-config.js?v=optimized-03"></script>
   <script
     src="system-auth.js?v=system-auth-01"
-    data-protected-scripts="windows-admin.js?v=windows-admin-professional-02"
+    data-protected-scripts="windows-admin.js?v=windows-admin-create-code-03"
     defer
   ></script>
 </body>
