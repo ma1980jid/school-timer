@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>إدارة برنامج Windows - مؤقت الحصص</title>
+  <style>
+    :root{--navy:#0f172a;--teal:#0f766e;--cyan:#14b8a6;--line:#d8e1ea;--soft:#f8fafc;--muted:#64748b;--red:#991b1b;--amber:#9a3412}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:14px;font-family:Tahoma,Arial,sans-serif;color:var(--navy);background:linear-gradient(135deg,#e8eef8,#f8fafc 45%,#e9f7f5)}
+    .app{width:min(1500px,100%);margin:auto;display:grid;gap:12px}.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;border-radius:22px;color:#fff;background:linear-gradient(135deg,var(--navy),#123a46 65%,var(--teal));box-shadow:0 18px 42px #0f172a2a}.hero h1{margin:0 0 7px;font-size:clamp(29px,3.4vw,50px)}.hero p{margin:0;color:#dffaf5;font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:10px 15px;min-height:42px;font:900 14px Tahoma,Arial,sans-serif;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.btn.primary{background:#fff;color:var(--navy)}.btn.secondary{background:#2563eb;color:#fff}.btn:disabled{opacity:.55;cursor:wait}
+    .notice{padding:11px 14px;border-radius:14px;background:#ecfeff;color:#155e75;border:1px solid #a5f3fc;font-weight:900}.notice.error{background:#fee2e2;color:var(--red);border-color:#fecaca}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px 18px;box-shadow:0 10px 28px #0f172a12;display:flex;justify-content:space-between;align-items:center}.stat span{color:var(--muted);font-weight:900}.stat strong{font-size:29px;color:var(--teal)}
+    .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:12px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 32px #0f172a12;overflow:hidden}.panel-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.panel-head h2{margin:0;font-size:22px}.pill{border-radius:999px;background:#e0f2fe;color:#075985;padding:6px 10px;font-size:12px;font-weight:900}.search{padding:12px 14px}.search input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:12px;font:800 14px Tahoma,Arial,sans-serif}.schools{padding:0 12px 14px;display:grid;gap:8px;max-height:620px;overflow:auto}.school{padding:12px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,#fff,#fbfdff);cursor:pointer}.school.active{border-color:var(--cyan);box-shadow:0 0 0 3px #14b8a61f}.school-top{display:flex;justify-content:space-between;gap:8px}.school-name{font-weight:900;line-height:1.5}.meta{margin-top:6px;color:var(--muted);font-size:12px;font-weight:800;line-height:1.7}.badge{border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;white-space:nowrap}.badge.on{background:#dcfce7;color:#166534}.badge.off{background:#fee2e2;color:var(--red)}
+    .empty{padding:60px 20px;text-align:center;color:var(--muted);font-weight:900}.details-head{padding:18px;border-bottom:1px solid var(--line);background:var(--soft)}.details-head h2{margin:0 0 7px}.details-head p{margin:0;color:var(--muted);font-weight:800}.section{padding:17px;border-bottom:1px solid var(--line)}.section h3{margin:0 0 12px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.card{border:1px solid var(--line);border-radius:15px;padding:13px;background:#fbfdff}.code{direction:ltr;text-align:left;font:900 18px Consolas,monospace}.row{display:flex;justify-content:space-between;gap:8px;align-items:center}.small{margin-top:8px;color:var(--muted);font-size:12px;font-weight:800;line-height:1.7}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:15px}table{width:100%;border-collapse:collapse;min-width:820px}th,td{padding:11px;border-bottom:1px solid #e8edf2;text-align:right;font-size:12px}th{background:var(--soft);color:#475569}.device{font-weight:900}.device-id{direction:ltr;color:var(--muted);font:700 11px Consolas,monospace;margin-top:4px}.grace{font-weight:900;color:#166534}.grace.warn{color:var(--amber)}.grace.expired{color:var(--red)}
+    @media(max-width:950px){.workspace{grid-template-columns:1fr}.schools{max-height:330px}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){body{padding:8px}.hero{display:grid}.actions{display:grid}.stats{grid-template-columns:1fr 1fr}.stat{padding:12px}.cards{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="hero">
+    <div><h1>إدارة برنامج Windows</h1><p>عرض التراخيص والأجهزة وحساب مهلة العمل دوم إنترنت.</p></div>
+    <div class="actions"><a class="btn primary" href="system-admin.html">العودة إلى لوحة النظام</a><button class="btn secondary" id="refreshBtn">تحديث البيانات</button></div>
+  </header>
+  <section id="status" class="notice">جارٍ تحميل بيانات برنامج Windows…</section>
+  <section class="stats">
+    <article class="stat"><span>المدارس الحقيقية</span><strong id="schoolsStat">0</strong></article>
+    <article class="stat"><span>الأكواد النشطة</span><strong id="codesStat">0</strong></article>
+    <article class="stat"><span>الأجهزة المفعلة</span><strong id="devicesStat">0</strong></article>
+    <article class="stat"><span>اتصلت اليوم</span><strong id="todayStat">0</strong></article>
+  </section>
+  <section class="workspace">
+    <aside class="panel">
+      <div class="panel-head"><h2>المدارس</h2><span class="pill" id="schoolsCount">0</span></div>
+      <div class="search"><input id="search" type="search" placeholder="ابحث باسم المدرسة أو الرابط المختصر"></div>
+      <div id="schoolsList" class="schools"></div>
+    </aside>
+    <section class="panel">
+      <div id="empty" class="empty">لا توجد مدرسة محددة.</div>
+      <div id="details" hidden>
+        <div class="details-head"><h2 id="schoolName">—</h2><p id="schoolMeta">—</p></div>
+        <section class="section"><h3>أكواد التفعيل</h3><div id="codesList" class="cards"></div></section>
+        <section class="section"><h3>الأجهزة المفعلة</h3><div class="table-wrap"><table><thead><tr><th>الجهاز</th><th>الحالة</th><th>آخر اتصال</th><th>المتبقي من 20 يومًا</th><th>الإصدار</th></tr></thead><tbody id="devicesBody"></tbody></table></div></section>
+      </div>
+    </section>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=optimized-03" defer></script>
+<script src="windows-admin.js?v=windows-admin-preview-01" defer></script>
+</body>
+</html>
