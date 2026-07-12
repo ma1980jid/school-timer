@@ -172,7 +172,7 @@
     time('nextTime', s.next);
     if (s.current) { markNoStart(false); set('currentName', s.current.name); time('currentTime', s.current); }
     else if (first && s.currentMinutes < first.startMinutes) { markNoStart(true); set('currentName', '--'); time('currentTime', null); }
-    else if (s.next) { markNoStart(false); set('currentName', 'الحصة\nالخالية'); time('currentTime', s.next); }
+    else if (s.next) { markNoStart(false); set('currentName', 'فاصل\nبين الحصص'); time('currentTime', s.next); }
     else { markNoStart(false); set('currentName', '--'); time('currentTime', null); }
   }
 
