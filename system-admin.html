@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>لوحة مدير النظام - مؤقت الحصص</title>
+  <style>body.auth-pending{visibility:hidden}</style>
 
   <style>
     :root{
@@ -416,7 +417,7 @@
   </style>
 </head>
 
-<body>
+<body class="auth-pending">
   <main class="app">
 
     <header class="topbar">
@@ -654,7 +655,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="system-admin-supabase-fallback.js?v=system-admin-fallback-01"></script>
   <script src="supabase-config.js?v=optimized-03"></script>
-  <script src="system-admin.js?v=separate-app-icon-01"></script>
-  <script src="system-install-link-fix.js?v=install-link-02"></script>
+  <script
+    src="system-auth.js?v=system-auth-01"
+    data-protected-scripts="system-admin.js?v=separate-app-icon-01|system-install-link-fix.js?v=install-link-02"
+  ></script>
 </body>
 </html>

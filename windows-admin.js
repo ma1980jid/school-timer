@@ -44,6 +44,10 @@
 
   function getClient() {
     if (state.client) return state.client;
+    if (window.SYSTEM_ADMIN_SUPABASE_CLIENT) {
+      state.client = window.SYSTEM_ADMIN_SUPABASE_CLIENT;
+      return state.client;
+    }
     if (!window.supabase || !window.SCHOOL_TIMER_SUPABASE_URL || !window.SCHOOL_TIMER_SUPABASE_ANON_KEY) return null;
 
     state.client = window.supabase.createClient(

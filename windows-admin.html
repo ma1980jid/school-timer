@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>إدارة برنامج Windows - مؤقت الحصص</title>
+  <style>body.auth-pending{visibility:hidden}</style>
 
   <style>
     :root {
@@ -355,7 +356,7 @@
   </style>
 </head>
 
-<body>
+<body class="auth-pending">
   <main class="app">
     <header class="hero">
       <div>
@@ -431,6 +432,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="supabase-config.js?v=optimized-03" defer></script>
-  <script src="windows-admin.js?v=windows-admin-professional-02" defer></script>
+  <script
+    src="system-auth.js?v=system-auth-01"
+    data-protected-scripts="windows-admin.js?v=windows-admin-professional-02"
+    defer
+  ></script>
 </body>
 </html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>دخول مدير النظام - مؤقت الحصص</title>
+  <style>
+    :root { --navy:#0b1f33; --teal:#087f72; --blue:#2563eb; --text:#172033; --muted:#667085; --line:#dce4ec; --red:#b42318; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:18px; display:grid; place-items:center; font-family:Tahoma,Arial,sans-serif; color:var(--text); background:radial-gradient(circle at 85% 10%,#d8f5ef,transparent 34%),radial-gradient(circle at 5% 90%,#dce9ff,transparent 34%),#f4f7fb; }
+    .login-shell { width:min(980px,100%); min-height:590px; overflow:hidden; display:grid; grid-template-columns:1.05fr .95fr; border:1px solid var(--line); border-radius:28px; background:#fff; box-shadow:0 28px 70px rgba(11,31,51,.16); }
+    .brand { position:relative; overflow:hidden; padding:45px; color:#fff; background:linear-gradient(145deg,var(--navy),#123b4a 62%,var(--teal)); display:flex; flex-direction:column; justify-content:center; }
+    .brand::after { content:""; position:absolute; width:330px; height:330px; left:-150px; bottom:-170px; border:45px solid rgba(255,255,255,.06); border-radius:50%; }
+    .mark { width:64px; height:64px; margin-bottom:23px; border-radius:20px; background:rgba(255,255,255,.12); display:grid; place-items:center; font-size:31px; font-weight:900; }
+    .brand h1 { margin:0 0 13px; font-size:clamp(34px,5vw,58px); line-height:1.1; }
+    .brand p { margin:0; color:#d9faf4; font-weight:800; line-height:1.9; }
+    .form-side { padding:45px; display:flex; flex-direction:column; justify-content:center; }
+    .eyebrow { color:var(--teal); font-size:13px; font-weight:900; }
+    h2 { margin:8px 0 8px; color:var(--navy); font-size:29px; }
+    .intro { margin:0 0 25px; color:var(--muted); font-weight:700; line-height:1.7; }
+    form { display:grid; gap:15px; }
+    label { display:grid; gap:7px; color:#475467; font-size:13px; font-weight:900; }
+    input { width:100%; min-height:48px; padding:11px 13px; border:1px solid #cfd8e3; border-radius:12px; background:#fff; color:var(--text); font:800 15px Tahoma,Arial,sans-serif; outline:none; }
+    input:focus { border-color:var(--teal); box-shadow:0 0 0 4px rgba(8,127,114,.12); }
+    button { min-height:49px; border:0; border-radius:13px; padding:11px 17px; background:linear-gradient(135deg,var(--blue),var(--teal)); color:#fff; font:900 15px Tahoma,Arial,sans-serif; cursor:pointer; box-shadow:0 11px 25px rgba(37,99,235,.22); }
+    button:disabled { opacity:.6; cursor:wait; }
+    .message { padding:11px 13px; border:1px solid #fecdca; border-radius:12px; background:#fff1f0; color:var(--red); font-size:13px; font-weight:900; line-height:1.7; }
+    .privacy { margin:18px 0 0; color:var(--muted); font-size:12px; font-weight:700; line-height:1.7; }
+    [hidden] { display:none!important; }
+    @media(max-width:760px){ body{padding:8px}.login-shell{min-height:0;grid-template-columns:1fr;border-radius:20px}.brand{padding:28px}.brand h1{font-size:35px}.form-side{padding:28px}.mark{width:52px;height:52px;margin-bottom:16px} }
+  </style>
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand">
+      <div class="mark">م</div>
+      <h1>مؤقت الحصص</h1>
+      <p>دخول آمن إلى لوحة مدير النظام وإدارة المدارس وتراخيص برنامج Windows.</p>
+    </section>
+
+    <section class="form-side">
+      <span class="eyebrow">لوحة مدير النظام</span>
+      <h2>تسجيل الدخول</h2>
+      <p class="intro">استخدم حساب مدير النظام المعتمد في Supabase.</p>
+
+      <form id="loginForm">
+        <label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" required></label>
+        <label>كلمة المرور<input id="password" type="password" autocomplete="current-password" required></label>
+        <div id="message" class="message" role="alert" hidden></div>
+        <button id="loginButton" type="submit">دخول آمن</button>
+      </form>
+
+      <p class="privacy">لا تُحفظ كلمة المرور داخل ملفات الموقع؛ يتم التحقق منها مباشرة عبر Supabase Authentication.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=optimized-03"></script>
+  <script>
+    (function () {
+      "use strict";
+      const ADMIN_UID = "1e32db69-d286-49c7-8a56-3e6eb7b02590";
+      const allowedReturns = new Set(["system-admin.html", "windows-admin.html"]);
+      const requestedReturn = new URLSearchParams(location.search).get("return");
+      const returnPage = allowedReturns.has(requestedReturn) ? requestedReturn : "system-admin.html";
+      const form = document.getElementById("loginForm");
+      const button = document.getElementById("loginButton");
+      const message = document.getElementById("message");
+
+      const client = window.supabase.createClient(
+        window.SCHOOL_TIMER_SUPABASE_URL,
+        window.SCHOOL_TIMER_SUPABASE_ANON_KEY,
+        { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } },
+      );
+
+      function showError(text) { message.textContent = text; message.hidden = false; }
+
+      async function checkExistingSession() {
+        const { data } = await client.auth.getSession();
+        if (data?.session?.user?.id === ADMIN_UID) location.replace(returnPage);
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        message.hidden = true;
+        button.disabled = true;
+        button.textContent = "جارٍ التحقق…";
+        try {
+          const { data, error } = await client.auth.signInWithPassword({
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value,
+          });
+          if (error) throw error;
+          if (data.user?.id !== ADMIN_UID) {
+            await client.auth.signOut();
+            throw new Error("هذا الحساب غير مصرح له بالدخول إلى لوحة مدير النظام.");
+          }
+          location.replace(returnPage);
+        } catch (error) {
+          const invalid = /invalid login credentials/i.test(error?.message || "");
+          showError(invalid ? "البريد الإلكتروني أو كلمة المرور غير صحيحة." : (error?.message || "تعذر تسجيل الدخول."));
+        } finally {
+          button.disabled = false;
+          button.textContent = "دخول آمن";
+        }
+      });
+
+      checkExistingSession();
+    })();
+  </script>
+</body>
+</html>
