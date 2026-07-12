@@ -3,7 +3,6 @@
 
   const GRACE_DAYS = 20;
   const DAY = 86400000;
-  const HOUR = 3600000;
   const TABLES = {
     schools: "schools",
     codes: "school_activation_codes",
@@ -107,10 +106,9 @@
     const left = GRACE_DAYS * DAY - Math.max(0, Date.now() - parsed.getTime());
     if (left <= 0) return { label: "انتهت المهلة", className: "expired" };
 
-    const days = Math.floor(left / DAY);
-    const hours = Math.floor((left % DAY) / HOUR);
-    const label = days ? `${days} يوم و${hours} ساعة` : `${Math.max(1, hours)} ساعة`;
-    return { label, className: left <= 3 * DAY ? "warn" : "" };
+    const days = Math.ceil(left / DAY);
+    const label = `متبقي ${days} ${days === 1 ? "يوم" : "يومًا"}`;
+    return { label, className: days <= 3 ? "warn" : "" };
   }
 
   const codesFor = (slug) => state.codes.filter((row) => row.school_slug === slug);
