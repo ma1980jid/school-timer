@@ -3,48 +3,434 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
   <title>إدارة برنامج Windows - مؤقت الحصص</title>
+
   <style>
-    :root{--navy:#0f172a;--teal:#0f766e;--cyan:#14b8a6;--line:#d8e1ea;--soft:#f8fafc;--muted:#64748b;--red:#991b1b;--amber:#9a3412}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:14px;font-family:Tahoma,Arial,sans-serif;color:var(--navy);background:linear-gradient(135deg,#e8eef8,#f8fafc 45%,#e9f7f5)}
-    .app{width:min(1500px,100%);margin:auto;display:grid;gap:12px}.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;border-radius:22px;color:#fff;background:linear-gradient(135deg,var(--navy),#123a46 65%,var(--teal));box-shadow:0 18px 42px #0f172a2a}.hero h1{margin:0 0 7px;font-size:clamp(29px,3.4vw,50px)}.hero p{margin:0;color:#dffaf5;font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:10px 15px;min-height:42px;font:900 14px Tahoma,Arial,sans-serif;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.btn.primary{background:#fff;color:var(--navy)}.btn.secondary{background:#2563eb;color:#fff}.btn:disabled{opacity:.55;cursor:wait}
-    .notice{padding:11px 14px;border-radius:14px;background:#ecfeff;color:#155e75;border:1px solid #a5f3fc;font-weight:900}.notice.error{background:#fee2e2;color:var(--red);border-color:#fecaca}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px 18px;box-shadow:0 10px 28px #0f172a12;display:flex;justify-content:space-between;align-items:center}.stat span{color:var(--muted);font-weight:900}.stat strong{font-size:29px;color:var(--teal)}
-    .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:12px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 32px #0f172a12;overflow:hidden}.panel-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.panel-head h2{margin:0;font-size:22px}.pill{border-radius:999px;background:#e0f2fe;color:#075985;padding:6px 10px;font-size:12px;font-weight:900}.search{padding:12px 14px}.search input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:12px;font:800 14px Tahoma,Arial,sans-serif}.schools{padding:0 12px 14px;display:grid;gap:8px;max-height:620px;overflow:auto}.school{padding:12px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,#fff,#fbfdff);cursor:pointer}.school.active{border-color:var(--cyan);box-shadow:0 0 0 3px #14b8a61f}.school-top{display:flex;justify-content:space-between;gap:8px}.school-name{font-weight:900;line-height:1.5}.meta{margin-top:6px;color:var(--muted);font-size:12px;font-weight:800;line-height:1.7}.badge{border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;white-space:nowrap}.badge.on{background:#dcfce7;color:#166534}.badge.off{background:#fee2e2;color:var(--red)}
-    .empty{padding:60px 20px;text-align:center;color:var(--muted);font-weight:900}.details-head{padding:18px;border-bottom:1px solid var(--line);background:var(--soft)}.details-head h2{margin:0 0 7px}.details-head p{margin:0;color:var(--muted);font-weight:800}.section{padding:17px;border-bottom:1px solid var(--line)}.section h3{margin:0 0 12px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.card{border:1px solid var(--line);border-radius:15px;padding:13px;background:#fbfdff}.code{direction:ltr;text-align:left;font:900 18px Consolas,monospace}.row{display:flex;justify-content:space-between;gap:8px;align-items:center}.small{margin-top:8px;color:var(--muted);font-size:12px;font-weight:800;line-height:1.7}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:15px}table{width:100%;border-collapse:collapse;min-width:820px}th,td{padding:11px;border-bottom:1px solid #e8edf2;text-align:right;font-size:12px}th{background:var(--soft);color:#475569}.device{font-weight:900}.device-id{direction:ltr;color:var(--muted);font:700 11px Consolas,monospace;margin-top:4px}.grace{font-weight:900;color:#166534}.grace.warn{color:var(--amber)}.grace.expired{color:var(--red)}
-    @media(max-width:950px){.workspace{grid-template-columns:1fr}.schools{max-height:330px}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){body{padding:8px}.hero{display:grid}.actions{display:grid}.stats{grid-template-columns:1fr 1fr}.stat{padding:12px}.cards{grid-template-columns:1fr}}
+    :root {
+      --navy: #0b1f33;
+      --navy-2: #123b4a;
+      --teal: #087f72;
+      --teal-light: #12a594;
+      --blue: #2563eb;
+      --gold: #e7a51a;
+      --green: #16834b;
+      --red: #b42318;
+      --amber: #b54708;
+      --text: #172033;
+      --muted: #667085;
+      --line: #dce4ec;
+      --surface: #ffffff;
+      --soft: #f7f9fc;
+      --shadow: 0 16px 38px rgba(15, 35, 55, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 18px;
+      font-family: Tahoma, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 90% 0, rgba(18,165,148,.13), transparent 28%),
+        radial-gradient(circle at 4% 20%, rgba(37,99,235,.10), transparent 30%),
+        #f4f7fb;
+    }
+
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .app {
+      width: min(1460px, 100%);
+      margin: auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      padding: 27px 30px;
+      border-radius: 26px;
+      color: #fff;
+      background: linear-gradient(125deg, var(--navy), var(--navy-2) 62%, var(--teal));
+      box-shadow: 0 22px 50px rgba(11,31,51,.20);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 310px;
+      height: 310px;
+      left: -70px;
+      bottom: -205px;
+      border: 40px solid rgba(255,255,255,.055);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 8px;
+      color: #9ff5e9;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #52e5ca;
+      box-shadow: 0 0 0 5px rgba(82,229,202,.14);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(31px, 4vw, 53px);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 700px;
+      color: #dcfaf5;
+      font-weight: 800;
+      line-height: 1.8;
+    }
+
+    .actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 44px;
+      border: 0;
+      border-radius: 13px;
+      padding: 10px 17px;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 900;
+      transition: transform .15s, filter .15s, box-shadow .15s;
+    }
+
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(37,99,235,.23); outline-offset: 2px; }
+    .btn:disabled { opacity: .58; cursor: wait; transform: none; }
+    .btn.primary { background: #fff; color: var(--navy); }
+    .btn.secondary { background: var(--blue); color: #fff; box-shadow: 0 9px 23px rgba(37,99,235,.27); }
+    .btn.small { min-height: 34px; padding: 6px 11px; border: 1px solid var(--line); background: #fff; color: var(--navy); font-size: 12px; }
+
+    .notice {
+      min-height: 44px;
+      padding: 11px 15px;
+      border: 1px solid #a5f3fc;
+      border-radius: 14px;
+      background: #ecfeff;
+      color: #155e75;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .notice::before { content: "✓"; }
+    .notice.loading::before { content: ""; width: 15px; height: 15px; border: 2px solid currentColor; border-left-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+    .notice.error { background: #fff1f0; color: var(--red); border-color: #fecdca; }
+    .notice.error::before { content: "!"; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+    }
+
+    .stat {
+      min-height: 105px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      border-radius: 15px;
+      background: #e8f7f4;
+      color: var(--teal);
+      display: grid;
+      place-items: center;
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .stat-label { color: var(--muted); font-size: 13px; font-weight: 900; }
+    .stat strong { display: block; margin-top: 3px; color: var(--navy); font-size: 30px; line-height: 1; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 345px minmax(0, 1fr);
+      gap: 13px;
+      align-items: start;
+    }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 21px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      padding: 16px 17px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-head h2 { margin: 0; font-size: 21px; }
+    .pill { border-radius: 999px; background: #e6f4ff; color: #075985; padding: 6px 11px; font-size: 12px; font-weight: 900; }
+
+    .filters { padding: 12px; border-bottom: 1px solid #edf1f5; display: grid; gap: 8px; }
+    .search-wrap { position: relative; }
+    .search-wrap::before { content: "⌕"; position: absolute; right: 13px; top: 50%; transform: translateY(-51%); color: var(--muted); font-size: 20px; pointer-events: none; }
+
+    .filters input, .filters select {
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 38px 10px 11px;
+      border: 1px solid #cfd8e3;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .filters select { padding-right: 11px; }
+
+    .schools { padding: 11px; display: grid; gap: 8px; max-height: 650px; overflow: auto; }
+
+    .school {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: linear-gradient(180deg, #fff, #fbfcfe);
+      cursor: pointer;
+      transition: border .15s, box-shadow .15s, transform .15s;
+    }
+
+    .school:hover { transform: translateY(-1px); border-color: #aab8c8; }
+    .school.active { border-color: var(--teal-light); background: #f4fffc; box-shadow: 0 0 0 3px rgba(18,165,148,.12); }
+    .school-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .school-name { font-weight: 900; line-height: 1.55; }
+    .meta { margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 800; line-height: 1.75; }
+
+    .badge { border-radius: 999px; padding: 5px 9px; font-size: 11px; font-weight: 900; white-space: nowrap; }
+    .badge.on { background: #dcfae6; color: #067647; }
+    .badge.off { background: #fee4e2; color: var(--red); }
+    .badge.warn { background: #fef0c7; color: var(--amber); }
+
+    .empty { padding: 56px 20px; text-align: center; color: var(--muted); font-weight: 900; line-height: 1.8; }
+    .empty-mark { width: 55px; height: 55px; margin: 0 auto 11px; border-radius: 18px; background: #edf3f8; color: #789; display: grid; place-items: center; font-size: 25px; }
+
+    .details-head {
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfcfe, #f7f9fc);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .details-head h2 { margin: 0 0 7px; font-size: 23px; }
+    .details-head p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 800; }
+    .school-state { flex: 0 0 auto; }
+
+    .section { padding: 19px; border-bottom: 1px solid var(--line); }
+    .section:last-child { border-bottom: 0; }
+    .section-title { margin-bottom: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .section-title h3 { margin: 0; font-size: 18px; }
+    .section-count { color: var(--muted); font-size: 12px; font-weight: 900; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+    .card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: #fbfcfe; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 9px; }
+    .code { direction: ltr; text-align: left; font: 900 18px Consolas, monospace; color: var(--navy); overflow-wrap: anywhere; }
+    .code-actions { margin-top: 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .small-text { color: var(--muted); font-size: 12px; font-weight: 800; line-height: 1.8; }
+    .usage { margin-top: 11px; }
+    .usage-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e8edf3; }
+    .usage-bar { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #39c6b2); }
+
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 15px; }
+    table { width: 100%; border-collapse: collapse; min-width: 830px; }
+    th, td { padding: 12px; border-bottom: 1px solid #e8edf2; text-align: right; font-size: 12px; vertical-align: middle; }
+    th { position: sticky; top: 0; z-index: 1; background: var(--soft); color: #475467; font-weight: 900; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #fafcfe; }
+    .device { font-weight: 900; font-size: 13px; }
+    .device-id { direction: ltr; color: var(--muted); font: 700 11px Consolas, monospace; margin-top: 5px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    .grace { font-weight: 900; color: var(--green); }
+    .grace.warn { color: var(--amber); }
+    .grace.expired { color: var(--red); }
+    .muted { color: var(--muted); }
+
+    .toast {
+      position: fixed;
+      z-index: 10;
+      left: 20px;
+      bottom: 20px;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 12px 16px;
+      border-radius: 13px;
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 16px 35px rgba(11,31,51,.25);
+      font-weight: 900;
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1000px) {
+      .workspace { grid-template-columns: 1fr; }
+      .schools { max-height: 340px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 8px; }
+      .hero { min-height: 0; padding: 21px 18px; border-radius: 19px; display: grid; }
+      .actions { display: grid; grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat { min-height: 92px; padding: 13px; gap: 10px; }
+      .stat-icon { width: 40px; height: 40px; flex-basis: 40px; border-radius: 12px; }
+      .stat strong { font-size: 25px; }
+      .details-head { align-items: flex-start; }
+      .cards { grid-template-columns: 1fr; }
+      .section { padding: 14px; }
+    }
+
+    @media (max-width: 430px) {
+      .stats { grid-template-columns: 1fr; }
+      .stat { min-height: 78px; }
+    }
   </style>
 </head>
+
 <body>
-<main class="app">
-  <header class="hero">
-    <div><h1>إدارة برنامج Windows</h1><p>عرض التراخيص والأجهزة وحساب مهلة العمل دوم إنترنت.</p></div>
-    <div class="actions"><a class="btn primary" href="system-admin.html">العودة إلى لوحة النظام</a><button class="btn secondary" id="refreshBtn">تحديث البيانات</button></div>
-  </header>
-  <section id="status" class="notice">جارٍ تحميل بيانات برنامج Windows…</section>
-  <section class="stats">
-    <article class="stat"><span>المدارس الحقيقية</span><strong id="schoolsStat">0</strong></article>
-    <article class="stat"><span>الأكواد النشطة</span><strong id="codesStat">0</strong></article>
-    <article class="stat"><span>الأجهزة المفعلة</span><strong id="devicesStat">0</strong></article>
-    <article class="stat"><span>اتصلت اليوم</span><strong id="todayStat">0</strong></article>
-  </section>
-  <section class="workspace">
-    <aside class="panel">
-      <div class="panel-head"><h2>المدارس</h2><span class="pill" id="schoolsCount">0</span></div>
-      <div class="search"><input id="search" type="search" placeholder="ابحث باسم المدرسة أو الرابط المختصر"></div>
-      <div id="schoolsList" class="schools"></div>
-    </aside>
-    <section class="panel">
-      <div id="empty" class="empty">لا توجد مدرسة محددة.</div>
-      <div id="details" hidden>
-        <div class="details-head"><h2 id="schoolName">—</h2><p id="schoolMeta">—</p></div>
-        <section class="section"><h3>أكواد التفعيل</h3><div id="codesList" class="cards"></div></section>
-        <section class="section"><h3>الأجهزة المفعلة</h3><div class="table-wrap"><table><thead><tr><th>الجهاز</th><th>الحالة</th><th>آخر اتصال</th><th>المتبقي من 20 يومًا</th><th>الإصدار</th></tr></thead><tbody id="devicesBody"></tbody></table></div></section>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">مؤقت الحصص</div>
+        <h1>إدارة برنامج Windows</h1>
+        <p>متابعة تراخيص المدارس والأجهزة وحالة الاتصال ومهلة العمل دون إنترنت من مكان واحد.</p>
       </div>
+
+      <div class="actions">
+        <a class="btn primary" href="system-admin.html">← العودة إلى لوحة النظام</a>
+        <button class="btn secondary" id="refreshBtn" type="button">↻ تحديث البيانات</button>
+      </div>
+    </header>
+
+    <section id="status" class="notice loading" aria-live="polite">جارٍ تحميل بيانات برنامج Windows…</section>
+
+    <section class="stats" aria-label="ملخص البيانات">
+      <article class="stat"><div class="stat-icon">م</div><div><span class="stat-label">المدارس الحقيقية</span><strong id="schoolsStat">0</strong></div></article>
+      <article class="stat"><div class="stat-icon">#</div><div><span class="stat-label">الأكواد النشطة</span><strong id="codesStat">0</strong></div></article>
+      <article class="stat"><div class="stat-icon">▣</div><div><span class="stat-label">الأجهزة المفعلة</span><strong id="devicesStat">0</strong></div></article>
+      <article class="stat"><div class="stat-icon">●</div><div><span class="stat-label">اتصلت اليوم</span><strong id="todayStat">0</strong></div></article>
     </section>
-  </section>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="supabase-config.js?v=optimized-03" defer></script>
-<script src="windows-admin.js?v=windows-admin-preview-01" defer></script>
+
+    <section class="workspace">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>المدارس</h2>
+          <span class="pill" id="schoolsCount">0 مدرسة</span>
+        </div>
+
+        <div class="filters">
+          <div class="search-wrap"><input id="search" type="search" autocomplete="off" placeholder="ابحث باسم المدرسة أو الرابط المختصر" aria-label="البحث في المدارس"></div>
+          <select id="schoolFilter" aria-label="تصفية المدارس">
+            <option value="all">جميع المدارس</option>
+            <option value="licensed">لديها كود نشط</option>
+            <option value="devices">لديها أجهزة مفعلة</option>
+            <option value="inactive">المدارس الموقوفة</option>
+          </select>
+        </div>
+
+        <div id="schoolsList" class="schools"></div>
+      </aside>
+
+      <section class="panel">
+        <div id="empty" class="empty"><div class="empty-mark">▣</div>اختر مدرسة لعرض التراخيص والأجهزة.</div>
+
+        <div id="details" hidden>
+          <div class="details-head">
+            <div><h2 id="schoolName">—</h2><p id="schoolMeta">—</p></div>
+            <span id="schoolState" class="badge on school-state">مفعلة</span>
+          </div>
+
+          <section class="section">
+            <div class="section-title"><h3>أكواد التفعيل</h3><span id="codesCount" class="section-count">0 كود</span></div>
+            <div id="codesList" class="cards"></div>
+          </section>
+
+          <section class="section">
+            <div class="section-title"><h3>الأجهزة المسجلة</h3><span id="devicesCount" class="section-count">0 جهاز</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>الجهاز</th><th>الحالة</th><th>آخر اتصال</th><th>مهلة 20 يومًا</th><th>الإصدار</th></tr></thead>
+                <tbody id="devicesBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js?v=optimized-03" defer></script>
+  <script src="windows-admin.js?v=windows-admin-professional-02" defer></script>
 </body>
 </html>
