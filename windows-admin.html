@@ -298,6 +298,8 @@
     .manage-actions { display: flex; flex-wrap: wrap; gap: 7px; }
     .btn.warning { background: #fff4e5; color: #9a4a00; border: 1px solid #f5c77a; }
     .btn.success { background: #e8f8ef; color: #087443; border: 1px solid #9ed8b9; }
+    .btn.danger { background: #fff1f0; color: #b42318; border: 1px solid #fda29b; }
+    .btn[disabled] { opacity: .48; cursor: not-allowed; transform: none; filter: none; }
     .small-text { color: var(--muted); font-size: 12px; font-weight: 800; line-height: 1.8; }
     .usage { margin-top: 11px; }
     .usage-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e8edf3; }
@@ -509,7 +511,7 @@
   <script src="supabase-config.js?v=optimized-03"></script>
   <script
     src="system-auth.js?v=system-auth-01"
-    data-protected-scripts="windows-admin.js?v=windows-admin-code-tools-04"
+    data-protected-scripts="windows-admin.js?v=windows-admin-delete-code-05"
     defer
   ></script>
 </body>

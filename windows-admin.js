@@ -179,6 +179,9 @@
             const activeDevices = devicesFor(school.school_slug).filter(
               (device) => device.activation_code === code.activation_code && device.is_active !== false,
             ).length;
+            const allDevices = devicesFor(school.school_slug).filter(
+              (device) => device.activation_code === code.activation_code,
+            ).length;
             const limit = Math.max(1, Number(code.max_devices || 1));
             const usage = Math.min(100, Math.round((activeDevices / limit) * 100));
             return `
@@ -204,6 +207,7 @@
                   <div class="manage-actions">
                     <button class="btn small toggle-code ${code.is_active === false ? "success" : "warning"}" type="button">${code.is_active === false ? "إعادة تفعيل الكود" : "إيقاف الكود"}</button>
                     <button class="btn small replace-code" type="button">إصدار كود بديل</button>
+                    <button class="btn small danger delete-code" type="button" ${code.is_active !== false || allDevices > 0 ? "disabled" : ""} title="${code.is_active !== false ? "أوقف الكود أولًا" : allDevices > 0 ? "لا يمكن حذف كود مرتبط بأجهزة" : "حذف الكود نهائيًا"}">حذف الكود</button>
                   </div>
                 </div>
               </article>`;
@@ -458,6 +462,40 @@
     openCreateCodeDialog({ maxDevices: Number(code.max_devices || 2), disableOld: true });
   }
 
+  async function deleteActivationCode(card) {
+    const database = getClient();
+    const id = card?.dataset.codeId;
+    const code = state.codes.find((row) => text(row.id) === text(id));
+    if (!database || !code) return;
+
+    if (code.is_active !== false) {
+      showToast("يجب إيقاف الكود قبل حذفه.");
+      return;
+    }
+    const linkedDevices = state.devices.filter(
+      (device) => device.activation_code === code.activation_code,
+    ).length;
+    if (linkedDevices > 0) {
+      showToast("لا يمكن حذف كود مرتبط بأجهزة مسجلة.");
+      return;
+    }
+
+    const typed = window.prompt(
+      `الحذف نهائي ولا يمكن التراجع عنه. للتأكيد اكتب كود التفعيل كاملًا:\n${code.activation_code}`,
+      "",
+    );
+    if (typed === null) return;
+    if (text(typed).trim().toUpperCase() !== text(code.activation_code).trim().toUpperCase()) {
+      showToast("لم يتطابق كود التأكيد. لم يتم الحذف.");
+      return;
+    }
+
+    const { error } = await database.from(TABLES.codes).delete().eq("id", code.id);
+    if (error) throw error;
+    await loadData();
+    showToast("تم حذف الكود المتوقف نهائيًا.");
+  }
+
   async function handleCodeManagement(event) {
     const target = event.target;
     const card = target.closest("[data-code-id]");
@@ -466,6 +504,7 @@
       if (target.closest(".save-limit")) await updateCodeLimit(card);
       else if (target.closest(".toggle-code")) await toggleActivationCode(card);
       else if (target.closest(".replace-code")) replaceActivationCode(card);
+      else if (target.closest(".delete-code")) await deleteActivationCode(card);
     } catch (error) {
       console.error(error);
       setStatus(`تعذر تنفيذ العملية: ${error.message || error}`, "error");
