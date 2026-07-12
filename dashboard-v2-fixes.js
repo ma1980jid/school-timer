@@ -62,7 +62,7 @@
   }
 
   function setDashboardSchoolName(name){
-    const schoolName = String(name || '').trim() || 'مدرسة الشيخ سيف بن حمد الأغبري';
+    const schoolName = String(name || '').trim() || (getSchoolSlug() === 'alsheikh-saif' ? 'مدرسة الشيخ سيف بن حمد الأغبري' : 'جارٍ تحميل بيانات المدرسة...');
     ensureDashboardSchoolNameStyles();
 
     const title = findDashboardTitle();
@@ -84,7 +84,7 @@
   }
 
   async function loadDashboardSchoolName(){
-    if (!setDashboardSchoolName('مدرسة الشيخ سيف بن حمد الأغبري')) return;
+    if (!setDashboardSchoolName(getSchoolSlug() === 'alsheikh-saif' ? 'مدرسة الشيخ سيف بن حمد الأغبري' : 'جارٍ تحميل بيانات المدرسة...')) return;
 
     const client = getClient();
     if (!client) return;

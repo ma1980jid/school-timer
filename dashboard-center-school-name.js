@@ -71,7 +71,7 @@
   }
 
   function setSchoolName(name){
-    const schoolName = String(name || '').trim() || 'مدرسة الشيخ سيف بن حمد الأغبري';
+    const schoolName = String(name || '').trim() || (getSchoolSlug() === 'alsheikh-saif' ? 'مدرسة الشيخ سيف بن حمد الأغبري' : 'جارٍ تحميل بيانات المدرسة...');
     ensureStyles();
 
     const title = findScheduleTitle();
@@ -94,7 +94,7 @@
   }
 
   async function loadSchoolName(){
-    setSchoolName('مدرسة الشيخ سيف بن حمد الأغبري');
+    setSchoolName(getSchoolSlug() === 'alsheikh-saif' ? 'مدرسة الشيخ سيف بن حمد الأغبري' : 'جارٍ تحميل بيانات المدرسة...');
 
     const client = getClient();
     if (!client) return;
