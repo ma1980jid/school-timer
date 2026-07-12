@@ -235,10 +235,16 @@
                 <td>${formatDate(device.last_seen_at)}</td>
                 <td><span class="grace ${grace.className}">${device.is_active === false ? "الجهاز موقوف" : grace.label}</span></td>
                 <td>${escapeHtml(device.app_version || "—")}</td>
+                <td>
+                  <div class="device-actions" data-device-id="${escapeHtml(device.id || "")}">
+                    <button class="btn small toggle-device ${device.is_active === false ? "success" : "warning"}" type="button">${device.is_active === false ? "إعادة تفعيل الجهاز" : "إيقاف الجهاز"}</button>
+                    <button class="btn small danger release-device" type="button" ${device.is_active === false ? "" : "disabled"} title="${device.is_active === false ? "تحرير مقعد الجهاز نهائيًا" : "أوقف الجهاز أولًا"}">تحرير المقعد</button>
+                  </div>
+                </td>
               </tr>`;
           })
           .join("")
-      : '<tr><td colspan="5" class="empty">لا توجد أجهزة مسجلة لهذه المدرسة.</td></tr>';
+      : '<tr><td colspan="6" class="empty">لا توجد أجهزة مسجلة لهذه المدرسة.</td></tr>';
   }
 
   function renderDetails() {
@@ -511,6 +517,88 @@
     }
   }
 
+  function deviceFromActions(actions) {
+    const id = actions?.dataset.deviceId;
+    return state.devices.find((device) => text(device.id) === text(id)) || null;
+  }
+
+  async function toggleDevice(actions) {
+    const database = getClient();
+    const device = deviceFromActions(actions);
+    if (!database || !device) return;
+
+    const nextActive = device.is_active === false;
+    const label = device.device_name || device.device_id || "الجهاز";
+    const message = nextActive
+      ? `هل تريد إعادة تفعيل الجهاز «${label}»؟`
+      : `سيتم إيقاف الجهاز «${label}» فقط دون إيقاف كود المدرسة. هل تريد المتابعة؟`;
+    if (!window.confirm(message)) return;
+
+    const button = actions.querySelector(".toggle-device");
+    button.disabled = true;
+    try {
+      const { error } = await database
+        .from(TABLES.devices)
+        .update({ is_active: nextActive })
+        .eq("id", device.id);
+      if (error) throw error;
+      await loadData();
+      showToast(nextActive ? "تمت إعادة تفعيل الجهاز." : "تم إيقاف الجهاز.");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function releaseDeviceSeat(actions) {
+    const database = getClient();
+    const device = deviceFromActions(actions);
+    if (!database || !device) return;
+
+    if (device.is_active !== false) {
+      showToast("يجب إيقاف الجهاز قبل تحرير مقعده.");
+      return;
+    }
+
+    const deviceName = text(device.device_name).trim();
+    const deviceId = text(device.device_id).trim();
+    const confirmationLabel = deviceName || deviceId;
+    const typed = window.prompt(
+      `سيُحذف تسجيل الجهاز ويُحرر مقعده نهائيًا. للتأكيد اكتب اسم الجهاز أو معرّفه كاملًا:\n${confirmationLabel}`,
+      "",
+    );
+    if (typed === null) return;
+
+    const normalized = text(typed).trim();
+    if (normalized !== deviceName && normalized !== deviceId) {
+      showToast("لم يتطابق اسم الجهاز أو معرّفه. لم يتم تحرير المقعد.");
+      return;
+    }
+
+    const button = actions.querySelector(".release-device");
+    button.disabled = true;
+    try {
+      const { error } = await database.from(TABLES.devices).delete().eq("id", device.id);
+      if (error) throw error;
+      await loadData();
+      showToast("تم تحرير مقعد الجهاز وتحديث عدد الأجهزة المستخدمة.");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function handleDeviceManagement(event) {
+    const target = event.target;
+    const actions = target.closest("[data-device-id]");
+    if (!actions) return;
+    try {
+      if (target.closest(".toggle-device")) await toggleDevice(actions);
+      else if (target.closest(".release-device")) await releaseDeviceSeat(actions);
+    } catch (error) {
+      console.error(error);
+      setStatus(`تعذر تنفيذ عملية الجهاز: ${error.message || error}`, "error");
+    }
+  }
+
   async function loadData() {
     const button = $("refreshBtn");
     button.disabled = true;
@@ -585,6 +673,7 @@
     $("createCodeDialog").addEventListener("click", (event) => {
       if (event.target === $("createCodeDialog")) closeCreateCodeDialog();
     });
+    $("devicesBody").addEventListener("click", handleDeviceManagement);
     loadData();
   }
 
