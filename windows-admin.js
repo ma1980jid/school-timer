@@ -182,7 +182,7 @@
             const limit = Math.max(1, Number(code.max_devices || 1));
             const usage = Math.min(100, Math.round((activeDevices / limit) * 100));
             return `
-              <article class="card">
+              <article class="card" data-code-id="${escapeHtml(code.id || "")}">
                 <div class="card-top">
                   <div class="code">${escapeHtml(code.activation_code || "—")}</div>
                   <span class="badge ${code.is_active === false ? "off" : "on"}">${code.is_active === false ? "موقوف" : "نشط"}</span>
@@ -195,6 +195,17 @@
                   <button class="btn small copy-code" type="button" data-code="${escapeHtml(code.activation_code || "")}">نسخ الكود</button>
                 </div>
                 <div class="small-text">الإنشاء: ${formatDate(code.created_at)}<br>الانتهاء: ${code.expires_at ? formatDate(code.expires_at) : "بدون تاريخ انتهاء"}</div>
+                <div class="code-management">
+                  <div class="limit-control">
+                    <label>الحد الأقصى للأجهزة</label>
+                    <input class="code-limit" type="number" min="${Math.max(1, activeDevices)}" max="50" value="${limit}" aria-label="الحد الأقصى للأجهزة">
+                    <button class="btn small save-limit" type="button">حفظ العدد</button>
+                  </div>
+                  <div class="manage-actions">
+                    <button class="btn small toggle-code ${code.is_active === false ? "success" : "warning"}" type="button">${code.is_active === false ? "إعادة تفعيل الكود" : "إيقاف الكود"}</button>
+                    <button class="btn small replace-code" type="button">إصدار كود بديل</button>
+                  </div>
+                </div>
               </article>`;
           })
           .join("")
@@ -286,7 +297,7 @@
     return realSchools().find((school) => school.school_slug === state.selected) || null;
   }
 
-  function openCreateCodeDialog() {
+  function openCreateCodeDialog(options = {}) {
     const school = selectedSchool();
     if (!school) {
       showToast("اختر مدرسة أولًا.");
@@ -299,9 +310,9 @@
 
     $("dialogSchoolName").textContent = school.school_name || school.school_slug;
     $("newActivationCode").value = generateActivationCode();
-    $("newMaxDevices").value = "2";
+    $("newMaxDevices").value = String(options.maxDevices || 2);
     $("newExpiresAt").value = "";
-    $("disableOldCodes").checked = false;
+    $("disableOldCodes").checked = Boolean(options.disableOld);
     $("createCodeDialog").showModal();
   }
 
@@ -387,6 +398,80 @@
     }
   }
 
+  async function updateCodeLimit(card) {
+    const database = getClient();
+    const id = card?.dataset.codeId;
+    const code = state.codes.find((row) => text(row.id) === text(id));
+    if (!database || !code) return;
+
+    const used = state.devices.filter(
+      (device) => device.activation_code === code.activation_code && device.is_active !== false,
+    ).length;
+    const input = card.querySelector(".code-limit");
+    const value = Math.max(1, Math.min(50, Number(input?.value || 1)));
+    if (value < used) {
+      showToast(`لا يمكن تقليل العدد عن الأجهزة المستخدمة حاليًا (${used}).`);
+      input.value = String(Math.max(used, Number(code.max_devices || 1)));
+      return;
+    }
+    if (value === Number(code.max_devices || 1)) {
+      showToast("لم يتغير عدد الأجهزة.");
+      return;
+    }
+    if (!window.confirm(`هل تريد تغيير عدد الأجهزة المسموح بها إلى ${value}؟`)) return;
+
+    const { error } = await database
+      .from(TABLES.codes)
+      .update({ max_devices: value, updated_at: new Date().toISOString() })
+      .eq("id", code.id);
+    if (error) throw error;
+    await loadData();
+    showToast("تم تحديث عدد الأجهزة.");
+  }
+
+  async function toggleActivationCode(card) {
+    const database = getClient();
+    const id = card?.dataset.codeId;
+    const code = state.codes.find((row) => text(row.id) === text(id));
+    if (!database || !code) return;
+
+    const nextActive = code.is_active === false;
+    const message = nextActive
+      ? "هل تريد إعادة تفعيل هذا الكود؟"
+      : "عند إيقاف الكود سيتوقف البرنامج على أجهزته عند أول تحقق متصل. هل تريد المتابعة؟";
+    if (!window.confirm(message)) return;
+
+    const { error } = await database
+      .from(TABLES.codes)
+      .update({ is_active: nextActive, updated_at: new Date().toISOString() })
+      .eq("id", code.id);
+    if (error) throw error;
+    await loadData();
+    showToast(nextActive ? "تمت إعادة تفعيل الكود." : "تم إيقاف الكود.");
+  }
+
+  function replaceActivationCode(card) {
+    const id = card?.dataset.codeId;
+    const code = state.codes.find((row) => text(row.id) === text(id));
+    if (!code) return;
+    if (!window.confirm("سيتم تجهيز كود بديل مع تحديد خيار إيقاف الأكواد القديمة. يمكنك إلغاء العملية قبل الحفظ. هل تريد المتابعة؟")) return;
+    openCreateCodeDialog({ maxDevices: Number(code.max_devices || 2), disableOld: true });
+  }
+
+  async function handleCodeManagement(event) {
+    const target = event.target;
+    const card = target.closest("[data-code-id]");
+    if (!card) return;
+    try {
+      if (target.closest(".save-limit")) await updateCodeLimit(card);
+      else if (target.closest(".toggle-code")) await toggleActivationCode(card);
+      else if (target.closest(".replace-code")) replaceActivationCode(card);
+    } catch (error) {
+      console.error(error);
+      setStatus(`تعذر تنفيذ العملية: ${error.message || error}`, "error");
+    }
+  }
+
   async function loadData() {
     const button = $("refreshBtn");
     button.disabled = true;
@@ -445,7 +530,11 @@
     });
     $("codesList").addEventListener("click", (event) => {
       const button = event.target.closest(".copy-code");
-      if (button) copyCode(button.dataset.code);
+      if (button) {
+        copyCode(button.dataset.code);
+        return;
+      }
+      handleCodeManagement(event);
     });
     $("createCodeBtn").addEventListener("click", openCreateCodeDialog);
     $("generateCodeBtn").addEventListener("click", () => {

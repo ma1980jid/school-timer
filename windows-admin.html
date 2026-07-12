@@ -291,6 +291,13 @@
     .card-top { display: flex; justify-content: space-between; align-items: center; gap: 9px; }
     .code { direction: ltr; text-align: left; font: 900 18px Consolas, monospace; color: var(--navy); overflow-wrap: anywhere; }
     .code-actions { margin-top: 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .code-management { margin-top: 13px; padding-top: 13px; border-top: 1px solid var(--line); display: grid; gap: 9px; }
+    .limit-control { display: grid; grid-template-columns: 1fr 88px auto; align-items: end; gap: 8px; }
+    .limit-control label { color: var(--muted); font-size: 12px; font-weight: 900; }
+    .limit-control input { width: 100%; min-height: 36px; margin-top: 6px; padding: 6px 9px; border: 1px solid #cfd8e3; border-radius: 10px; background: #fff; font-weight: 900; }
+    .manage-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .btn.warning { background: #fff4e5; color: #9a4a00; border: 1px solid #f5c77a; }
+    .btn.success { background: #e8f8ef; color: #087443; border: 1px solid #9ed8b9; }
     .small-text { color: var(--muted); font-size: 12px; font-weight: 800; line-height: 1.8; }
     .usage { margin-top: 11px; }
     .usage-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e8edf3; }
@@ -374,6 +381,8 @@
       .details-head { align-items: flex-start; }
       .cards { grid-template-columns: 1fr; }
       .section { padding: 14px; }
+      .limit-control { grid-template-columns: 1fr 80px; }
+      .limit-control .btn { grid-column: 1 / -1; }
     }
 
     @media (max-width: 430px) {
@@ -500,7 +509,7 @@
   <script src="supabase-config.js?v=optimized-03"></script>
   <script
     src="system-auth.js?v=system-auth-01"
-    data-protected-scripts="windows-admin.js?v=windows-admin-create-code-03"
+    data-protected-scripts="windows-admin.js?v=windows-admin-code-tools-04"
     defer
   ></script>
 </body>
