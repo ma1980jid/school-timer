@@ -162,6 +162,92 @@
     .notice.error::before { content: "!"; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .global-panel { overflow: visible; }
+    .global-head {
+      padding: 19px 21px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, #fff, #f6fbfa);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .global-title { display: flex; align-items: flex-start; gap: 13px; }
+    .global-title-icon {
+      width: 47px;
+      height: 47px;
+      flex: 0 0 47px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, var(--teal), var(--teal-light));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(8,127,114,.20);
+    }
+    .global-head h2 { margin: 0 0 5px; color: var(--navy); font-size: 22px; }
+    .global-head p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 800; line-height: 1.75; }
+    .global-head-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .global-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .global-version { border-radius: 999px; padding: 6px 10px; background: #edf3f8; color: #475467; font-size: 11px; font-weight: 900; }
+    .global-version.changed { background: #fff4e5; color: #9a4a00; }
+    .global-settings-body { padding: 18px 20px 21px; display: grid; gap: 17px; }
+    .global-info {
+      padding: 13px 15px;
+      border: 1px solid #bdebe4;
+      border-radius: 14px;
+      background: #effcf9;
+      color: #155e57;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.8;
+    }
+    .global-info.error { border-color: #fecdca; background: #fff1f0; color: var(--red); }
+    .global-group { display: grid; gap: 11px; }
+    .global-group-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+    .global-group-head h3 { margin: 0 0 3px; color: var(--navy); font-size: 17px; }
+    .global-group-head p { margin: 0; color: var(--muted); font-size: 11px; font-weight: 800; line-height: 1.65; }
+    .asset-grid { display: grid; gap: 11px; }
+    .asset-grid.backgrounds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .asset-grid.sounds { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .asset-card {
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: #fbfcfe;
+      display: grid;
+      gap: 10px;
+    }
+    .asset-card.pending { border-color: #f0b44d; box-shadow: 0 0 0 3px rgba(231,165,26,.10); }
+    .asset-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+    .asset-card h4 { margin: 0 0 4px; color: #18324b; font-size: 14px; }
+    .asset-card-head p { margin: 0; color: var(--muted); font-size: 10px; font-weight: 800; line-height: 1.55; }
+    .asset-kind { flex: 0 0 auto; border-radius: 999px; padding: 5px 8px; background: #e7f7f3; color: var(--teal); font-size: 10px; font-weight: 900; }
+    .asset-preview {
+      position: relative;
+      overflow: hidden;
+      min-height: 118px;
+      border: 1px dashed #bdc9d7;
+      border-radius: 13px;
+      background: #f1f5f9;
+      display: grid;
+      place-items: center;
+    }
+    .asset-preview.image { aspect-ratio: 16 / 6; }
+    .asset-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .asset-preview.audio { min-height: 91px; padding: 13px; }
+    .asset-preview audio { width: 100%; height: 40px; }
+    .asset-empty { padding: 12px; color: #758397; text-align: center; font-size: 11px; font-weight: 900; line-height: 1.65; }
+    .asset-file-name { min-height: 18px; color: #526176; font-size: 11px; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .asset-file-name.remove { color: var(--red); }
+    .asset-controls { display: flex; gap: 7px; flex-wrap: wrap; }
+    .asset-controls .btn { flex: 1 1 auto; }
+    .file-button { cursor: pointer; }
+    .file-button input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; pointer-events: none; }
+    .global-publish { min-width: 150px; }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -371,6 +457,7 @@
       .workspace { grid-template-columns: 1fr; }
       .schools { max-height: 340px; }
       .stats { grid-template-columns: repeat(2, 1fr); }
+      .asset-grid.sounds { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 680px) {
@@ -378,6 +465,11 @@
       .hero { min-height: 0; padding: 21px 18px; border-radius: 19px; display: grid; }
       .actions { display: grid; grid-template-columns: 1fr; }
       .btn { width: 100%; }
+      .global-head { align-items: stretch; display: grid; padding: 17px; }
+      .global-head-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .global-meta { grid-column: 1 / -1; }
+      .global-settings-body { padding: 14px; }
+      .asset-grid.backgrounds { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
       .stat { min-height: 92px; padding: 13px; gap: 10px; }
       .stat-icon { width: 40px; height: 40px; flex-basis: 40px; border-radius: 12px; }
@@ -402,7 +494,7 @@
       <div>
         <div class="eyebrow">مؤقت الحصص</div>
         <h1>إدارة برنامج Windows</h1>
-        <p>متابعة تراخيص المدارس والأجهزة وحالة الاتصال ومهلة العمل دون إنترنت من مكان واحد.</p>
+        <p>إدارة تراخيص المدارس والأجهزة، ونشر أصوات وخلفيات موحدة إلى جميع نسخ Windows من مكان واحد.</p>
       </div>
 
       <div class="actions">
@@ -412,6 +504,98 @@
     </header>
 
     <section id="status" class="notice loading" aria-live="polite">جارٍ تحميل بيانات برنامج Windows…</section>
+
+    <section id="globalSettingsPanel" class="panel global-panel" aria-labelledby="globalSettingsTitle">
+      <div class="global-head">
+        <div class="global-title">
+          <span class="global-title-icon" aria-hidden="true">◎</span>
+          <div>
+            <h2 id="globalSettingsTitle">المظهر والأصوات لجميع المدارس</h2>
+            <p>أي تغيير تنشره هنا يصل إلى كل نسخة Windows عند اتصالها، ثم يُحفظ على الجهاز للعمل دون إنترنت.</p>
+          </div>
+        </div>
+        <div class="global-head-actions">
+          <div class="global-meta">
+            <span id="globalVersion" class="global-version">الإصدار —</span>
+            <span id="globalUpdatedAt" class="global-version">لم يُحمّل بعد</span>
+          </div>
+          <button id="resetGlobalDraftBtn" class="btn small" type="button" disabled>إلغاء التعديلات</button>
+          <button id="publishGlobalBtn" class="btn secondary global-publish" type="button" disabled>نشر إلى جميع المدارس</button>
+        </div>
+      </div>
+
+      <div class="global-settings-body">
+        <div id="globalSettingsNotice" class="global-info" role="status" aria-live="polite">
+          أصوات المدرسة التي تضيفها محليًا تبقى أعلى أولوية. أما الخلفية المنشورة هنا فتُطبّق على جميع المدارس.
+        </div>
+
+        <section class="global-group" aria-labelledby="backgroundsGroupTitle">
+          <div class="global-group-head">
+            <div><h3 id="backgroundsGroupTitle">الخلفيات العامة</h3><p>يفضل WebP أو JPG مضغوط. الحد الأقصى 15 ميجابايت للصورة.</p></div>
+            <span class="pill">تطبق على الجميع</span>
+          </div>
+          <div class="asset-grid backgrounds">
+            <article id="desktopBackgroundCard" class="asset-card">
+              <div class="asset-card-head"><div><h4>خلفية الحاسوب</h4><p>تظهر في الشاشات العريضة داخل برنامج Windows.</p></div><span class="asset-kind">صورة</span></div>
+              <div class="asset-preview image"><img id="desktopBackgroundPreview" alt="معاينة خلفية الحاسوب" hidden><div id="desktopBackgroundEmpty" class="asset-empty">لا توجد خلفية عامة؛ سيستخدم البرنامج الخلفية الاحتياطية.</div></div>
+              <div id="desktopBackgroundName" class="asset-file-name">لم يتم اختيار ملف</div>
+              <div class="asset-controls">
+                <label class="btn small file-button">اختيار صورة<input id="desktopBackgroundInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
+                <button class="btn small danger" type="button" data-remove-global="desktopBackground">إزالة العامة</button>
+              </div>
+            </article>
+
+            <article id="mobileBackgroundCard" class="asset-card">
+              <div class="asset-card-head"><div><h4>خلفية الشاشة الضيقة</h4><p>نسخة اختيارية للأجهزة أو النوافذ الضيقة.</p></div><span class="asset-kind">صورة</span></div>
+              <div class="asset-preview image"><img id="mobileBackgroundPreview" alt="معاينة خلفية الشاشة الضيقة" hidden><div id="mobileBackgroundEmpty" class="asset-empty">إن لم تُحدد، يستخدم البرنامج خلفية الحاسوب العامة.</div></div>
+              <div id="mobileBackgroundName" class="asset-file-name">لم يتم اختيار ملف</div>
+              <div class="asset-controls">
+                <label class="btn small file-button">اختيار صورة<input id="mobileBackgroundInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
+                <button class="btn small danger" type="button" data-remove-global="mobileBackground">إزالة العامة</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="global-group" aria-labelledby="soundsGroupTitle">
+          <div class="global-group-head">
+            <div><h3 id="soundsGroupTitle">أصوات مدير النظام</h3><p>MP3 أو WAV أو OGG. إذا خصصت المدرسة صوتًا محليًا فسيُستخدم تخصيصها بدل الصوت العام.</p></div>
+            <span class="pill">جاهزة دون إنترنت</span>
+          </div>
+          <div class="asset-grid sounds">
+            <article id="startSoundCard" class="asset-card">
+              <div class="asset-card-head"><div><h4>بداية الحصة</h4><p>الصوت العام عند بدء الحصة.</p></div><span class="asset-kind">صوت</span></div>
+              <div class="asset-preview audio"><audio id="startSoundPreview" controls preload="metadata" hidden></audio><div id="startSoundEmpty" class="asset-empty">سيستخدم البرنامج جرس البداية المرفق.</div></div>
+              <div id="startSoundName" class="asset-file-name">الصوت الاحتياطي المرفق</div>
+              <div class="asset-controls">
+                <label class="btn small file-button">اختيار صوت<input id="startSoundInput" type="file" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,application/ogg"></label>
+                <button class="btn small danger" type="button" data-remove-global="startSound">إزالة العامة</button>
+              </div>
+            </article>
+
+            <article id="endSoundCard" class="asset-card">
+              <div class="asset-card-head"><div><h4>نهاية الحصة</h4><p>الصوت العام عند انتهاء الحصة.</p></div><span class="asset-kind">صوت</span></div>
+              <div class="asset-preview audio"><audio id="endSoundPreview" controls preload="metadata" hidden></audio><div id="endSoundEmpty" class="asset-empty">سيستخدم البرنامج جرس النهاية المرفق.</div></div>
+              <div id="endSoundName" class="asset-file-name">الصوت الاحتياطي المرفق</div>
+              <div class="asset-controls">
+                <label class="btn small file-button">اختيار صوت<input id="endSoundInput" type="file" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,application/ogg"></label>
+                <button class="btn small danger" type="button" data-remove-global="endSound">إزالة العامة</button>
+              </div>
+            </article>
+
+            <article id="warningSoundCard" class="asset-card">
+              <div class="asset-card-head"><div><h4>تنبيه قبل النهاية</h4><p>يعمل قبل نهاية الحصة بخمس دقائق.</p></div><span class="asset-kind">صوت</span></div>
+              <div class="asset-preview audio"><audio id="warningSoundPreview" controls preload="metadata" hidden></audio><div id="warningSoundEmpty" class="asset-empty">سيستخدم البرنامج صوت التنبيه المرفق.</div></div>
+              <div id="warningSoundName" class="asset-file-name">الصوت الاحتياطي المرفق</div>
+              <div class="asset-controls">
+                <label class="btn small file-button">اختيار صوت<input id="warningSoundInput" type="file" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,application/ogg"></label>
+                <button class="btn small danger" type="button" data-remove-global="warningSound">إزالة العامة</button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
 
     <section class="stats" aria-label="ملخص البيانات">
       <article class="stat"><div class="stat-icon">م</div><div><span class="stat-label">المدارس الحقيقية</span><strong id="schoolsStat">0</strong></div></article>
@@ -513,7 +697,7 @@
   <script src="supabase-config.js?v=optimized-03"></script>
   <script
     src="system-auth.js?v=system-auth-01"
-    data-protected-scripts="windows-admin.js?v=windows-admin-device-tools-06"
+    data-protected-scripts="windows-admin.js?v=windows-admin-global-settings-07"
     defer
   ></script>
 </body>

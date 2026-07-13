@@ -7,7 +7,77 @@
     schools: "schools",
     codes: "school_activation_codes",
     devices: "school_activated_devices",
+    globalSettings: "windows_global_settings",
   };
+  const GLOBAL_ASSETS_BUCKET = "windows-assets";
+  const MAX_GLOBAL_ASSET_SIZE = 15 * 1024 * 1024;
+  const GLOBAL_ASSETS = Object.freeze({
+    desktopBackground: {
+      kind: "image",
+      cardId: "desktopBackgroundCard",
+      inputId: "desktopBackgroundInput",
+      previewId: "desktopBackgroundPreview",
+      emptyId: "desktopBackgroundEmpty",
+      nameId: "desktopBackgroundName",
+      urlColumn: "desktop_background_url",
+      pathColumn: "desktop_background_path",
+      nameColumn: "desktop_background_name",
+      pathPrefix: "desktop-background",
+      fallbackName: "لا توجد خلفية عامة",
+    },
+    mobileBackground: {
+      kind: "image",
+      cardId: "mobileBackgroundCard",
+      inputId: "mobileBackgroundInput",
+      previewId: "mobileBackgroundPreview",
+      emptyId: "mobileBackgroundEmpty",
+      nameId: "mobileBackgroundName",
+      urlColumn: "mobile_background_url",
+      pathColumn: "mobile_background_path",
+      nameColumn: "mobile_background_name",
+      pathPrefix: "mobile-background",
+      fallbackName: "تستخدم خلفية الحاسوب العامة تلقائيًا",
+    },
+    startSound: {
+      kind: "audio",
+      cardId: "startSoundCard",
+      inputId: "startSoundInput",
+      previewId: "startSoundPreview",
+      emptyId: "startSoundEmpty",
+      nameId: "startSoundName",
+      urlColumn: "start_sound_url",
+      pathColumn: "start_sound_path",
+      nameColumn: "start_sound_name",
+      pathPrefix: "start-sound",
+      fallbackName: "جرس البداية الاحتياطي المرفق",
+    },
+    endSound: {
+      kind: "audio",
+      cardId: "endSoundCard",
+      inputId: "endSoundInput",
+      previewId: "endSoundPreview",
+      emptyId: "endSoundEmpty",
+      nameId: "endSoundName",
+      urlColumn: "end_sound_url",
+      pathColumn: "end_sound_path",
+      nameColumn: "end_sound_name",
+      pathPrefix: "end-sound",
+      fallbackName: "جرس النهاية الاحتياطي المرفق",
+    },
+    warningSound: {
+      kind: "audio",
+      cardId: "warningSoundCard",
+      inputId: "warningSoundInput",
+      previewId: "warningSoundPreview",
+      emptyId: "warningSoundEmpty",
+      nameId: "warningSoundName",
+      urlColumn: "warning_sound_url",
+      pathColumn: "warning_sound_path",
+      nameColumn: "warning_sound_name",
+      pathPrefix: "warning-sound",
+      fallbackName: "صوت التنبيه الاحتياطي المرفق",
+    },
+  });
 
   const state = {
     client: null,
@@ -15,6 +85,9 @@
     codes: [],
     devices: [],
     selected: null,
+    globalSettings: null,
+    globalSettingsReady: false,
+    globalDraft: createEmptyGlobalDraft(),
   };
 
   const $ = (id) => document.getElementById(id);
@@ -39,6 +112,345 @@
     toast.classList.add("show");
     clearTimeout(showToast.timer);
     showToast.timer = setTimeout(() => toast.classList.remove("show"), 2300);
+  }
+
+  function createEmptyGlobalDraft() {
+    return Object.fromEntries(
+      Object.keys(GLOBAL_ASSETS).map((key) => [key, { file: null, remove: false, objectUrl: "" }]),
+    );
+  }
+
+  function setGlobalNotice(message, type = "info") {
+    const notice = $("globalSettingsNotice");
+    if (!notice) return;
+    notice.textContent = message;
+    notice.className = `global-info${type === "error" ? " error" : ""}`;
+  }
+
+  function globalDefaultNotice() {
+    return "أصوات المدرسة التي تضيفها محليًا تبقى أعلى أولوية. أما الخلفية المنشورة هنا فتُطبّق على جميع المدارس.";
+  }
+
+  function hasGlobalChanges() {
+    return Object.values(state.globalDraft).some((draft) => draft.file || draft.remove);
+  }
+
+  function revokeDraftUrl(draft) {
+    if (!draft?.objectUrl) return;
+    try {
+      URL.revokeObjectURL(draft.objectUrl);
+    } catch (_error) {}
+    draft.objectUrl = "";
+  }
+
+  function clearGlobalDraft({ render = true } = {}) {
+    Object.values(state.globalDraft).forEach(revokeDraftUrl);
+    state.globalDraft = createEmptyGlobalDraft();
+    Object.values(GLOBAL_ASSETS).forEach((config) => {
+      const input = $(config.inputId);
+      if (input) input.value = "";
+    });
+    if (render) renderGlobalSettings();
+  }
+
+  function renderGlobalAsset(key) {
+    const config = GLOBAL_ASSETS[key];
+    const draft = state.globalDraft[key];
+    const current = state.globalSettings || {};
+    const currentUrl = text(current[config.urlColumn]).trim();
+    const source = draft.file ? draft.objectUrl : draft.remove ? "" : currentUrl;
+    const currentName = text(current[config.nameColumn]).trim();
+    const preview = $(config.previewId);
+    const empty = $(config.emptyId);
+    const name = $(config.nameId);
+    const card = $(config.cardId);
+    const input = $(config.inputId);
+    const removeButton = document.querySelector(`[data-remove-global="${key}"]`);
+
+    card?.classList.toggle("pending", Boolean(draft.file || draft.remove));
+    if (input) input.disabled = !state.globalSettingsReady;
+
+    if (preview) {
+      if (source) {
+        if (preview.dataset.source !== source) {
+          if (config.kind === "audio") preview.pause?.();
+          preview.src = source;
+          preview.dataset.source = source;
+          if (config.kind === "audio") preview.load?.();
+        }
+        preview.hidden = false;
+        if (empty) empty.hidden = true;
+      } else {
+        if (config.kind === "audio") preview.pause?.();
+        preview.removeAttribute("src");
+        delete preview.dataset.source;
+        preview.hidden = true;
+        if (empty) empty.hidden = false;
+      }
+    }
+
+    if (name) {
+      name.classList.toggle("remove", draft.remove);
+      if (draft.file) name.textContent = `جاهز للنشر: ${draft.file.name}`;
+      else if (draft.remove) name.textContent = "سيتم إلغاء الملف العام عند النشر";
+      else name.textContent = currentName || config.fallbackName;
+    }
+
+    if (removeButton) {
+      removeButton.disabled = !state.globalSettingsReady || (!currentUrl && !draft.file && !draft.remove);
+      removeButton.textContent = draft.remove ? "تراجع عن الإزالة" : "إزالة العامة";
+    }
+  }
+
+  function renderGlobalSettings() {
+    Object.keys(GLOBAL_ASSETS).forEach(renderGlobalAsset);
+
+    const changed = hasGlobalChanges();
+    const version = Number(state.globalSettings?.config_version || 0);
+    const versionElement = $("globalVersion");
+    const updatedElement = $("globalUpdatedAt");
+    if (versionElement) {
+      versionElement.textContent = version ? `الإصدار ${version}` : "الإصدار —";
+      versionElement.classList.toggle("changed", changed);
+    }
+    if (updatedElement) {
+      updatedElement.textContent = state.globalSettings?.updated_at
+        ? `آخر نشر: ${formatDate(state.globalSettings.updated_at)}`
+        : "لم تُنشر إعدادات بعد";
+    }
+
+    const publishButton = $("publishGlobalBtn");
+    const resetButton = $("resetGlobalDraftBtn");
+    if (publishButton) publishButton.disabled = !state.globalSettingsReady || !changed;
+    if (resetButton) resetButton.disabled = !changed;
+  }
+
+  function globalSettingsErrorMessage(error) {
+    const message = text(error?.message || error).trim();
+    if (/windows_global_settings|relation .* does not exist|schema cache|PGRST205|42P01/i.test(message)) {
+      return "الإدارة المركزية غير مهيأة بعد. نفّذ ملف windows_global_settings.sql في Supabase أولًا؛ بقية أدوات الأكواد والأجهزة ستستمر في العمل.";
+    }
+    return `تعذر تحميل الإعدادات العامة: ${message || "خطأ غير معروف"}`;
+  }
+
+  async function loadGlobalSettings(database) {
+    try {
+      const { data, error } = await database
+        .from(TABLES.globalSettings)
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) throw error;
+
+      state.globalSettings = data || { id: 1, config_version: 1 };
+      state.globalSettingsReady = true;
+      clearGlobalDraft({ render: false });
+      renderGlobalSettings();
+      setGlobalNotice(globalDefaultNotice());
+      return true;
+    } catch (error) {
+      console.error("[WindowsAdmin] global settings load failed", error);
+      state.globalSettings = null;
+      state.globalSettingsReady = false;
+      clearGlobalDraft({ render: false });
+      renderGlobalSettings();
+      setGlobalNotice(globalSettingsErrorMessage(error), "error");
+      return false;
+    }
+  }
+
+  function fileMatchesKind(file, kind) {
+    const mime = text(file?.type).toLowerCase();
+    const extension = text(file?.name).split(".").pop().toLowerCase();
+    if (kind === "image") {
+      return ["image/png", "image/jpeg", "image/webp"].includes(mime) || ["png", "jpg", "jpeg", "webp"].includes(extension);
+    }
+    return ["audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav", "audio/wave", "audio/ogg", "application/ogg"].includes(mime)
+      || ["mp3", "wav", "ogg"].includes(extension);
+  }
+
+  function validateGlobalFile(file, config) {
+    if (!file || file.size <= 0) return "الملف المختار فارغ أو غير صالح.";
+    if (file.size > MAX_GLOBAL_ASSET_SIZE) return "حجم الملف أكبر من 15 ميجابايت.";
+    if (!fileMatchesKind(file, config.kind)) {
+      return config.kind === "image" ? "اختر صورة PNG أو JPG أو WebP." : "اختر ملف MP3 أو WAV أو OGG.";
+    }
+    return "";
+  }
+
+  function chooseGlobalAsset(key, event) {
+    const config = GLOBAL_ASSETS[key];
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const validationError = validateGlobalFile(file, config);
+    if (validationError) {
+      event.target.value = "";
+      showToast(validationError);
+      return;
+    }
+
+    const draft = state.globalDraft[key];
+    revokeDraftUrl(draft);
+    draft.file = file;
+    draft.remove = false;
+    draft.objectUrl = URL.createObjectURL(file);
+    renderGlobalSettings();
+    setGlobalNotice("التعديل جاهز للمعاينة ولم يصل إلى المدارس بعد. اضغط «نشر إلى جميع المدارس» لاعتماده.");
+  }
+
+  function toggleRemoveGlobalAsset(key) {
+    const config = GLOBAL_ASSETS[key];
+    const draft = state.globalDraft[key];
+    const currentUrl = text(state.globalSettings?.[config.urlColumn]).trim();
+
+    if (draft.remove) {
+      draft.remove = false;
+      renderGlobalSettings();
+      return;
+    }
+
+    if (draft.file && !currentUrl) {
+      revokeDraftUrl(draft);
+      draft.file = null;
+      const input = $(config.inputId);
+      if (input) input.value = "";
+      renderGlobalSettings();
+      showToast("تم إلغاء الملف المختار.");
+      return;
+    }
+
+    if (!currentUrl && !draft.file) {
+      showToast("لا يوجد ملف عام لإزالته.");
+      return;
+    }
+
+    revokeDraftUrl(draft);
+    draft.file = null;
+    draft.remove = true;
+    const input = $(config.inputId);
+    if (input) input.value = "";
+    renderGlobalSettings();
+    setGlobalNotice("سيتم الرجوع إلى الملف الاحتياطي أو إعداد المدرسة بعد النشر. لم يُطبق التغيير بعد.");
+  }
+
+  function extensionForUpload(file, kind) {
+    const mimeExtensions = {
+      "image/png": "png",
+      "image/jpeg": "jpg",
+      "image/webp": "webp",
+      "audio/mpeg": "mp3",
+      "audio/mp3": "mp3",
+      "audio/wav": "wav",
+      "audio/x-wav": "wav",
+      "audio/wave": "wav",
+      "audio/ogg": "ogg",
+      "application/ogg": "ogg",
+    };
+    const extension = mimeExtensions[text(file?.type).toLowerCase()]
+      || text(file?.name).split(".").pop().toLowerCase();
+    if (kind === "image" && ["png", "jpg", "jpeg", "webp"].includes(extension)) return extension === "jpeg" ? "jpg" : extension;
+    if (kind === "audio" && ["mp3", "wav", "ogg"].includes(extension)) return extension;
+    return kind === "image" ? "webp" : "mp3";
+  }
+
+  function uploadMimeType(file, extension) {
+    const declared = text(file?.type).trim().toLowerCase();
+    if (declared) return declared;
+    return {
+      png: "image/png",
+      jpg: "image/jpeg",
+      webp: "image/webp",
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+      ogg: "audio/ogg",
+    }[extension] || "application/octet-stream";
+  }
+
+  async function removeStoragePaths(storage, paths) {
+    const unique = [...new Set(paths.filter(Boolean))];
+    if (!unique.length || typeof storage?.remove !== "function") return;
+    const { error } = await storage.remove(unique);
+    if (error) console.warn("[WindowsAdmin] storage cleanup failed", error);
+  }
+
+  async function publishGlobalSettings() {
+    if (!state.globalSettingsReady || !hasGlobalChanges()) return;
+    if (!window.confirm("سيصل هذا التغيير إلى جميع نسخ Windows عند اتصالها بالإنترنت. هل تريد نشره الآن؟")) return;
+
+    const database = getClient();
+    const storage = database?.storage?.from?.(GLOBAL_ASSETS_BUCKET);
+    if (!database || !storage) {
+      setGlobalNotice("تعذر تجهيز خدمة رفع الملفات في Supabase.", "error");
+      return;
+    }
+
+    const button = $("publishGlobalBtn");
+    const uploadedPaths = [];
+    const oldPathsToRemove = [];
+    const payload = {};
+    button.disabled = true;
+    button.textContent = "جارٍ الرفع والنشر…";
+    setGlobalNotice("جارٍ رفع الملفات الجديدة ثم تحديث الإصدار العام…");
+
+    try {
+      for (const [key, config] of Object.entries(GLOBAL_ASSETS)) {
+        const draft = state.globalDraft[key];
+        if (!draft.file && !draft.remove) continue;
+
+        const oldPath = text(state.globalSettings?.[config.pathColumn]).trim();
+        if (draft.remove) {
+          payload[config.urlColumn] = null;
+          payload[config.pathColumn] = null;
+          payload[config.nameColumn] = null;
+          if (oldPath) oldPathsToRemove.push(oldPath);
+          continue;
+        }
+
+        const extension = extensionForUpload(draft.file, config.kind);
+        const suffix = `${Date.now()}-${randomDigits(6)}`;
+        const path = `global/${config.pathPrefix}-${suffix}.${extension}`;
+        const { error: uploadError } = await storage.upload(path, draft.file, {
+          cacheControl: "31536000",
+          contentType: uploadMimeType(draft.file, extension),
+          upsert: false,
+        });
+        if (uploadError) throw new Error(`تعذر رفع «${draft.file.name}»: ${uploadError.message || uploadError}`);
+        uploadedPaths.push(path);
+
+        const publicResult = storage.getPublicUrl(path);
+        const publicUrl = text(publicResult?.data?.publicUrl).trim();
+        if (!publicUrl) throw new Error(`تعذر إنشاء رابط عام للملف «${draft.file.name}».`);
+
+        payload[config.urlColumn] = publicUrl;
+        payload[config.pathColumn] = path;
+        payload[config.nameColumn] = draft.file.name;
+        if (oldPath && oldPath !== path) oldPathsToRemove.push(oldPath);
+      }
+
+      const { data, error } = await database
+        .from(TABLES.globalSettings)
+        .upsert({ id: 1, ...payload }, { onConflict: "id" })
+        .select("*")
+        .single();
+      if (error) throw error;
+
+      state.globalSettings = data || { ...state.globalSettings, ...payload };
+      state.globalSettingsReady = true;
+      await removeStoragePaths(storage, oldPathsToRemove);
+      clearGlobalDraft({ render: false });
+      renderGlobalSettings();
+      setGlobalNotice("تم النشر بنجاح. ستلتقط نسخ Windows الإعداد الجديد عند اتصالها وتحفظه للعمل دون إنترنت.");
+      showToast("تم نشر إعدادات Windows لجميع المدارس.");
+    } catch (error) {
+      console.error("[WindowsAdmin] global settings publish failed", error);
+      await removeStoragePaths(storage, uploadedPaths);
+      setGlobalNotice(`تعذر النشر: ${error.message || error}`, "error");
+      renderGlobalSettings();
+    } finally {
+      button.textContent = "نشر إلى جميع المدارس";
+      button.disabled = !state.globalSettingsReady || !hasGlobalChanges();
+    }
   }
 
   function getClient() {
@@ -608,6 +1020,8 @@
       const database = getClient();
       if (!database) throw new Error("تعذر تحميل إعدادات الاتصال بقاعدة البيانات.");
 
+      const globalSettingsPromise = loadGlobalSettings(database);
+
       const [schoolsResponse, codesResponse, devicesResponse] = await Promise.all([
         database.from(TABLES.schools).select("*").order("school_name", { ascending: true }),
         database.from(TABLES.codes).select("*"),
@@ -630,6 +1044,7 @@
       renderStats();
       renderSchools();
       renderDetails();
+      await globalSettingsPromise;
       setStatus(`تم تحديث البيانات بنجاح · ${new Intl.DateTimeFormat("ar-OM", { timeStyle: "short" }).format(new Date())}`);
     } catch (error) {
       console.error(error);
@@ -648,7 +1063,23 @@
   }
 
   function init() {
-    $("refreshBtn").addEventListener("click", loadData);
+    $("refreshBtn").addEventListener("click", () => {
+      if (hasGlobalChanges() && !window.confirm("توجد تعديلات عامة لم تُنشر. هل تريد إلغاءها وتحديث البيانات؟")) return;
+      loadData();
+    });
+    Object.entries(GLOBAL_ASSETS).forEach(([key, config]) => {
+      $(config.inputId).addEventListener("change", (event) => chooseGlobalAsset(key, event));
+    });
+    $("globalSettingsPanel").addEventListener("click", (event) => {
+      const removeButton = event.target.closest("[data-remove-global]");
+      if (removeButton) toggleRemoveGlobalAsset(removeButton.dataset.removeGlobal);
+    });
+    $("resetGlobalDraftBtn").addEventListener("click", () => {
+      clearGlobalDraft();
+      setGlobalNotice(globalDefaultNotice());
+      showToast("تم إلغاء التعديلات غير المنشورة.");
+    });
+    $("publishGlobalBtn").addEventListener("click", publishGlobalSettings);
     $("search").addEventListener("input", renderSchools);
     $("schoolFilter").addEventListener("change", renderSchools);
     $("schoolsList").addEventListener("click", handleSchoolActivation);
@@ -674,6 +1105,12 @@
       if (event.target === $("createCodeDialog")) closeCreateCodeDialog();
     });
     $("devicesBody").addEventListener("click", handleDeviceManagement);
+    window.addEventListener("beforeunload", (event) => {
+      if (!hasGlobalChanges()) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+    renderGlobalSettings();
     loadData();
   }
 
