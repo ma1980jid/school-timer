@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>إدارة الصوتيات المركزية - مؤقت الحصص</title>
+  <link rel="stylesheet" href="programmer-audio.css?v=1.0.0">
+</head>
+<body class="auth-pending">
+  <main id="loginView" class="login-view" hidden>
+    <section class="login-card">
+      <div class="login-brand">
+        <span class="brand-icon" aria-hidden="true">♪</span>
+        <span class="eyebrow light">برنامج Windows</span>
+        <h1>الصوتيات المركزية</h1>
+        <p>دخول المبرمج لإدارة حزمة أصوات موحدة تُنشر لجميع المدارس.</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <span class="eyebrow">حساب المبرمج</span>
+        <h2>تسجيل الدخول</h2>
+        <p>استخدم الحساب المعتمد في Supabase.</p>
+        <label>البريد الإلكتروني
+          <input id="loginEmail" type="email" autocomplete="username" required>
+        </label>
+        <label>كلمة المرور
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <div id="loginMessage" class="notice error" role="alert" hidden></div>
+        <button id="loginButton" class="button primary wide" type="submit">دخول آمن</button>
+      </form>
+    </section>
+  </main>
+
+  <main id="appView" class="app-shell" hidden>
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow light">إعدادات المبرمج · برنامج Windows</span>
+        <h1>إدارة الصوتيات المركزية</h1>
+        <p>ارفع الحزمة، اختر مقطعي التوعية، راجع المسودة ثم انشر إصدارًا مكتملًا لجميع المدارس.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="button ghost" href="windows-admin.html">العودة إلى إدارة Windows</a>
+        <button class="button ghost" id="refreshBtn" type="button">تحديث البيانات</button>
+        <button class="button light" id="logoutBtn" type="button">تسجيل الخروج</button>
+      </div>
+    </header>
+
+    <section id="pageStatus" class="notice" role="status" hidden></section>
+
+    <section class="stats" aria-label="ملخص الصوتيات">
+      <article class="stat-card">
+        <span>الإصدار المنشور</span>
+        <strong id="statPublishedVersion">—</strong>
+      </article>
+      <article class="stat-card">
+        <span>ملفات الإصدار</span>
+        <strong id="statPublishedAssets">0</strong>
+      </article>
+      <article class="stat-card">
+        <span>المسودات</span>
+        <strong id="statDrafts">0</strong>
+      </article>
+      <article class="stat-card">
+        <span>المدارس المخصصة</span>
+        <strong id="statSchoolOverrides">0</strong>
+      </article>
+    </section>
+
+    <section class="workflow-grid">
+      <section class="panel upload-panel">
+        <div class="panel-head">
+          <div>
+            <span class="section-kicker">الخطوة 1</span>
+            <h2>تجهيز إصدار صوتي</h2>
+          </div>
+          <span id="localPackageBadge" class="pill muted">لم تُحدد حزمة</span>
+        </div>
+
+        <div class="panel-body form-grid">
+          <label class="folder-picker" for="audioFolderInput">
+            <span class="folder-icon" aria-hidden="true">＋</span>
+            <strong>اختيار مجلد الحزمة المنظمة</strong>
+            <small>بعد فك ZIP اختر مجلد <bdi>school-timer-audio-pack</bdi> كاملًا.</small>
+            <input id="audioFolderInput" type="file" webkitdirectory directory multiple accept="audio/mpeg,.mp3,.json,.csv,.md">
+          </label>
+
+          <div id="packageSummary" class="package-summary" hidden>
+            <div><span>ملفات النظام</span><strong id="localSystemCount">0 / 19</strong></div>
+            <div><span>الإرشادات</span><strong id="localGuidanceCount">0</strong></div>
+            <div><span>الحجم</span><strong id="localPackageSize">0</strong></div>
+            <div><span>التحقق</span><strong id="localValidation">—</strong></div>
+          </div>
+
+          <div class="field-grid two">
+            <label>اسم الإصدار
+              <input id="releaseTitle" type="text" value="الإصدار الصوتي الأول" maxlength="120">
+            </label>
+            <label>الوضع الافتراضي للمدارس
+              <select id="releaseDefaultProfile">
+                <option value="end_only">النهايات فقط</option>
+                <option value="start_and_end">البداية والنهاية</option>
+              </select>
+            </label>
+          </div>
+
+          <label>ملاحظات الإصدار
+            <textarea id="releaseNotes" rows="3" maxlength="600" placeholder="مثال: الحزمة الأولى المنظمة لأصوات الطابور والحصص والإرشادات."></textarea>
+          </label>
+
+          <fieldset class="awareness-box">
+            <legend>مقطعا التوعية بعد الطابور</legend>
+            <p>يعمل المقطع الأول، وعند انتهائه يبدأ الثاني مباشرة. لا يوجد تدوير أسبوعي.</p>
+            <div class="field-grid two">
+              <label>التوعية الأولى
+                <select id="awarenessFirst" disabled><option value="">اختر الحزمة أولًا</option></select>
+              </label>
+              <label>التوعية الثانية
+                <select id="awarenessSecond" disabled><option value="">اختر الحزمة أولًا</option></select>
+              </label>
+            </div>
+          </fieldset>
+
+          <button id="createDraftBtn" class="button primary wide" type="button" disabled>
+            رفع الحزمة وحفظها كمسودة
+          </button>
+          <div id="uploadProgress" class="progress-block" hidden>
+            <div class="progress-label"><span id="uploadProgressText">جارٍ الرفع…</span><strong id="uploadProgressPercent">0%</strong></div>
+            <progress id="uploadProgressBar" max="100" value="0"></progress>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel releases-panel">
+        <div class="panel-head">
+          <div>
+            <span class="section-kicker">الخطوة 2</span>
+            <h2>المراجعة والنشر</h2>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="publishedReleaseCard" class="release-card published">
+            <span class="release-state">الإصدار المنشور</span>
+            <h3>لا يوجد إصدار منشور</h3>
+            <p>أنشئ مسودة مكتملة ثم انشرها.</p>
+          </div>
+          <div class="subhead">
+            <h3>المسودات</h3>
+            <span id="draftsBadge" class="pill">0</span>
+          </div>
+          <div id="draftsList" class="drafts-list">
+            <div class="empty-state">لا توجد مسودات.</div>
+          </div>
+          <div class="security-note">
+            لا تستقبل نسخ Windows أي ملف من المسودة؛ يبدأ التحديث فقط بعد النشر الناجح.
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel library-panel">
+      <div class="panel-head responsive-head">
+        <div>
+          <span class="section-kicker">المراجعة المحلية</span>
+          <h2>محتويات الحزمة قبل الرفع</h2>
+        </div>
+        <div class="library-tools">
+          <div class="segmented" id="assetFilter" role="group" aria-label="تصفية الملفات">
+            <button class="active" type="button" data-filter="all">الكل</button>
+            <button type="button" data-filter="system_event">أصوات النظام</button>
+            <button type="button" data-filter="guidance">الإرشادات</button>
+          </div>
+          <input id="assetSearch" type="search" placeholder="ابحث عن صوت…">
+        </div>
+      </div>
+      <div class="panel-body no-top">
+        <div id="localAssetsList" class="assets-list">
+          <div class="empty-state large">اختر مجلد الحزمة المنظمة لعرض الأصوات ومعاينتها.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel schools-panel">
+      <div class="panel-head responsive-head">
+        <div>
+          <span class="section-kicker">الخطوة 3</span>
+          <h2>الوضع الصوتي لكل مدرسة</h2>
+          <p class="panel-description">المدرسة لا تغيّر الوضع؛ يحدده المبرمج مركزيًا.</p>
+        </div>
+        <div class="school-toolbar">
+          <label class="compact-label">الوضع الافتراضي
+            <select id="globalDefaultProfile">
+              <option value="end_only">النهايات فقط</option>
+              <option value="start_and_end">البداية والنهاية</option>
+            </select>
+          </label>
+          <button id="saveGlobalDefaultBtn" class="button secondary" type="button">حفظ الافتراضي</button>
+          <input id="schoolSearch" type="search" placeholder="ابحث عن مدرسة…">
+        </div>
+      </div>
+      <div class="panel-body no-top">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>المدرسة</th>
+                <th>الرابط المختصر</th>
+                <th>الوضع الفعلي</th>
+                <th>تخصيص المدرسة</th>
+                <th>الحفظ</th>
+              </tr>
+            </thead>
+            <tbody id="schoolsTableBody">
+              <tr><td colspan="5"><div class="empty-state">جارٍ تحميل المدارس…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>صفحة مستقلة تجريبية — لم تُربط بلوحة المبرمج بعد.</span>
+      <span>لا تعديل على ملفات المؤقت أو الجداول أو واجهات المدارس.</span>
+    </footer>
+  </main>
+
+  <dialog id="publishDialog" class="dialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head">
+        <div>
+          <span class="section-kicker">تأكيد النشر</span>
+          <h2>نشر الإصدار لجميع المدارس</h2>
+        </div>
+        <button id="closePublishDialog" class="icon-button" type="button" aria-label="إغلاق">×</button>
+      </div>
+      <p id="publishDialogText">—</p>
+      <div class="confirm-box">
+        <label>اكتب كلمة <strong>نشر</strong> للتأكيد
+          <input id="publishConfirmation" type="text" autocomplete="off">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button id="cancelPublishBtn" class="button secondary" type="button">إلغاء</button>
+        <button id="confirmPublishBtn" class="button danger" type="button" disabled>نشر الإصدار</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="audioDock" class="audio-dock" hidden>
+    <div>
+      <span>معاينة الصوت</span>
+      <strong id="audioDockTitle">—</strong>
+    </div>
+    <audio id="audioPreview" controls preload="metadata"></audio>
+    <button id="closeAudioDock" class="icon-button" type="button" aria-label="إغلاق المعاينة">×</button>
+  </div>
+
+  <script src="supabase.min.js?v=2-local-audio-01"></script>
+  <script src="supabase-config.js?v=optimized-03"></script>
+  <script src="programmer-audio.js?v=1.0.0"></script>
+</body>
+</html>
+
