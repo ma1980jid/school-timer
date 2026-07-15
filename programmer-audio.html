@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>إدارة الصوتيات المركزية - مؤقت الحصص</title>
-  <link rel="stylesheet" href="programmer-audio.css?v=1.0.0">
+  <link rel="stylesheet" href="programmer-audio.css?v=2.0.0">
 </head>
 <body class="auth-pending">
   <main id="loginView" class="login-view" hidden>
@@ -14,7 +14,7 @@
         <span class="brand-icon" aria-hidden="true">♪</span>
         <span class="eyebrow light">برنامج Windows</span>
         <h1>الصوتيات المركزية</h1>
-        <p>دخول المبرمج لإدارة حزمة أصوات موحدة تُنشر لجميع المدارس.</p>
+        <p>دخول المبرمج لإدارة إصدارات البنين والبنات وحملات المناسبات.</p>
       </div>
       <form id="loginForm" class="login-form">
         <span class="eyebrow">حساب المبرمج</span>
@@ -37,7 +37,7 @@
       <div class="hero-copy">
         <span class="eyebrow light">إعدادات المبرمج · برنامج Windows</span>
         <h1>إدارة الصوتيات المركزية</h1>
-        <p>ارفع الحزمة، اختر مقطعي التوعية، راجع المسودة ثم انشر إصدارًا مكتملًا لجميع المدارس.</p>
+        <p>إصدارات مستقلة للبنين والبنات، تدوير أسبوعي للإرشادات، وحملات صوتية مجدولة للمناسبات.</p>
       </div>
       <div class="hero-actions">
         <a class="button ghost" href="windows-admin.html">العودة إلى إدارة Windows</a>
@@ -48,22 +48,48 @@
 
     <section id="pageStatus" class="notice" role="status" hidden></section>
 
-    <section class="stats" aria-label="ملخص الصوتيات">
-      <article class="stat-card">
-        <span>الإصدار المنشور</span>
-        <strong id="statPublishedVersion">—</strong>
+    <section id="migrationNotice" class="notice warn migration-notice" hidden>
+      <div>
+        <strong>ترقية قاعدة الصوتيات مطلوبة</strong>
+        <span>نفّذ الملف <bdi>database/windows_audio_central_v2.sql</bdi> في Supabase ثم حدّث الصفحة.</span>
+      </div>
+    </section>
+
+    <section class="stats stats-six" aria-label="ملخص الصوتيات">
+      <article class="stat-card audience-stat boys">
+        <span>إصدار البنين</span>
+        <strong id="statBoysVersion">—</strong>
+      </article>
+      <article class="stat-card audience-stat girls">
+        <span>إصدار البنات</span>
+        <strong id="statGirlsVersion">—</strong>
       </article>
       <article class="stat-card">
-        <span>ملفات الإصدار</span>
-        <strong id="statPublishedAssets">0</strong>
+        <span>الحملات الفعالة</span>
+        <strong id="statActiveCampaigns">0</strong>
       </article>
       <article class="stat-card">
         <span>المسودات</span>
         <strong id="statDrafts">0</strong>
       </article>
       <article class="stat-card">
-        <span>المدارس المخصصة</span>
-        <strong id="statSchoolOverrides">0</strong>
+        <span>إرشادات هذا الأسبوع</span>
+        <strong id="statWeeklyGuidance">—</strong>
+      </article>
+      <article class="stat-card">
+        <span>اختيارات المدارس</span>
+        <strong id="statSchoolChoices">0</strong>
+      </article>
+    </section>
+
+    <section class="channel-strip" aria-label="قنوات الصوتيات">
+      <article class="channel-card boys" id="boysChannelCard">
+        <div class="channel-icon" aria-hidden="true">ب</div>
+        <div><span>مدارس البنين</span><h2 id="boysChannelTitle">لا يوجد إصدار منشور</h2><p id="boysChannelMeta">ارفع حزمة البنين ثم انشرها.</p></div>
+      </article>
+      <article class="channel-card girls" id="girlsChannelCard">
+        <div class="channel-icon" aria-hidden="true">ن</div>
+        <div><span>مدارس البنات</span><h2 id="girlsChannelTitle">لا يوجد إصدار منشور</h2><p id="girlsChannelMeta">ارفع حزمة البنات ثم انشرها.</p></div>
       </article>
     </section>
 
@@ -78,10 +104,26 @@
         </div>
 
         <div class="panel-body form-grid">
+          <fieldset class="audience-selector">
+            <legend>الفئة المستهدفة لهذا الإصدار</legend>
+            <div class="audience-options">
+              <label class="audience-option boys active">
+                <input type="radio" name="releaseAudience" value="boys" checked>
+                <span class="audience-option-icon">ب</span>
+                <span><strong>مدارس البنين</strong><small>أصوات وصياغات مناسبة للبنين.</small></span>
+              </label>
+              <label class="audience-option girls">
+                <input type="radio" name="releaseAudience" value="girls">
+                <span class="audience-option-icon">ن</span>
+                <span><strong>مدارس البنات</strong><small>أصوات وصياغات مناسبة للبنات.</small></span>
+              </label>
+            </div>
+          </fieldset>
+
           <label class="folder-picker" for="audioFolderInput">
             <span class="folder-icon" aria-hidden="true">＋</span>
             <strong>اختيار مجلد الحزمة المنظمة</strong>
-            <small>بعد فك ZIP اختر مجلد <bdi>school-timer-audio-pack</bdi> كاملًا.</small>
+            <small>اختر مجلد <bdi>school-timer-audio-pack</bdi> كاملًا للفئة المحددة.</small>
             <input id="audioFolderInput" type="file" webkitdirectory directory multiple accept="audio/mpeg,.mp3,.json,.csv,.md">
           </label>
 
@@ -94,9 +136,9 @@
 
           <div class="field-grid two">
             <label>اسم الإصدار
-              <input id="releaseTitle" type="text" value="الإصدار الصوتي الأول" maxlength="120">
+              <input id="releaseTitle" type="text" value="الإصدار الصوتي الرسمي" maxlength="120">
             </label>
-            <label>الوضع الافتراضي للمدارس
+            <label>الوضع الاحتياطي للمدارس الجديدة
               <select id="releaseDefaultProfile">
                 <option value="end_only">النهايات فقط</option>
                 <option value="start_and_end">البداية والنهاية</option>
@@ -105,19 +147,23 @@
           </div>
 
           <label>ملاحظات الإصدار
-            <textarea id="releaseNotes" rows="3" maxlength="600" placeholder="مثال: الحزمة الأولى المنظمة لأصوات الطابور والحصص والإرشادات."></textarea>
+            <textarea id="releaseNotes" rows="3" maxlength="600" placeholder="مثال: إصدار مدارس البنين للفصل الدراسي الأول."></textarea>
           </label>
 
-          <fieldset class="awareness-box">
-            <legend>مقطعا التوعية بعد الطابور</legend>
-            <p>يعمل المقطع الأول، وعند انتهائه يبدأ الثاني مباشرة. لا يوجد تدوير أسبوعي.</p>
-            <div class="field-grid two">
-              <label>التوعية الأولى
-                <select id="awarenessFirst" disabled><option value="">اختر الحزمة أولًا</option></select>
-              </label>
-              <label>التوعية الثانية
-                <select id="awarenessSecond" disabled><option value="">اختر الحزمة أولًا</option></select>
-              </label>
+          <fieldset class="rotation-builder">
+            <legend>دورة الإرشادات الأسبوعية</legend>
+            <div class="rotation-intro">
+              <p>حدد مقطعين أو أكثر من بطاقات الإرشادات أدناه. إذا زاد العدد على مقطعين تنتقل الدورة تلقائيًا كل يوم أحد.</p>
+              <span id="awarenessSelectedBadge" class="pill muted">0 مختارة</span>
+            </div>
+            <div id="awarenessSelectedList" class="awareness-selected-list">
+              <div class="empty-state">اختر الحزمة ثم أضف الإرشادات إلى الدورة.</div>
+            </div>
+            <div class="rotation-preview-wrap">
+              <div class="subhead"><h3>معاينة الأسابيع القادمة</h3><span class="pill">يبدأ الأحد</span></div>
+              <div id="rotationPreview" class="rotation-preview">
+                <div class="empty-state">تظهر المعاينة بعد اختيار مقطعين على الأقل.</div>
+              </div>
             </div>
           </fieldset>
 
@@ -137,23 +183,20 @@
             <span class="section-kicker">الخطوة 2</span>
             <h2>المراجعة والنشر</h2>
           </div>
+          <span id="draftsBadge" class="pill">0</span>
         </div>
         <div class="panel-body">
-          <div id="publishedReleaseCard" class="release-card published">
-            <span class="release-state">الإصدار المنشور</span>
-            <h3>لا يوجد إصدار منشور</h3>
-            <p>أنشئ مسودة مكتملة ثم انشرها.</p>
+          <div class="published-grid">
+            <div id="publishedBoysCard" class="release-card published audience-release boys">
+              <span class="release-state">منشور للبنين</span><h3>لا يوجد إصدار</h3><p>أنشئ مسودة البنين ثم انشرها.</p>
+            </div>
+            <div id="publishedGirlsCard" class="release-card published audience-release girls">
+              <span class="release-state">منشور للبنات</span><h3>لا يوجد إصدار</h3><p>أنشئ مسودة البنات ثم انشرها.</p>
+            </div>
           </div>
-          <div class="subhead">
-            <h3>المسودات</h3>
-            <span id="draftsBadge" class="pill">0</span>
-          </div>
-          <div id="draftsList" class="drafts-list">
-            <div class="empty-state">لا توجد مسودات.</div>
-          </div>
-          <div class="security-note">
-            لا تستقبل نسخ Windows أي ملف من المسودة؛ يبدأ التحديث فقط بعد النشر الناجح.
-          </div>
+          <div class="subhead"><h3>المسودات</h3><span class="pill muted">لا تصل إلى المدارس</span></div>
+          <div id="draftsList" class="drafts-list"><div class="empty-state">لا توجد مسودات.</div></div>
+          <div class="security-note">كل فئة لها إصدار مستقل. نشر إصدار البنين لا يغيّر إصدار البنات والعكس.</div>
         </div>
       </aside>
     </section>
@@ -163,6 +206,7 @@
         <div>
           <span class="section-kicker">المراجعة المحلية</span>
           <h2>محتويات الحزمة قبل الرفع</h2>
+          <p class="panel-description">الإرشادات تحتوي زر «إضافة للدورة»؛ ترتيب الإضافة هو ترتيب التدوير.</p>
         </div>
         <div class="library-tools">
           <div class="segmented" id="assetFilter" role="group" aria-label="تصفية الملفات">
@@ -180,65 +224,106 @@
       </div>
     </section>
 
-    <section class="panel schools-panel">
+    <section class="panel campaigns-panel">
       <div class="panel-head responsive-head">
         <div>
           <span class="section-kicker">الخطوة 3</span>
-          <h2>الوضع الصوتي لكل مدرسة</h2>
-          <p class="panel-description">المدرسة لا تغيّر الوضع؛ يحدده المبرمج مركزيًا.</p>
+          <h2>حملات المناسبات</h2>
+          <p class="panel-description">مقطع مؤقت يعمم على الجميع أو على فئة محددة، ويتوقف تلقائيًا بانتهاء المدة.</p>
         </div>
-        <div class="school-toolbar">
-          <label class="compact-label">الوضع الافتراضي
-            <select id="globalDefaultProfile">
-              <option value="end_only">النهايات فقط</option>
-              <option value="start_and_end">البداية والنهاية</option>
+        <span id="campaignsBadge" class="pill">0 حملة</span>
+      </div>
+      <div class="panel-body campaigns-layout">
+        <form id="campaignForm" class="campaign-form">
+          <div class="form-section-title"><span class="campaign-symbol">✦</span><div><h3>إنشاء حملة صوتية</h3><p>مثال: اليوم الوطني، يوم المعلم، مناسبة دينية أو توجيه عاجل.</p></div></div>
+          <label>اسم المناسبة
+            <input id="campaignTitle" type="text" maxlength="140" placeholder="مثال: تهنئة اليوم الوطني" required>
+          </label>
+          <label class="campaign-file-picker">الملف الصوتي
+            <input id="campaignFile" type="file" accept="audio/mpeg,.mp3" required>
+            <span id="campaignFileName">لم يتم اختيار ملف</span>
+          </label>
+          <div class="field-grid two">
+            <label>الفئة المستهدفة
+              <select id="campaignAudience">
+                <option value="all">جميع المدارس</option>
+                <option value="boys">مدارس البنين</option>
+                <option value="girls">مدارس البنات</option>
+              </select>
+            </label>
+            <label>موضع التشغيل
+              <select id="campaignSlot">
+                <option value="after_assembly">بعد الطابور والتوعيات</option>
+                <option value="before_first_period">قبل بداية الحصة الأولى</option>
+                <option value="after_break">بعد انتهاء الفسحة</option>
+                <option value="end_of_day">في نهاية اليوم الدراسي</option>
+              </select>
+            </label>
+          </div>
+          <div class="field-grid two">
+            <label>تاريخ البداية<input id="campaignStartsOn" type="date" required></label>
+            <label>تاريخ النهاية<input id="campaignEndsOn" type="date" required></label>
+          </div>
+          <label>التشغيل اليومي
+            <select id="campaignDailyLimit">
+              <option value="1">مرة واحدة يوميًا</option>
             </select>
           </label>
-          <button id="saveGlobalDefaultBtn" class="button secondary" type="button">حفظ الافتراضي</button>
-          <input id="schoolSearch" type="search" placeholder="ابحث عن مدرسة…">
+          <div id="campaignProgress" class="progress-block" hidden>
+            <div class="progress-label"><span>جارٍ رفع المناسبة…</span><strong id="campaignProgressPercent">0%</strong></div>
+            <progress id="campaignProgressBar" max="100" value="0"></progress>
+          </div>
+          <button id="createCampaignBtn" class="button primary wide" type="submit">نشر حملة المناسبة</button>
+        </form>
+
+        <div class="campaigns-library">
+          <div class="subhead"><h3>الحملات المنشورة</h3><div class="segmented compact" id="campaignFilter"><button class="active" type="button" data-campaign-filter="all">الكل</button><button type="button" data-campaign-filter="active">الفعالة</button><button type="button" data-campaign-filter="scheduled">القادمة</button><button type="button" data-campaign-filter="ended">المنتهية</button></div></div>
+          <div id="campaignsList" class="campaigns-list"><div class="empty-state large">لا توجد حملات صوتية.</div></div>
         </div>
+      </div>
+    </section>
+
+    <section class="panel schools-panel">
+      <div class="panel-head responsive-head">
+        <div>
+          <span class="section-kicker">الخطوة 4</span>
+          <h2>اختيار مدير المدرسة</h2>
+          <p class="panel-description">المبرمج يرفع الصوتيات، ومدير المدرسة يختار «النهايات فقط» أو «البداية والنهاية» دون صلاحية رفع الملفات.</p>
+        </div>
+        <input id="schoolSearch" type="search" placeholder="ابحث عن مدرسة…">
       </div>
       <div class="panel-body no-top">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>المدرسة</th>
-                <th>الرابط المختصر</th>
-                <th>الوضع الفعلي</th>
-                <th>تخصيص المدرسة</th>
-                <th>الحفظ</th>
-              </tr>
-            </thead>
-            <tbody id="schoolsTableBody">
-              <tr><td colspan="5"><div class="empty-state">جارٍ تحميل المدارس…</div></td></tr>
-            </tbody>
+            <thead><tr><th>المدرسة</th><th>الفئة</th><th>النظام المختار</th><th>مصدر الاختيار</th><th>صفحة المدير</th></tr></thead>
+            <tbody id="schoolsTableBody"><tr><td colspan="5"><div class="empty-state">جارٍ تحميل المدارس…</div></td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
+    <section class="smart-features">
+      <article><span>✓</span><div><h3>منع التداخل</h3><p>لا يبدأ المقطع التالي إلا بعد حدث انتهاء الصوت السابق.</p></div></article>
+      <article><span>↻</span><div><h3>تدوير يمكن توقعه</h3><p>بداية موحدة يوم الأحد ومعاينة الأسابيع قبل النشر.</p></div></article>
+      <article><span>⌛</span><div><h3>انتهاء تلقائي للمناسبة</h3><p>تتوقف الحملة بانتهاء تاريخها دون تدخل يدوي.</p></div></article>
+      <article><span>▣</span><div><h3>إصدارات قابلة للتتبع</h3><p>يبقى كل إصدار مؤرشفًا مع سجل تغييرات مركزي.</p></div></article>
+    </section>
+
     <footer class="page-footer">
-      <span>صفحة مستقلة تجريبية — لم تُربط بلوحة المبرمج بعد.</span>
-      <span>لا تعديل على ملفات المؤقت أو الجداول أو واجهات المدارس.</span>
+      <span>إدارة الملفات للمبرمج فقط؛ مدير المدرسة يختار نظام التشغيل دون رفع أصوات.</span>
+      <span>تظل جداول المؤقت وواجهات العرض دون تعديل في هذه المرحلة.</span>
     </footer>
   </main>
 
   <dialog id="publishDialog" class="dialog">
     <form method="dialog" class="dialog-card">
       <div class="dialog-head">
-        <div>
-          <span class="section-kicker">تأكيد النشر</span>
-          <h2>نشر الإصدار لجميع المدارس</h2>
-        </div>
+        <div><span class="section-kicker">تأكيد النشر</span><h2>نشر الإصدار للفئة المحددة</h2></div>
         <button id="closePublishDialog" class="icon-button" type="button" aria-label="إغلاق">×</button>
       </div>
       <p id="publishDialogText">—</p>
-      <div class="confirm-box">
-        <label>اكتب كلمة <strong>نشر</strong> للتأكيد
-          <input id="publishConfirmation" type="text" autocomplete="off">
-        </label>
-      </div>
+      <div id="publishRotationSummary" class="dialog-summary"></div>
+      <div class="confirm-box"><label>اكتب كلمة <strong>نشر</strong> للتأكيد<input id="publishConfirmation" type="text" autocomplete="off"></label></div>
       <div class="dialog-actions">
         <button id="cancelPublishBtn" class="button secondary" type="button">إلغاء</button>
         <button id="confirmPublishBtn" class="button danger" type="button" disabled>نشر الإصدار</button>
@@ -247,17 +332,13 @@
   </dialog>
 
   <div id="audioDock" class="audio-dock" hidden>
-    <div>
-      <span>معاينة الصوت</span>
-      <strong id="audioDockTitle">—</strong>
-    </div>
+    <div><span>معاينة الصوت</span><strong id="audioDockTitle">—</strong></div>
     <audio id="audioPreview" controls preload="metadata"></audio>
     <button id="closeAudioDock" class="icon-button" type="button" aria-label="إغلاق المعاينة">×</button>
   </div>
 
-  <script src="supabase.min.js?v=2-local-audio-01"></script>
+  <script src="supabase.min.js?v=2-local-audio-02"></script>
   <script src="supabase-config.js?v=optimized-03"></script>
-  <script src="programmer-audio.js?v=1.0.0"></script>
+  <script src="programmer-audio.js?v=2.0.0"></script>
 </body>
 </html>
-
