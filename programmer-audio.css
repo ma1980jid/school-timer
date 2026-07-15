@@ -1362,6 +1362,27 @@ tr:last-child td {
   box-shadow: 0 0 0 3px rgba(20, 184, 166, .08);
 }
 
+.asset-route {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.asset-route select {
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--navy);
+  background: var(--soft);
+  font: inherit;
+}
+
 .asset-card-controls {
   display: flex;
   align-items: center;
