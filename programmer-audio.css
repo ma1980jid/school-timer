@@ -507,6 +507,72 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.guidance-route-overview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.guidance-route-card {
+  min-width: 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  border: 1px solid #d9e6ec;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #fff, #f6fafc);
+}
+
+.guidance-route-card.route-before_assembly { border-color: #fde68a; background: linear-gradient(145deg, #fffbeb, #fff); }
+.guidance-route-card.route-during_break { border-color: #a7f3d0; background: linear-gradient(145deg, #ecfdf5, #fff); }
+.guidance-route-card.route-during_activity { border-color: #bfdbfe; background: linear-gradient(145deg, #eff6ff, #fff); }
+.guidance-route-card.route-during_prayer { border-color: #c4b5fd; background: linear-gradient(145deg, #f5f3ff, #fff); }
+.guidance-route-card.route-end_of_day { border-color: #fecaca; background: linear-gradient(145deg, #fff7ed, #fff); }
+
+.guidance-route-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: var(--navy);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.guidance-route-card > div:not(.guidance-route-count) {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.guidance-route-card strong {
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.guidance-route-card small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.guidance-route-count {
+  grid-column: 1 / -1;
+  padding-top: 9px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid rgba(15, 23, 42, .08);
+}
+
+.guidance-route-count b { color: var(--teal); font-size: 21px; }
+.guidance-route-count span { color: var(--muted); font-size: 9px; font-weight: 900; }
+
 .awareness-box {
   margin: 0;
   padding: 15px;
@@ -672,6 +738,62 @@ progress::-webkit-progress-value {
   margin: 0;
   color: var(--muted);
   font-size: 11px;
+  font-weight: 700;
+}
+
+.release-card-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.release-card-actions.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.archive-head {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.archived-releases-list {
+  display: grid;
+  gap: 8px;
+}
+
+.archived-release-card {
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #f8fafc;
+}
+
+.archived-release-card > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 5px 8px;
+}
+
+.archived-release-card strong {
+  overflow: hidden;
+  color: var(--navy);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archived-release-card small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -914,6 +1036,29 @@ tr:last-child td {
   background: #fff7f7;
 }
 
+.danger-text { color: var(--red); }
+
+.delete-release-dialog .dialog-card {
+  border-top: 5px solid var(--red);
+}
+
+.delete-release-warning {
+  margin: 14px 0;
+  padding: 13px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid #fdba74;
+  border-radius: 13px;
+  color: #9a3412;
+  background: #fff7ed;
+}
+
+.delete-release-warning span {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
 .dialog-actions {
   justify-content: flex-end;
 }
@@ -968,6 +1113,10 @@ tr:last-child td {
 
   .assets-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .guidance-route-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .responsive-head {
@@ -1027,6 +1176,16 @@ tr:last-child td {
 
   .assets-list {
     grid-template-columns: 1fr;
+  }
+
+  .guidance-route-overview,
+  .release-card-actions.split {
+    grid-template-columns: 1fr;
+  }
+
+  .archived-release-card {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .page-footer {
