@@ -7,6 +7,17 @@
     end_only: "النهايات فقط",
     start_and_end: "البداية والنهاية",
   };
+  const AUDIENCE_LABELS = {
+    all: "جميع المدارس",
+    boys: "مدارس البنين",
+    girls: "مدارس البنات",
+  };
+  const SLOT_LABELS = {
+    after_assembly: "بعد الطابور والتوعيات",
+    before_first_period: "قبل بداية الحصة الأولى",
+    after_break: "بعد انتهاء الفسحة",
+    end_of_day: "في نهاية اليوم الدراسي",
+  };
   const REQUIRED_SYSTEM_KEYS = [
     "assembly_start",
     "break_start",
@@ -31,14 +42,18 @@
 
   const state = {
     client: null,
+    migrationReady: false,
     localManifest: null,
     localFiles: new Map(),
     localAssets: [],
+    awarenessOrder: [],
     packageValid: false,
     assetFilter: "all",
+    campaignFilter: "all",
     releases: [],
     remoteAssets: [],
-    settings: { default_profile_key: "end_only", active_release_id: null },
+    channels: [],
+    campaigns: [],
     schools: [],
     schoolProfiles: [],
     publishingReleaseId: null,
@@ -64,13 +79,19 @@
       : "";
   }
 
-  function formatDate(value) {
+  function formatDate(value, dateOnly = false) {
     if (!value) return "—";
-    const date = new Date(value);
+    const date = dateOnly
+      ? new Date(`${String(value).slice(0, 10)}T12:00:00Z`)
+      : new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
-    return new Intl.DateTimeFormat("ar-OM", {
+    return new Intl.DateTimeFormat("ar-OM", dateOnly ? {
+      dateStyle: "medium",
+      timeZone: "Asia/Muscat",
+    } : {
       dateStyle: "medium",
       timeStyle: "short",
+      timeZone: "Asia/Muscat",
     }).format(date);
   }
 
@@ -79,6 +100,29 @@
     if (bytes < 1024) return `${bytes} بايت`;
     if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} ك.ب`;
     return `${(bytes / 1024 ** 2).toFixed(1)} م.ب`;
+  }
+
+  function omanDateString(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Muscat",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+
+  function addDays(dateString, days) {
+    const date = new Date(`${dateString}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function sundayFor(dateString) {
+    const date = new Date(`${dateString}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() - date.getUTCDay());
+    return date.toISOString().slice(0, 10);
   }
 
   function showStatus(message, type = "success", sticky = false) {
@@ -123,9 +167,8 @@
   }
 
   async function authorizeSession() {
-    let client;
     try {
-      client = createClient();
+      const client = createClient();
       const { data, error } = await client.auth.getSession();
       if (error) throw error;
       const user = data?.session?.user;
@@ -189,7 +232,16 @@
     document.body.classList.remove("auth-pending");
     $("loginView").hidden = true;
     $("appView").hidden = false;
+    setCampaignDefaultDates();
     await loadRemoteData({ silent: true });
+  }
+
+  function selectedAudience() {
+    return document.querySelector('input[name="releaseAudience"]:checked')?.value || "boys";
+  }
+
+  function normalizeSchoolAudience(schoolType, schoolName = "") {
+    return /(بنات|إناث|اناث|female|girls)/i.test(`${schoolType || ""} ${schoolName || ""}`) ? "girls" : "boys";
   }
 
   function normalizeSelectedPath(file) {
@@ -203,6 +255,7 @@
     state.localManifest = null;
     state.localFiles = new Map();
     state.localAssets = [];
+    state.awarenessOrder = [];
     state.packageValid = false;
 
     const files = Array.from(fileList || []);
@@ -238,6 +291,7 @@
         active: item.active !== false,
       }));
       state.localAssets = [...systemAssets, ...guidanceAssets];
+      state.awarenessOrder = guidanceAssets.filter((asset) => asset.active).map((asset) => asset.assetKey);
 
       const missingFiles = state.localAssets.filter((asset) => !state.localFiles.has(asset.filePath));
       const availableSystemKeys = new Set(systemAssets.map((asset) => asset.assetKey));
@@ -248,7 +302,7 @@
 
       state.packageValid = (
         systemAssets.length === REQUIRED_SYSTEM_KEYS.length
-        && guidanceAssets.length > 0
+        && guidanceAssets.length >= 2
         && missingFiles.length === 0
         && missingSystemKeys.length === 0
         && duplicateKeys.length === 0
@@ -262,7 +316,7 @@
         missingSystemKeys,
         duplicateKeys,
       });
-      populateAwarenessSelectors(guidanceAssets);
+      renderAwarenessSelection();
       renderLocalAssets();
       validateDraftReadiness();
     } catch (error) {
@@ -276,10 +330,9 @@
     $("localPackageBadge").className = "pill warn";
     $("localPackageBadge").textContent = "الحزمة غير صالحة";
     $("localAssetsList").innerHTML = `<div class="empty-state large">${escapeHtml(message)}</div>`;
-    $("awarenessFirst").innerHTML = '<option value="">اختر الحزمة أولًا</option>';
-    $("awarenessSecond").innerHTML = '<option value="">اختر الحزمة أولًا</option>';
-    $("awarenessFirst").disabled = true;
-    $("awarenessSecond").disabled = true;
+    $("awarenessSelectedList").innerHTML = '<div class="empty-state">اختر الحزمة ثم أضف الإرشادات إلى الدورة.</div>';
+    $("rotationPreview").innerHTML = '<div class="empty-state">تظهر المعاينة بعد اختيار مقطعين على الأقل.</div>';
+    $("awarenessSelectedBadge").textContent = "0 مختارة";
     $("createDraftBtn").disabled = true;
     showStatus(message, "error", true);
   }
@@ -289,6 +342,7 @@
     const issues = [];
     if (details.systemAssets.length !== REQUIRED_SYSTEM_KEYS.length) issues.push("عدد أصوات النظام غير مكتمل");
     if (details.missingSystemKeys.length) issues.push(`${details.missingSystemKeys.length} حدث مفقود`);
+    if (details.guidanceAssets.length < 2) issues.push("يلزم مقطعا إرشاد على الأقل");
     if (details.missingFiles.length) issues.push(`${details.missingFiles.length} ملف غير موجود`);
     if (details.duplicateKeys.length) issues.push("معرفات مكررة");
 
@@ -302,32 +356,108 @@
     $("localPackageBadge").textContent = state.packageValid ? "الحزمة سليمة" : "تحتاج مراجعة";
 
     if (state.packageValid) {
-      showStatus(`تم التحقق من ${state.localAssets.length} ملفًا صوتيًا داخل الحزمة.`, "success");
+      showStatus(`تم التحقق من ${state.localAssets.length} ملفًا، وأضيفت الإرشادات المفعلة إلى الدورة.`, "success");
     } else {
       showStatus(`الحزمة غير مكتملة: ${issues.join("، ")}.`, "error", true);
     }
   }
 
-  function populateAwarenessSelectors(guidanceAssets) {
-    const options = [
-      '<option value="">— اختر مقطعًا —</option>',
-      ...guidanceAssets.map((asset) => (
-        `<option value="${escapeHtml(asset.assetKey)}">${escapeHtml(asset.titleAr)} · ${escapeHtml(asset.categoryAr)}</option>`
-      )),
-    ].join("");
-    $("awarenessFirst").innerHTML = options;
-    $("awarenessSecond").innerHTML = options;
-    $("awarenessFirst").disabled = false;
-    $("awarenessSecond").disabled = false;
+  function awarenessAsset(assetKey) {
+    return state.localAssets.find((asset) => asset.assetKey === assetKey && asset.kind === "guidance");
+  }
+
+  function renderAwarenessSelection() {
+    const list = $("awarenessSelectedList");
+    const validOrder = state.awarenessOrder.filter((assetKey) => awarenessAsset(assetKey));
+    state.awarenessOrder = validOrder;
+    $("awarenessSelectedBadge").className = `pill ${validOrder.length >= 2 ? "success" : "warn"}`;
+    $("awarenessSelectedBadge").textContent = `${validOrder.length} مختارة`;
+
+    if (!validOrder.length) {
+      list.innerHTML = '<div class="empty-state">أضف مقطعين على الأقل من بطاقات الإرشادات.</div>';
+    } else {
+      list.innerHTML = validOrder.map((assetKey, index) => {
+        const asset = awarenessAsset(assetKey);
+        return `<article class="awareness-row">
+          <span class="awareness-order">${index + 1}</span>
+          <div class="awareness-row-copy"><strong>${escapeHtml(asset.titleAr)}</strong><small>${escapeHtml(asset.categoryAr)}</small></div>
+          <div class="awareness-row-actions">
+            <button class="mini-button" type="button" data-awareness-move="up" data-awareness-key="${escapeHtml(assetKey)}" aria-label="تحريك لأعلى" ${index === 0 ? "disabled" : ""}>↑</button>
+            <button class="mini-button" type="button" data-awareness-move="down" data-awareness-key="${escapeHtml(assetKey)}" aria-label="تحريك لأسفل" ${index === validOrder.length - 1 ? "disabled" : ""}>↓</button>
+            <button class="mini-button danger" type="button" data-awareness-remove="${escapeHtml(assetKey)}" aria-label="إزالة">×</button>
+          </div>
+        </article>`;
+      }).join("");
+      list.querySelectorAll("[data-awareness-move]").forEach((button) => {
+        button.addEventListener("click", () => moveAwareness(button.dataset.awarenessKey, button.dataset.awarenessMove));
+      });
+      list.querySelectorAll("[data-awareness-remove]").forEach((button) => {
+        button.addEventListener("click", () => toggleAwareness(button.dataset.awarenessRemove, false));
+      });
+    }
+
+    renderRotationPreview();
+    validateDraftReadiness();
+  }
+
+  function moveAwareness(assetKey, direction) {
+    const index = state.awarenessOrder.indexOf(assetKey);
+    if (index < 0) return;
+    const target = direction === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= state.awarenessOrder.length) return;
+    [state.awarenessOrder[index], state.awarenessOrder[target]] = [state.awarenessOrder[target], state.awarenessOrder[index]];
+    renderAwarenessSelection();
+    renderLocalAssets();
+  }
+
+  function toggleAwareness(assetKey, forceValue) {
+    const asset = awarenessAsset(assetKey);
+    if (!asset) return;
+    const exists = state.awarenessOrder.includes(assetKey);
+    const shouldAdd = forceValue === undefined ? !exists : forceValue;
+    if (shouldAdd && !exists) {
+      asset.active = true;
+      state.awarenessOrder.push(assetKey);
+    } else if (!shouldAdd && exists) {
+      state.awarenessOrder = state.awarenessOrder.filter((key) => key !== assetKey);
+    }
+    renderAwarenessSelection();
+    renderLocalAssets();
+  }
+
+  function renderRotationPreview() {
+    const preview = $("rotationPreview");
+    const order = state.awarenessOrder;
+    if (order.length < 2) {
+      preview.innerHTML = '<div class="empty-state">تظهر المعاينة بعد اختيار مقطعين على الأقل.</div>';
+      return;
+    }
+    const currentSunday = sundayFor(omanDateString());
+    preview.innerHTML = Array.from({ length: 6 }, (_, weekIndex) => {
+      const firstIndex = order.length === 2 ? 0 : (weekIndex * 2) % order.length;
+      const first = awarenessAsset(order[firstIndex]);
+      const second = awarenessAsset(order[(firstIndex + 1) % order.length]);
+      const weekDate = addDays(currentSunday, weekIndex * 7);
+      return `<article class="rotation-week ${weekIndex === 0 ? "current" : ""}">
+        <span>${weekIndex === 0 ? "الأسبوع الحالي" : `أسبوع ${formatDate(weekDate, true)}`}</span>
+        <strong>1. ${escapeHtml(first?.titleAr || "—")}</strong>
+        <strong>2. ${escapeHtml(second?.titleAr || "—")}</strong>
+      </article>`;
+    }).join("");
   }
 
   function validateDraftReadiness() {
-    const first = $("awarenessFirst").value;
-    const second = $("awarenessSecond").value;
-    const selectedAssets = state.localAssets.filter((asset) => first === asset.assetKey || second === asset.assetKey);
-    const awarenessReady = Boolean(first && second && first !== second && selectedAssets.length === 2 && selectedAssets.every((asset) => asset.active));
+    const selectedAssets = state.awarenessOrder.map(awarenessAsset).filter(Boolean);
+    const awarenessReady = state.awarenessOrder.length >= 2
+      && new Set(state.awarenessOrder).size === state.awarenessOrder.length
+      && selectedAssets.length === state.awarenessOrder.length
+      && selectedAssets.every((asset) => asset.active);
     const titleReady = Boolean($("releaseTitle").value.trim());
-    $("createDraftBtn").disabled = state.busy || !state.packageValid || !awarenessReady || !titleReady;
+    $("createDraftBtn").disabled = state.busy
+      || !state.migrationReady
+      || !state.packageValid
+      || !awarenessReady
+      || !titleReady;
   }
 
   function renderLocalAssets() {
@@ -349,7 +479,8 @@
 
     $("localAssetsList").innerHTML = filtered.map((asset) => {
       const file = state.localFiles.get(asset.filePath);
-      return `<article class="asset-card" data-asset-key="${escapeHtml(asset.assetKey)}">
+      const selected = state.awarenessOrder.includes(asset.assetKey);
+      return `<article class="asset-card ${selected ? "selected-for-rotation" : ""}" data-asset-key="${escapeHtml(asset.assetKey)}">
         <div class="asset-card-top">
           <span class="tag ${asset.kind === "system_event" ? "system" : ""}">${escapeHtml(asset.categoryAr)}</span>
           <label class="asset-check"><input type="checkbox" data-asset-active="${escapeHtml(asset.assetKey)}" ${asset.active ? "checked" : ""}> مفعّل</label>
@@ -358,7 +489,10 @@
         <p title="${escapeHtml(asset.filePath)}">${escapeHtml(asset.filePath)}</p>
         <div class="asset-card-actions">
           <span class="pill muted">${formatBytes(file?.size || 0)}</span>
-          <button class="button secondary small" type="button" data-preview-key="${escapeHtml(asset.assetKey)}">تشغيل</button>
+          <div class="asset-card-controls">
+            ${asset.kind === "guidance" ? `<button class="button secondary small rotation-toggle ${selected ? "active" : ""}" type="button" data-toggle-awareness="${escapeHtml(asset.assetKey)}">${selected ? "ضمن الدورة ✓" : "إضافة للدورة"}</button>` : ""}
+            <button class="button secondary small" type="button" data-preview-key="${escapeHtml(asset.assetKey)}">تشغيل</button>
+          </div>
         </div>
       </article>`;
     }).join("");
@@ -366,11 +500,21 @@
     $("localAssetsList").querySelectorAll("[data-preview-key]").forEach((button) => {
       button.addEventListener("click", () => previewLocalAsset(button.dataset.previewKey));
     });
+    $("localAssetsList").querySelectorAll("[data-toggle-awareness]").forEach((button) => {
+      button.addEventListener("click", () => toggleAwareness(button.dataset.toggleAwareness));
+    });
     $("localAssetsList").querySelectorAll("[data-asset-active]").forEach((input) => {
       input.addEventListener("change", () => {
         const asset = state.localAssets.find((item) => item.assetKey === input.dataset.assetActive);
-        if (asset) asset.active = input.checked;
-        validateDraftReadiness();
+        if (!asset) return;
+        asset.active = input.checked;
+        if (!asset.active && state.awarenessOrder.includes(asset.assetKey)) {
+          state.awarenessOrder = state.awarenessOrder.filter((key) => key !== asset.assetKey);
+          renderAwarenessSelection();
+        } else {
+          validateDraftReadiness();
+        }
+        renderLocalAssets();
       });
     });
   }
@@ -379,10 +523,15 @@
     const asset = state.localAssets.find((item) => item.assetKey === assetKey);
     const file = asset && state.localFiles.get(asset.filePath);
     if (!asset || !file) return;
+    const previewUrl = URL.createObjectURL(file);
+    openAudioPreview(previewUrl, asset.titleAr, true);
+  }
+
+  function openAudioPreview(url, title, objectUrl = false) {
     closeAudioPreview();
-    state.previewUrl = URL.createObjectURL(file);
-    $("audioDockTitle").textContent = asset.titleAr;
-    $("audioPreview").src = state.previewUrl;
+    if (objectUrl) state.previewUrl = url;
+    $("audioDockTitle").textContent = title;
+    $("audioPreview").src = url;
     $("audioDock").hidden = false;
     $("audioPreview").play().catch(() => {});
   }
@@ -409,7 +558,10 @@
     return new Promise((resolve) => {
       const audio = document.createElement("audio");
       const url = URL.createObjectURL(file);
+      let finished = false;
       const finish = (value) => {
+        if (finished) return;
+        finished = true;
         clearTimeout(timer);
         URL.revokeObjectURL(url);
         audio.removeAttribute("src");
@@ -454,13 +606,18 @@
   function preparedManifest() {
     const manifest = JSON.parse(JSON.stringify(state.localManifest));
     manifest.central_config = {
+      schema_version: 2,
+      target_audience: selectedAudience(),
       default_profile: $("releaseDefaultProfile").value,
-      awareness_sequence: [$("awarenessFirst").value, $("awarenessSecond").value],
-      awareness_rotation: false,
+      awareness_sequence: [...state.awarenessOrder],
+      awareness_rotation: state.awarenessOrder.length > 2,
+      clips_per_week: 2,
+      week_starts_on: "sunday",
+      timezone: "Asia/Muscat",
       transition: "start_next_when_current_ends",
       fixed_delay_seconds: 0,
       prevent_overlap: true,
-      school_controls: "read_only",
+      school_controls: "profile_only",
     };
     manifest.assets = Object.fromEntries(state.localAssets.map((asset) => [asset.assetKey, {
       kind: asset.kind,
@@ -489,7 +646,8 @@
   async function createDraft() {
     validateDraftReadiness();
     if ($("createDraftBtn").disabled || state.busy) return;
-    if (!confirm("سيتم رفع جميع ملفات الحزمة إلى مساحة الصوتيات وحفظها كمسودة غير منشورة. هل تريد المتابعة؟")) return;
+    const audience = selectedAudience();
+    if (!confirm(`سيتم رفع الحزمة كمسودة مستقلة لـ${AUDIENCE_LABELS[audience]}. هل تريد المتابعة؟`)) return;
 
     state.busy = true;
     validateDraftReadiness();
@@ -504,6 +662,7 @@
           title: $("releaseTitle").value.trim(),
           notes: $("releaseNotes").value.trim() || null,
           status: "draft",
+          audience_key: audience,
           manifest,
         })
         .select("*")
@@ -516,7 +675,7 @@
       const assetRows = await runPool(state.localAssets, 3, async (asset) => {
         const file = state.localFiles.get(asset.filePath);
         if (!file) throw new Error(`الملف غير موجود: ${asset.filePath}`);
-        const storagePath = `releases/${release.id}/${asset.filePath}`;
+        const storagePath = `releases/${audience}/${release.id}/${asset.filePath}`;
         const [checksum, audioDuration] = await Promise.all([
           sha256File(file),
           readAudioDuration(file),
@@ -552,6 +711,7 @@
       manifest.release = {
         id: release.id,
         version_number: release.version_number,
+        audience_key: audience,
         storage_bucket: AUDIO_BUCKET,
       };
       manifest.assets = Object.fromEntries(assetRows.map((asset) => [asset.asset_key, {
@@ -570,20 +730,13 @@
       if (manifestError) throw manifestError;
 
       setUploadProgress(state.localAssets.length, state.localAssets.length, "اكتمل رفع المسودة");
-      showStatus(`تم حفظ الإصدار رقم ${release.version_number} كمسودة. راجعه ثم اضغط «نشر».`, "success", true);
+      showStatus(`تم حفظ الإصدار v${release.version_number} كمسودة لـ${AUDIENCE_LABELS[audience]}.`, "success", true);
       await loadRemoteData({ silent: true });
     } catch (error) {
       console.error(error);
       await rollbackDraft(releaseId, uploadedPaths);
       $("uploadProgress").hidden = true;
-      const missingSql = /does not exist|schema cache|42P01/i.test(errorText(error));
-      showStatus(
-        missingSql
-          ? "جداول الصوتيات غير موجودة. نفّذ ملف database/windows_audio_central.sql في Supabase أولًا."
-          : `تعذر إنشاء المسودة، وتم التراجع عن الملفات المرفوعة: ${errorText(error)}`,
-        "error",
-        true,
-      );
+      showStatus(`تعذر إنشاء المسودة، وتم التراجع عن الملفات المرفوعة: ${errorText(error)}`, "error", true);
     } finally {
       state.busy = false;
       validateDraftReadiness();
@@ -595,29 +748,48 @@
     $("refreshBtn").disabled = true;
     $("refreshBtn").textContent = "جارٍ التحديث…";
     try {
-      const [releasesResult, assetsResult, settingsResult, schoolsResult, profilesResult] = await Promise.all([
+      const [releasesResult, assetsResult, schoolsResult, profilesResult] = await Promise.all([
         client.from("windows_audio_releases").select("*").order("version_number", { ascending: false }),
-        client.from("windows_audio_assets").select("id,release_id,asset_key,kind,is_active,file_size_bytes"),
-        client.from("windows_audio_settings").select("*").eq("id", 1).maybeSingle(),
+        client.from("windows_audio_assets").select("id,release_id,asset_key,kind,title_ar,is_active,file_size_bytes"),
         client.from("schools").select("school_name,school_slug,is_active,school_type").order("school_name", { ascending: true }),
-        client.from("windows_school_audio_profiles").select("school_slug,profile_key,updated_at"),
+        client.from("windows_school_audio_profiles").select("*")
       ]);
-      const audioErrors = [releasesResult.error, assetsResult.error, settingsResult.error, profilesResult.error].filter(Boolean);
-      if (audioErrors.length) throw audioErrors[0];
-      if (schoolsResult.error) throw schoolsResult.error;
-      state.releases = releasesResult.data || [];
+      const coreErrors = [releasesResult.error, assetsResult.error, schoolsResult.error, profilesResult.error].filter(Boolean);
+      if (coreErrors.length) throw coreErrors[0];
+
+      state.releases = (releasesResult.data || []).map((release) => ({
+        ...release,
+        audience_key: release.audience_key || "boys",
+      }));
       state.remoteAssets = assetsResult.data || [];
-      state.settings = settingsResult.data || { id: 1, default_profile_key: "end_only", active_release_id: null };
       state.schools = schoolsResult.data || [];
       state.schoolProfiles = profilesResult.data || [];
+
+      const [channelsResult, campaignsResult] = await Promise.all([
+        client.from("windows_audio_channels").select("*").order("audience_key", { ascending: true }),
+        client.from("windows_audio_campaigns").select("*").order("created_at", { ascending: false }),
+      ]);
+      state.migrationReady = !channelsResult.error && !campaignsResult.error;
+      state.channels = channelsResult.data || [];
+      state.campaigns = campaignsResult.data || [];
+      $("migrationNotice").hidden = state.migrationReady;
+      $("campaignForm").querySelectorAll("input,select,button").forEach((control) => {
+        control.disabled = !state.migrationReady;
+      });
       renderRemoteData();
-      if (!options.silent) showStatus("تم تحديث بيانات الصوتيات المركزية.", "success");
+      validateDraftReadiness();
+
+      if (!state.migrationReady) {
+        showStatus("البيانات الأساسية تعمل، لكن ميزات الفئات والتدوير والمناسبات تحتاج تنفيذ ترقية v2 في Supabase.", "warn", true);
+      } else if (!options.silent) {
+        showStatus("تم تحديث بيانات الصوتيات المركزية.", "success");
+      }
     } catch (error) {
       console.error(error);
       const missingSql = /does not exist|schema cache|42P01|PGRST205/i.test(errorText(error));
       showStatus(
         missingSql
-          ? "قاعدة الصوتيات لم تُجهز بعد. نفّذ ملف database/windows_audio_central.sql في Supabase، ثم اضغط تحديث البيانات."
+          ? "قاعدة الصوتيات لم تُجهز بعد. نفّذ ملفي SQL بالترتيب ثم حدّث الصفحة."
           : `تعذر تحميل بيانات الصوتيات: ${errorText(error)}`,
         "error",
         true,
@@ -629,39 +801,103 @@
     }
   }
 
+  function releaseForAudience(audience) {
+    return state.releases.find((release) => release.status === "published" && release.audience_key === audience);
+  }
+
+  function channelForAudience(audience) {
+    return state.channels.find((channel) => channel.audience_key === audience);
+  }
+
+  function guidancePairForRelease(release, weekIndex = null) {
+    const sequence = release?.manifest?.central_config?.awareness_sequence || [];
+    if (sequence.length < 2) return [];
+    let resolvedWeek = weekIndex === null || weekIndex === undefined ? Number.NaN : Number(weekIndex);
+    if (!Number.isFinite(resolvedWeek)) {
+      const currentSunday = sundayFor(omanDateString());
+      const configuredAnchor = release?.manifest?.central_config?.rotation_anchor_sunday;
+      const anchorSunday = /^\d{4}-\d{2}-\d{2}$/.test(String(configuredAnchor || ""))
+        ? sundayFor(configuredAnchor)
+        : currentSunday;
+      const elapsedDays = Math.floor((new Date(`${currentSunday}T12:00:00Z`) - new Date(`${anchorSunday}T12:00:00Z`)) / 86400000);
+      resolvedWeek = Math.max(0, Math.floor(elapsedDays / 7));
+    }
+    const firstIndex = sequence.length === 2 ? 0 : (resolvedWeek * 2) % sequence.length;
+    return [sequence[firstIndex], sequence[(firstIndex + 1) % sequence.length]];
+  }
+
   function renderRemoteData() {
-    const published = state.releases.find((release) => release.status === "published");
+    const boys = releaseForAudience("boys");
+    const girls = releaseForAudience("girls");
     const drafts = state.releases.filter((release) => release.status === "draft");
-    const assetCount = published
-      ? state.remoteAssets.filter((asset) => asset.release_id === published.id && asset.is_active).length
-      : 0;
-    $("statPublishedVersion").textContent = published ? `v${published.version_number}` : "—";
-    $("statPublishedAssets").textContent = String(assetCount);
+    const activeCampaigns = state.campaigns.filter((campaign) => campaignStatus(campaign).key === "active");
+
+    $("statBoysVersion").textContent = boys ? `v${boys.version_number}` : "—";
+    $("statGirlsVersion").textContent = girls ? `v${girls.version_number}` : "—";
+    $("statActiveCampaigns").textContent = String(activeCampaigns.length);
     $("statDrafts").textContent = String(drafts.length);
-    $("statSchoolOverrides").textContent = String(state.schoolProfiles.length);
+    $("statWeeklyGuidance").textContent = `${guidancePairForRelease(boys).length} + ${guidancePairForRelease(girls).length}`;
+    $("statSchoolChoices").textContent = String(state.schoolProfiles.length);
     $("draftsBadge").textContent = String(drafts.length);
-    $("globalDefaultProfile").value = state.settings.default_profile_key || "end_only";
-    renderPublishedRelease(published, assetCount);
+    $("campaignsBadge").textContent = `${state.campaigns.length} حملة`;
+
+    renderChannel("boys", boys);
+    renderChannel("girls", girls);
+    renderPublishedRelease("boys", boys);
+    renderPublishedRelease("girls", girls);
     renderDrafts(drafts);
+    renderCampaigns();
     renderSchools();
   }
 
-  function renderPublishedRelease(release, assetCount) {
-    const card = $("publishedReleaseCard");
+  function renderChannel(audience, release) {
+    const title = $(`${audience}ChannelTitle`);
+    const meta = $(`${audience}ChannelMeta`);
     if (!release) {
-      card.innerHTML = '<span class="release-state">الإصدار المنشور</span><h3>لا يوجد إصدار منشور</h3><p>أنشئ مسودة مكتملة ثم انشرها.</p>';
+      title.textContent = "لا يوجد إصدار منشور";
+      meta.textContent = `ارفع حزمة ${audience === "boys" ? "البنين" : "البنات"} ثم انشرها.`;
       return;
     }
-    const awareness = release.manifest?.central_config?.awareness_sequence || [];
-    card.innerHTML = `<span class="release-state">الإصدار المنشور</span>
+    const sequence = release.manifest?.central_config?.awareness_sequence || [];
+    const pair = guidancePairForRelease(release);
+    const assetMap = release.manifest?.assets || {};
+    title.textContent = `v${release.version_number} · ${release.title}`;
+    meta.textContent = `${sequence.length} إرشادًا في الدورة · هذا الأسبوع: ${pair.map((key) => assetMap[key]?.title_ar || key).join(" + ")}`;
+  }
+
+  function renderPublishedRelease(audience, release) {
+    const card = audience === "boys" ? $("publishedBoysCard") : $("publishedGirlsCard");
+    if (!release) {
+      card.innerHTML = `<span class="release-state">منشور لـ${AUDIENCE_LABELS[audience]}</span><h3>لا يوجد إصدار</h3><p>أنشئ مسودة مكتملة ثم انشرها.</p>`;
+      return;
+    }
+    const assets = state.remoteAssets.filter((asset) => asset.release_id === release.id && asset.is_active);
+    const sequence = release.manifest?.central_config?.awareness_sequence || [];
+    const rotating = sequence.length > 2;
+    card.innerHTML = `<span class="release-state">منشور لـ${escapeHtml(AUDIENCE_LABELS[audience])}</span>
       <h3>v${escapeHtml(release.version_number)} · ${escapeHtml(release.title)}</h3>
       <p>${escapeHtml(release.notes || "بدون ملاحظات")}</p>
       <div class="release-meta">
-        <span class="pill success">${assetCount} ملفًا مفعلًا</span>
-        <span class="pill muted">${escapeHtml(PROFILE_LABELS[release.manifest?.central_config?.default_profile] || PROFILE_LABELS[state.settings.default_profile_key])}</span>
-        <span class="pill muted">${awareness.length} توعيات ثابتة</span>
+        <span class="pill success">${assets.length} ملفًا مفعّلًا</span>
+        <span class="pill muted">${sequence.length} إرشادًا</span>
+        <span class="pill ${rotating ? "success" : "muted"}">${rotating ? "تدوير أسبوعي" : "مقطعان ثابتان"}</span>
         <span class="pill muted">${escapeHtml(formatDate(release.published_at))}</span>
       </div>`;
+  }
+
+  function releaseReady(release) {
+    const assets = state.remoteAssets.filter((asset) => asset.release_id === release.id);
+    const assetByKey = new Map(assets.map((asset) => [asset.asset_key, asset]));
+    const sequence = release.manifest?.central_config?.awareness_sequence || [];
+    const hasSystem = REQUIRED_SYSTEM_KEYS.every((key) => assetByKey.get(key)?.kind === "system_event");
+    const hasGuidance = sequence.length >= 2
+      && new Set(sequence).size === sequence.length
+      && sequence.every((key) => {
+        const asset = assetByKey.get(key);
+        return asset?.kind === "guidance" && asset.is_active;
+      });
+    const profile = release.manifest?.central_config?.default_profile;
+    return hasSystem && hasGuidance && Object.prototype.hasOwnProperty.call(PROFILE_LABELS, profile);
   }
 
   function renderDrafts(drafts) {
@@ -672,32 +908,20 @@
     $("draftsList").innerHTML = drafts.map((release) => {
       const assets = state.remoteAssets.filter((asset) => asset.release_id === release.id);
       const activeAssets = assets.filter((asset) => asset.is_active).length;
-      const awareness = release.manifest?.central_config?.awareness_sequence || [];
-      const assetByKey = new Map(assets.map((asset) => [asset.asset_key, asset]));
-      const hasRequiredSystemAssets = REQUIRED_SYSTEM_KEYS.every((key) => (
-        assetByKey.get(key)?.kind === "system_event"
-      ));
-      const hasValidAwareness = awareness.length === 2
-        && awareness[0] !== awareness[1]
-        && awareness.every((key) => {
-          const asset = assetByKey.get(key);
-          return asset?.kind === "guidance" && asset.is_active;
-        });
-      const defaultProfile = release.manifest?.central_config?.default_profile;
-      const ready = hasRequiredSystemAssets
-        && hasValidAwareness
-        && Object.hasOwn(PROFILE_LABELS, defaultProfile);
+      const sequence = release.manifest?.central_config?.awareness_sequence || [];
+      const ready = releaseReady(release);
       return `<article class="draft-card">
         <div class="draft-card-top">
           <div><h4>v${escapeHtml(release.version_number)} · ${escapeHtml(release.title)}</h4><p>${escapeHtml(formatDate(release.created_at))}</p></div>
-          <span class="release-state draft">مسودة</span>
+          <span class="audience-badge ${escapeHtml(release.audience_key)}">${escapeHtml(AUDIENCE_LABELS[release.audience_key])}</span>
         </div>
         <div class="release-meta">
           <span class="pill muted">${assets.length} ملفًا</span>
           <span class="pill muted">${activeAssets} مفعّل</span>
+          <span class="pill muted">${sequence.length} إرشادًا</span>
           <span class="pill ${ready ? "success" : "warn"}">${ready ? "جاهزة للنشر" : "غير مكتملة"}</span>
         </div>
-        <button class="button primary wide" type="button" data-publish-release="${escapeHtml(release.id)}" ${ready ? "" : "disabled"}>مراجعة ونشر</button>
+        <button class="button primary wide" type="button" data-publish-release="${escapeHtml(release.id)}" ${ready && state.migrationReady ? "" : "disabled"}>مراجعة ونشر</button>
       </article>`;
     }).join("");
     $("draftsList").querySelectorAll("[data-publish-release]").forEach((button) => {
@@ -709,9 +933,15 @@
     const release = state.releases.find((item) => item.id === releaseId && item.status === "draft");
     if (!release) return;
     state.publishingReleaseId = releaseId;
+    const sequence = release.manifest?.central_config?.awareness_sequence || [];
     $("publishConfirmation").value = "";
     $("confirmPublishBtn").disabled = true;
-    $("publishDialogText").textContent = `سيصبح الإصدار v${release.version_number} «${release.title}» هو المصدر الرسمي الذي تستقبله جميع نسخ Windows عند الاتصال. سيُؤرشف الإصدار السابق تلقائيًا.`;
+    $("publishDialogText").textContent = `سيصبح الإصدار v${release.version_number} «${release.title}» المصدر الرسمي لـ${AUDIENCE_LABELS[release.audience_key]}. سيُؤرشف الإصدار السابق للفئة نفسها فقط.`;
+    $("publishRotationSummary").innerHTML = `
+      <span>الفئة: <strong>${escapeHtml(AUDIENCE_LABELS[release.audience_key])}</strong></span>
+      <span>الإرشادات: <strong>${sequence.length}</strong></span>
+      <span>آلية التشغيل: <strong>${sequence.length > 2 ? "تدوير مقطعين كل أحد" : "مقطعان ثابتان"}</strong></span>
+      <span>الانتقال: <strong>يبدأ التالي فور انتهاء السابق</strong></span>`;
     $("publishDialog").showModal();
   }
 
@@ -732,7 +962,7 @@
       });
       if (error) throw error;
       closePublishDialog();
-      showStatus(`تم نشر الإصدار v${data.version_number} بنجاح.`, "success", true);
+      showStatus(`تم نشر الإصدار v${data.version_number} بنجاح لـ${AUDIENCE_LABELS[data.audience_key || "boys"]}.`, "success", true);
       await loadRemoteData({ silent: true });
     } catch (error) {
       console.error(error);
@@ -740,6 +970,229 @@
     } finally {
       button.textContent = "نشر الإصدار";
       button.disabled = $("publishConfirmation").value.trim() !== "نشر";
+    }
+  }
+
+  function setCampaignDefaultDates() {
+    const today = omanDateString();
+    if (!$("campaignStartsOn").value) $("campaignStartsOn").value = today;
+    if (!$("campaignEndsOn").value) $("campaignEndsOn").value = addDays(today, 6);
+  }
+
+  function campaignStatus(campaign) {
+    const today = omanDateString();
+    if (!campaign.is_active) return { key: "off", label: "موقوفة" };
+    if (today < campaign.starts_on) return { key: "scheduled", label: "قادمة" };
+    if (today > campaign.ends_on) return { key: "ended", label: "منتهية" };
+    return { key: "active", label: "فعالة الآن" };
+  }
+
+  function publicStorageUrl(path) {
+    try {
+      const result = state.client.storage.from(AUDIO_BUCKET).getPublicUrl(path);
+      return result?.data?.publicUrl || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function safeFileName(name) {
+    const extension = String(name || "audio.mp3").toLowerCase().endsWith(".mp3") ? ".mp3" : ".mp3";
+    const base = String(name || "campaign")
+      .replace(/\.[^.]+$/, "")
+      .normalize("NFKD")
+      .replace(/[^a-zA-Z0-9_-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 70) || "campaign";
+    return `${base}${extension}`;
+  }
+
+  function randomUuid() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
+      const random = Math.floor(Math.random() * 16);
+      const value = character === "x" ? random : (random & 0x3) | 0x8;
+      return value.toString(16);
+    });
+  }
+
+  async function createCampaign(event) {
+    event.preventDefault();
+    if (!state.migrationReady || state.busy) return;
+    const file = $("campaignFile").files?.[0];
+    const title = $("campaignTitle").value.trim();
+    const startsOn = $("campaignStartsOn").value;
+    const endsOn = $("campaignEndsOn").value;
+    if (!file || !title || !startsOn || !endsOn) {
+      showStatus("أكمل اسم المناسبة والملف وتاريخي البداية والنهاية.", "error");
+      return;
+    }
+    if (!/\.mp3$/i.test(file.name) && file.type !== "audio/mpeg") {
+      showStatus("ملف المناسبة يجب أن يكون بصيغة MP3.", "error");
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      showStatus("حجم ملف المناسبة أكبر من 15 ميجابايت.", "error");
+      return;
+    }
+    if (endsOn < startsOn) {
+      showStatus("تاريخ النهاية يجب أن يساوي تاريخ البداية أو يأتي بعده.", "error");
+      return;
+    }
+    if (!confirm(`سيتم نشر «${title}» حسب التاريخ والفئة المحددين. هل تريد المتابعة؟`)) return;
+
+    state.busy = true;
+    const button = $("createCampaignBtn");
+    button.disabled = true;
+    button.textContent = "جارٍ النشر…";
+    $("campaignProgress").hidden = false;
+    $("campaignProgressBar").value = 10;
+    $("campaignProgressPercent").textContent = "10%";
+    const campaignId = randomUuid();
+    const storagePath = `campaigns/${campaignId}/${safeFileName(file.name)}`;
+    let uploaded = false;
+    try {
+      const [checksum, duration] = await Promise.all([sha256File(file), readAudioDuration(file)]);
+      $("campaignProgressBar").value = 35;
+      $("campaignProgressPercent").textContent = "35%";
+      const { error: uploadError } = await state.client.storage.from(AUDIO_BUCKET).upload(storagePath, file, {
+        cacheControl: "3600",
+        contentType: "audio/mpeg",
+        upsert: false,
+      });
+      if (uploadError) throw uploadError;
+      uploaded = true;
+      $("campaignProgressBar").value = 75;
+      $("campaignProgressPercent").textContent = "75%";
+
+      const payload = {
+        id: campaignId,
+        title,
+        audience_key: $("campaignAudience").value,
+        play_slot: $("campaignSlot").value,
+        starts_on: startsOn,
+        ends_on: endsOn,
+        storage_path: storagePath,
+        file_name: file.name,
+        mime_type: "audio/mpeg",
+        file_size_bytes: file.size,
+        duration_seconds: duration,
+        checksum_sha256: checksum,
+        max_plays_per_day: Number($("campaignDailyLimit").value || 1),
+        is_active: true,
+      };
+      const { error: insertError } = await state.client.from("windows_audio_campaigns").insert(payload);
+      if (insertError) throw insertError;
+      await state.client.from("windows_audio_audit_log").insert({
+        actor_type: "programmer",
+        action: "campaign_created",
+        entity_type: "audio_campaign",
+        entity_id: campaignId,
+        details: { title, audience_key: payload.audience_key, starts_on: startsOn, ends_on: endsOn },
+      });
+
+      $("campaignProgressBar").value = 100;
+      $("campaignProgressPercent").textContent = "100%";
+      $("campaignForm").reset();
+      $("campaignFileName").textContent = "لم يتم اختيار ملف";
+      setCampaignDefaultDates();
+      showStatus("تم نشر حملة المناسبة وستصل إلى المدارس المستهدفة ضمن مدتها.", "success", true);
+      await loadRemoteData({ silent: true });
+    } catch (error) {
+      console.error(error);
+      if (uploaded) await state.client.storage.from(AUDIO_BUCKET).remove([storagePath]);
+      showStatus(`تعذر نشر المناسبة: ${errorText(error)}`, "error", true);
+    } finally {
+      state.busy = false;
+      button.disabled = !state.migrationReady;
+      button.textContent = "نشر حملة المناسبة";
+      setTimeout(() => { $("campaignProgress").hidden = true; }, 1000);
+    }
+  }
+
+  function renderCampaigns() {
+    const list = $("campaignsList");
+    const campaigns = state.campaigns.filter((campaign) => {
+      if (state.campaignFilter === "all") return true;
+      return campaignStatus(campaign).key === state.campaignFilter;
+    });
+    if (!campaigns.length) {
+      list.innerHTML = '<div class="empty-state large">لا توجد حملات ضمن هذه الفئة.</div>';
+      return;
+    }
+    list.innerHTML = campaigns.map((campaign) => {
+      const status = campaignStatus(campaign);
+      const url = publicStorageUrl(campaign.storage_path);
+      return `<article class="campaign-card ${escapeHtml(status.key)}">
+        <div>
+          <h4>${escapeHtml(campaign.title)}</h4>
+          <div class="campaign-meta">
+            <span class="campaign-status ${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>
+            <span class="audience-badge ${escapeHtml(campaign.audience_key)}">${escapeHtml(AUDIENCE_LABELS[campaign.audience_key])}</span>
+            <span>${escapeHtml(SLOT_LABELS[campaign.play_slot] || campaign.play_slot)}</span>
+            <span>${escapeHtml(formatDate(campaign.starts_on, true))} — ${escapeHtml(formatDate(campaign.ends_on, true))}</span>
+            <span>${escapeHtml(formatBytes(campaign.file_size_bytes))}</span>
+          </div>
+        </div>
+        <div class="campaign-actions">
+          <button class="button secondary small" type="button" data-preview-campaign="${escapeHtml(campaign.id)}" ${url ? "" : "disabled"}>تشغيل</button>
+          <button class="button secondary small" type="button" data-toggle-campaign="${escapeHtml(campaign.id)}">${campaign.is_active ? "إيقاف" : "إعادة التفعيل"}</button>
+          <button class="button danger small" type="button" data-delete-campaign="${escapeHtml(campaign.id)}">حذف</button>
+        </div>
+      </article>`;
+    }).join("");
+    list.querySelectorAll("[data-preview-campaign]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const campaign = state.campaigns.find((item) => item.id === button.dataset.previewCampaign);
+        const url = campaign && publicStorageUrl(campaign.storage_path);
+        if (url) openAudioPreview(url, campaign.title);
+      });
+    });
+    list.querySelectorAll("[data-toggle-campaign]").forEach((button) => {
+      button.addEventListener("click", () => toggleCampaign(button.dataset.toggleCampaign, button));
+    });
+    list.querySelectorAll("[data-delete-campaign]").forEach((button) => {
+      button.addEventListener("click", () => deleteCampaign(button.dataset.deleteCampaign, button));
+    });
+  }
+
+  async function toggleCampaign(campaignId, button) {
+    const campaign = state.campaigns.find((item) => item.id === campaignId);
+    if (!campaign) return;
+    button.disabled = true;
+    try {
+      const { error } = await state.client.from("windows_audio_campaigns").update({
+        is_active: !campaign.is_active,
+        updated_at: new Date().toISOString(),
+      }).eq("id", campaignId);
+      if (error) throw error;
+      showStatus(campaign.is_active ? "تم إيقاف الحملة." : "تمت إعادة تفعيل الحملة.", "success");
+      await loadRemoteData({ silent: true });
+    } catch (error) {
+      console.error(error);
+      showStatus(`تعذر تحديث الحملة: ${errorText(error)}`, "error", true);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function deleteCampaign(campaignId, button) {
+    const campaign = state.campaigns.find((item) => item.id === campaignId);
+    if (!campaign) return;
+    if (!confirm(`حذف حملة «${campaign.title}» نهائيًا؟ لن يمكن التراجع عن ذلك.`)) return;
+    button.disabled = true;
+    try {
+      const { error } = await state.client.from("windows_audio_campaigns").delete().eq("id", campaignId);
+      if (error) throw error;
+      const storageResult = await state.client.storage.from(AUDIO_BUCKET).remove([campaign.storage_path]);
+      if (storageResult.error) console.warn("Campaign storage cleanup failed", storageResult.error);
+      showStatus("تم حذف حملة المناسبة.", "success");
+      await loadRemoteData({ silent: true });
+    } catch (error) {
+      console.error(error);
+      showStatus(`تعذر حذف الحملة: ${errorText(error)}`, "error", true);
+    } finally {
+      button.disabled = false;
     }
   }
 
@@ -754,74 +1207,29 @@
       return;
     }
     body.innerHTML = filtered.map((school) => {
-      const override = state.schoolProfiles.find((profile) => profile.school_slug === school.school_slug);
-      const effective = override?.profile_key || state.settings.default_profile_key || "end_only";
+      const audience = normalizeSchoolAudience(school.school_type, school.school_name);
+      const channel = channelForAudience(audience);
+      const profile = state.schoolProfiles.find((item) => item.school_slug === school.school_slug);
+      const effective = profile?.profile_key || channel?.default_profile_key || "end_only";
+      const source = profile?.updated_source === "school_manager"
+        ? "اختيار مدير المدرسة"
+        : profile ? "تخصيص سابق من المبرمج" : "الوضع الاحتياطي للفئة";
+      const settingsUrl = `school-audio-settings.html?school=${encodeURIComponent(school.school_slug)}`;
       return `<tr>
-        <td><div class="school-name">${escapeHtml(school.school_name || school.school_slug)}</div></td>
-        <td><div class="school-slug">${escapeHtml(school.school_slug)}</div></td>
-        <td><span class="pill ${override ? "success" : "muted"}">${escapeHtml(PROFILE_LABELS[effective])}${override ? " · مخصص" : " · افتراضي"}</span></td>
-        <td>
-          <select class="row-profile" data-school-profile="${escapeHtml(school.school_slug)}">
-            <option value="__default__" ${override ? "" : "selected"}>اتباع الوضع الافتراضي</option>
-            <option value="end_only" ${override?.profile_key === "end_only" ? "selected" : ""}>النهايات فقط</option>
-            <option value="start_and_end" ${override?.profile_key === "start_and_end" ? "selected" : ""}>البداية والنهاية</option>
-          </select>
-        </td>
-        <td><button class="button secondary small" type="button" data-save-school-profile="${escapeHtml(school.school_slug)}">حفظ</button></td>
+        <td><div class="school-name">${escapeHtml(school.school_name || school.school_slug)}</div><div class="school-slug">${escapeHtml(school.school_slug)}</div></td>
+        <td><span class="audience-badge ${escapeHtml(audience)}">${escapeHtml(AUDIENCE_LABELS[audience])}</span></td>
+        <td><span class="pill ${profile ? "success" : "muted"}">${escapeHtml(PROFILE_LABELS[effective] || effective)}</span></td>
+        <td><span class="school-source">${escapeHtml(source)}</span></td>
+        <td><a class="school-settings-link" href="${escapeHtml(settingsUrl)}">فتح صفحة الاختيار</a></td>
       </tr>`;
     }).join("");
-    body.querySelectorAll("[data-save-school-profile]").forEach((button) => {
-      button.addEventListener("click", () => saveSchoolProfile(button.dataset.saveSchoolProfile, button));
+  }
+
+  function updateAudienceSelection() {
+    document.querySelectorAll(".audience-option").forEach((label) => {
+      const input = label.querySelector('input[name="releaseAudience"]');
+      label.classList.toggle("active", Boolean(input?.checked));
     });
-  }
-
-  async function saveSchoolProfile(schoolSlug, button) {
-    const select = document.querySelector(`[data-school-profile="${CSS.escape(schoolSlug)}"]`);
-    if (!select) return;
-    button.disabled = true;
-    button.textContent = "جارٍ…";
-    try {
-      if (select.value === "__default__") {
-        const { error } = await state.client.from("windows_school_audio_profiles").delete().eq("school_slug", schoolSlug);
-        if (error) throw error;
-      } else {
-        const { error } = await state.client.from("windows_school_audio_profiles").upsert({
-          school_slug: schoolSlug,
-          profile_key: select.value,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "school_slug" });
-        if (error) throw error;
-      }
-      showStatus("تم حفظ الوضع الصوتي للمدرسة.", "success");
-      await loadRemoteData({ silent: true });
-    } catch (error) {
-      console.error(error);
-      showStatus(`تعذر حفظ وضع المدرسة: ${errorText(error)}`, "error", true);
-    } finally {
-      button.disabled = false;
-      button.textContent = "حفظ";
-    }
-  }
-
-  async function saveGlobalDefault() {
-    const button = $("saveGlobalDefaultBtn");
-    const profile = $("globalDefaultProfile").value;
-    if (!confirm(`سيصبح «${PROFILE_LABELS[profile]}» الوضع الافتراضي للمدارس التي لا تملك تخصيصًا. هل تريد المتابعة؟`)) return;
-    button.disabled = true;
-    try {
-      const { error } = await state.client.from("windows_audio_settings").update({
-        default_profile_key: profile,
-        updated_at: new Date().toISOString(),
-      }).eq("id", 1);
-      if (error) throw error;
-      showStatus("تم تحديث الوضع الصوتي الافتراضي.", "success");
-      await loadRemoteData({ silent: true });
-    } catch (error) {
-      console.error(error);
-      showStatus(`تعذر حفظ الوضع الافتراضي: ${errorText(error)}`, "error", true);
-    } finally {
-      button.disabled = false;
-    }
   }
 
   function bindEvents() {
@@ -829,8 +1237,12 @@
     $("logoutBtn").addEventListener("click", logout);
     $("refreshBtn").addEventListener("click", () => loadRemoteData());
     $("audioFolderInput").addEventListener("change", (event) => parseLocalPackage(event.target.files));
-    $("awarenessFirst").addEventListener("change", validateDraftReadiness);
-    $("awarenessSecond").addEventListener("change", validateDraftReadiness);
+    document.querySelectorAll('input[name="releaseAudience"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        updateAudienceSelection();
+        validateDraftReadiness();
+      });
+    });
     $("releaseTitle").addEventListener("input", validateDraftReadiness);
     $("createDraftBtn").addEventListener("click", createDraft);
     $("assetSearch").addEventListener("input", renderLocalAssets);
@@ -841,8 +1253,19 @@
         renderLocalAssets();
       });
     });
+    $("campaignForm").addEventListener("submit", createCampaign);
+    $("campaignFile").addEventListener("change", () => {
+      const file = $("campaignFile").files?.[0];
+      $("campaignFileName").textContent = file ? `${file.name} · ${formatBytes(file.size)}` : "لم يتم اختيار ملف";
+    });
+    $("campaignFilter").querySelectorAll("[data-campaign-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.campaignFilter = button.dataset.campaignFilter;
+        $("campaignFilter").querySelectorAll("[data-campaign-filter]").forEach((item) => item.classList.toggle("active", item === button));
+        renderCampaigns();
+      });
+    });
     $("schoolSearch").addEventListener("input", renderSchools);
-    $("saveGlobalDefaultBtn").addEventListener("click", saveGlobalDefault);
     $("publishConfirmation").addEventListener("input", () => {
       $("confirmPublishBtn").disabled = $("publishConfirmation").value.trim() !== "نشر";
     });
@@ -855,6 +1278,7 @@
 
   function init() {
     bindEvents();
+    updateAudienceSelection();
     authorizeSession();
   }
 
