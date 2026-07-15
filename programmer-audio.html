@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>إدارة الصوتيات المركزية - مؤقت الحصص</title>
-  <link rel="stylesheet" href="programmer-audio.css?v=2.1.0">
+  <link rel="stylesheet" href="programmer-audio.css?v=2.2.0">
 </head>
 <body class="auth-pending">
   <main id="loginView" class="login-view" hidden>
@@ -37,7 +37,7 @@
       <div class="hero-copy">
         <span class="eyebrow light">إعدادات المبرمج · برنامج Windows</span>
         <h1>إدارة الصوتيات المركزية</h1>
-        <p>إصدارات مستقلة للبنين والبنات، تدوير أسبوعي للإرشادات، وحملات صوتية مجدولة للمناسبات.</p>
+        <p>إصدارات مستقلة للبنين والبنات، وإرشادات مرتبة حسب وقت اليوم، وحملات صوتية مجدولة للمناسبات.</p>
       </div>
       <div class="hero-actions">
         <a class="button ghost" href="windows-admin.html">العودة إلى إدارة Windows</a>
@@ -73,7 +73,7 @@
         <strong id="statDrafts">0</strong>
       </article>
       <article class="stat-card">
-        <span>إرشادات هذا الأسبوع</span>
+        <span>مقاطع ما قبل الطابور</span>
         <strong id="statWeeklyGuidance">—</strong>
       </article>
       <article class="stat-card">
@@ -134,6 +134,8 @@
             <div><span>التحقق</span><strong id="localValidation">—</strong></div>
           </div>
 
+          <section id="guidanceRouteOverview" class="guidance-route-overview" aria-label="توزيع الإرشادات حسب وقت التشغيل" hidden></section>
+
           <div class="field-grid two">
             <label>اسم الإصدار
               <input id="releaseTitle" type="text" value="الإصدار الصوتي الرسمي" maxlength="120">
@@ -151,13 +153,13 @@
           </label>
 
           <fieldset class="rotation-builder">
-            <legend>دورة الإرشادات الأسبوعية</legend>
+            <legend>دورة ما قبل الطابور</legend>
             <div class="rotation-intro">
-              <p>حدد مقطعين أو أكثر من بطاقات الإرشادات أدناه. إذا زاد العدد على مقطعين تنتقل الدورة تلقائيًا كل يوم أحد.</p>
+              <p>تعمل هذه المقاطع قبل الطابور بثلاث دقائق. إذا زاد العدد على مقطعين ينتقل النظام إلى مقطعين جديدين كل يوم أحد.</p>
               <span id="awarenessSelectedBadge" class="pill muted">0 مختارة</span>
             </div>
             <div id="awarenessSelectedList" class="awareness-selected-list">
-              <div class="empty-state">اختر الحزمة ثم أضف الإرشادات إلى الدورة.</div>
+              <div class="empty-state">اختر الحزمة لعرض دورة ما قبل الطابور.</div>
             </div>
             <div class="rotation-preview-wrap">
               <div class="subhead"><h3>معاينة الأسابيع القادمة</h3><span class="pill">يبدأ الأحد</span></div>
@@ -196,6 +198,9 @@
           </div>
           <div class="subhead"><h3>المسودات</h3><span class="pill muted">لا تصل إلى المدارس</span></div>
           <div id="draftsList" class="drafts-list"><div class="empty-state">لا توجد مسودات.</div></div>
+          <div class="subhead archive-head"><h3>أرشيف الإصدارات</h3><span id="archivedBadge" class="pill muted">0</span></div>
+          <div id="archivedReleasesList" class="archived-releases-list"><div class="empty-state compact">لا توجد إصدارات مؤرشفة.</div></div>
+          <div class="security-note">المسح محمي بعبارة مطابقة للإصدار، ويتطلب تنفيذ ترقية <bdi>database/windows_audio_central_v3.sql</bdi> مرة واحدة.</div>
           <div class="security-note">كل فئة لها إصدار مستقل. نشر إصدار البنين لا يغيّر إصدار البنات والعكس.</div>
         </div>
       </aside>
@@ -206,7 +211,7 @@
         <div>
           <span class="section-kicker">المراجعة المحلية</span>
           <h2>محتويات الحزمة قبل الرفع</h2>
-          <p class="panel-description">حدد موضع كل إرشاد: بعد الطابور، أثناء الفسحة، أثناء الصلاة، أو نهاية اليوم. تدوّر القوائم التي تزيد على مقطعين كل أحد.</p>
+          <p class="panel-description">المواضع المتاحة: قبل الطابور بثلاث دقائق، الفسحة، النشاط، الصلاة، ونهاية اليوم. لكل موضع دورة أسبوعية مستقلة.</p>
         </div>
         <div class="library-tools">
           <div class="segmented" id="assetFilter" role="group" aria-label="تصفية الملفات">
@@ -331,6 +336,29 @@
     </form>
   </dialog>
 
+  <dialog id="deleteReleaseDialog" class="dialog delete-release-dialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head">
+        <div><span class="section-kicker danger-text">إجراء غير قابل للتراجع</span><h2 id="deleteReleaseTitle">مسح إصدار الصوت</h2></div>
+        <button id="closeDeleteReleaseDialog" class="icon-button" type="button" aria-label="إغلاق">×</button>
+      </div>
+      <p id="deleteReleaseText">—</p>
+      <div id="deleteReleaseWarning" class="delete-release-warning" hidden>
+        <strong>تنبيه للإصدار المنشور</strong>
+        <span>بعد المسح يجب نشر إصدار بديل حتى تستقبل المدارس تحديثات صوتية جديدة.</span>
+      </div>
+      <div class="confirm-box">
+        <label>للتأكيد اكتب <strong id="deleteReleasePhrase">—</strong>
+          <input id="deleteReleaseConfirmation" type="text" autocomplete="off" spellcheck="false">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button id="cancelDeleteReleaseBtn" class="button secondary" type="button">تراجع</button>
+        <button id="confirmDeleteReleaseBtn" class="button danger" type="button" disabled>مسح الإصدار نهائيًا</button>
+      </div>
+    </form>
+  </dialog>
+
   <div id="audioDock" class="audio-dock" hidden>
     <div><span>معاينة الصوت</span><strong id="audioDockTitle">—</strong></div>
     <audio id="audioPreview" controls preload="metadata"></audio>
@@ -339,6 +367,6 @@
 
   <script src="supabase.min.js?v=2-local-audio-02"></script>
   <script src="supabase-config.js?v=optimized-03"></script>
-  <script src="programmer-audio.js?v=2.1.0"></script>
+  <script src="programmer-audio.js?v=2.2.0"></script>
 </body>
 </html>
