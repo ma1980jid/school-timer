@@ -19,18 +19,29 @@
     end_of_day: "في نهاية اليوم الدراسي",
   };
   const GUIDANCE_SLOT_LABELS = {
-    after_assembly: "بعد الطابور",
+    before_assembly: "قبل الطابور بـ3 دقائق",
     during_break: "أثناء الفسحة",
+    during_activity: "أثناء النشاط",
     during_prayer: "أثناء الصلاة",
     end_of_day: "نهاية اليوم الدراسي",
   };
+  const GUIDANCE_SLOT_META = {
+    before_assembly: { icon: "☀", note: "يبدأ قبل موعد الطابور بثلاث دقائق" },
+    during_break: { icon: "◌", note: "يبدأ بعد صوت بداية الفسحة" },
+    during_activity: { icon: "◇", note: "يبدأ بعد صوت بداية النشاط عند وجوده" },
+    during_prayer: { icon: "◈", note: "يبدأ بعد صوت بداية الصلاة عند وجودها" },
+    end_of_day: { icon: "✓", note: "يبدأ بعد انتهاء آخر صوت في اليوم" },
+  };
   const DEFAULT_GUIDANCE_SLOTS = {
+    guidance_16_avoid_bad_company: "during_break",
+    guidance_18_choose_good_friends: "during_break",
+    guidance_20_student_absence: "during_break",
     guidance_09_waste: "during_break",
-    guidance_14_eat_breakfast: "during_break",
-    guidance_15_keep_clean: "during_break",
+    guidance_24_follow_teacher_explanation: "during_break",
     guidance_22_avoid_wastefulness: "during_break",
     guidance_23_say_bismillah_before_eating: "during_break",
     guidance_04_prayer_pillar_of_faith: "during_prayer",
+    guidance_03_safe_classroom_exit: "end_of_day",
     guidance_17_end_of_school_day: "end_of_day",
   };
   const REQUIRED_SYSTEM_KEYS = [
@@ -72,6 +83,7 @@
     schools: [],
     schoolProfiles: [],
     publishingReleaseId: null,
+    deletingReleaseId: null,
     previewUrl: null,
     busy: false,
   };
@@ -268,19 +280,19 @@
   function guidanceSlot(item) {
     const configured = String(item?.play_slot || "").trim();
     if (GUIDANCE_SLOT_LABELS[configured]) return configured;
-    return DEFAULT_GUIDANCE_SLOTS[item?.id] || "after_assembly";
+    return DEFAULT_GUIDANCE_SLOTS[item?.id] || "before_assembly";
   }
 
   function guidanceSequences() {
     const result = Object.fromEntries(Object.keys(GUIDANCE_SLOT_LABELS).map((slot) => [slot, []]));
-    result.after_assembly = state.awarenessOrder.filter((assetKey) => {
+    result.before_assembly = state.awarenessOrder.filter((assetKey) => {
       const asset = awarenessAsset(assetKey);
-      return asset?.active && asset.playSlot === "after_assembly";
+      return asset?.active && asset.playSlot === "before_assembly";
     });
     state.localAssets
       .filter((asset) => asset.kind === "guidance"
         && asset.active
-        && asset.playSlot !== "after_assembly"
+        && asset.playSlot !== "before_assembly"
         && GUIDANCE_SLOT_LABELS[asset.playSlot])
       .sort((first, second) => first.sortOrder - second.sortOrder)
       .forEach((asset) => result[asset.playSlot].push(asset.assetKey));
@@ -330,7 +342,7 @@
       }));
       state.localAssets = [...systemAssets, ...guidanceAssets];
       state.awarenessOrder = guidanceAssets
-        .filter((asset) => asset.active && asset.playSlot === "after_assembly")
+        .filter((asset) => asset.active && asset.playSlot === "before_assembly")
         .map((asset) => asset.assetKey);
 
       const missingFiles = state.localAssets.filter((asset) => !state.localFiles.has(asset.filePath));
@@ -357,6 +369,7 @@
         duplicateKeys,
       });
       renderAwarenessSelection();
+      renderGuidanceRouteOverview();
       renderLocalAssets();
       validateDraftReadiness();
     } catch (error) {
@@ -370,9 +383,10 @@
     $("localPackageBadge").className = "pill warn";
     $("localPackageBadge").textContent = "الحزمة غير صالحة";
     $("localAssetsList").innerHTML = `<div class="empty-state large">${escapeHtml(message)}</div>`;
-    $("awarenessSelectedList").innerHTML = '<div class="empty-state">اختر الحزمة ثم أضف الإرشادات إلى الدورة.</div>';
+    $("awarenessSelectedList").innerHTML = '<div class="empty-state">اختر الحزمة لعرض دورة ما قبل الطابور.</div>';
     $("rotationPreview").innerHTML = '<div class="empty-state">تظهر المعاينة بعد اختيار مقطعين على الأقل.</div>';
     $("awarenessSelectedBadge").textContent = "0 مختارة";
+    $("guidanceRouteOverview").hidden = true;
     $("createDraftBtn").disabled = true;
     showStatus(message, "error", true);
   }
@@ -396,10 +410,28 @@
     $("localPackageBadge").textContent = state.packageValid ? "الحزمة سليمة" : "تحتاج مراجعة";
 
     if (state.packageValid) {
-      showStatus(`تم التحقق من ${state.localAssets.length} ملفًا، وأضيفت الإرشادات المفعلة إلى الدورة.`, "success");
+      showStatus(`تم التحقق من ${state.localAssets.length} ملفًا وتوزيع الإرشادات حسب وقت التشغيل.`, "success");
     } else {
       showStatus(`الحزمة غير مكتملة: ${issues.join("، ")}.`, "error", true);
     }
+  }
+
+  function renderGuidanceRouteOverview() {
+    const overview = $("guidanceRouteOverview");
+    if (!overview) return;
+    const guidance = state.localAssets.filter((asset) => asset.kind === "guidance" && asset.active);
+    overview.hidden = !guidance.length;
+    if (!guidance.length) return;
+    overview.innerHTML = Object.entries(GUIDANCE_SLOT_LABELS).map(([slot, label]) => {
+      const count = guidance.filter((asset) => asset.playSlot === slot).length;
+      const meta = GUIDANCE_SLOT_META[slot];
+      const rotation = count > 2 ? "تدوير أسبوعي" : count === 2 ? "مقطعان ثابتان" : count === 1 ? "مقطع ثابت" : "جاهز للإضافة";
+      return `<article class="guidance-route-card route-${escapeHtml(slot)}">
+        <span class="guidance-route-icon" aria-hidden="true">${escapeHtml(meta.icon)}</span>
+        <div><strong>${escapeHtml(label)}</strong><small>${escapeHtml(meta.note)}</small></div>
+        <div class="guidance-route-count"><b>${count}</b><span>${escapeHtml(rotation)}</span></div>
+      </article>`;
+    }).join("");
   }
 
   function awarenessAsset(assetKey) {
@@ -457,12 +489,13 @@
     const shouldAdd = forceValue === undefined ? !exists : forceValue;
     if (shouldAdd && !exists) {
       asset.active = true;
-      asset.playSlot = "after_assembly";
+      asset.playSlot = "before_assembly";
       state.awarenessOrder.push(assetKey);
     } else if (!shouldAdd && exists) {
       state.awarenessOrder = state.awarenessOrder.filter((key) => key !== assetKey);
     }
     renderAwarenessSelection();
+    renderGuidanceRouteOverview();
     renderLocalAssets();
   }
 
@@ -470,12 +503,13 @@
     const asset = awarenessAsset(assetKey);
     if (!asset || !GUIDANCE_SLOT_LABELS[playSlot]) return;
     asset.playSlot = playSlot;
-    if (playSlot === "after_assembly") {
+    if (playSlot === "before_assembly") {
       if (asset.active && !state.awarenessOrder.includes(assetKey)) state.awarenessOrder.push(assetKey);
     } else {
       state.awarenessOrder = state.awarenessOrder.filter((key) => key !== assetKey);
     }
     renderAwarenessSelection();
+    renderGuidanceRouteOverview();
     renderLocalAssets();
   }
 
@@ -550,7 +584,7 @@
         <div class="asset-card-actions">
           <span class="pill muted">${formatBytes(file?.size || 0)}</span>
           <div class="asset-card-controls">
-            ${asset.kind === "guidance" && asset.playSlot === "after_assembly" ? `<button class="button secondary small rotation-toggle ${selected ? "active" : ""}" type="button" data-toggle-awareness="${escapeHtml(asset.assetKey)}">${selected ? "ضمن دورة الطابور ✓" : "إضافة لدورة الطابور"}</button>` : ""}
+            ${asset.kind === "guidance" && asset.playSlot === "before_assembly" ? `<button class="button secondary small rotation-toggle ${selected ? "active" : ""}" type="button" data-toggle-awareness="${escapeHtml(asset.assetKey)}">${selected ? "ضمن دورة ما قبل الطابور ✓" : "إضافة لدورة ما قبل الطابور"}</button>` : ""}
             <button class="button secondary small" type="button" data-preview-key="${escapeHtml(asset.assetKey)}">تشغيل</button>
           </div>
         </div>
@@ -577,6 +611,7 @@
         } else {
           validateDraftReadiness();
         }
+        renderGuidanceRouteOverview();
         renderLocalAssets();
       });
     });
@@ -670,15 +705,16 @@
     const manifest = JSON.parse(JSON.stringify(state.localManifest));
     const eventGuidance = guidanceSequences();
     manifest.central_config = {
-      schema_version: 2,
+      schema_version: 3,
       target_audience: selectedAudience(),
       default_profile: $("releaseDefaultProfile").value,
-      awareness_sequence: [...eventGuidance.after_assembly],
-      awareness_rotation: eventGuidance.after_assembly.length > 2,
-      event_guidance: eventGuidance,
+      awareness_sequence: [...eventGuidance.before_assembly],
+      awareness_rotation: eventGuidance.before_assembly.length > 2,
+      event_guidance: { after_assembly: [], ...eventGuidance },
       clips_per_week: 2,
       week_starts_on: "sunday",
       timezone: "Asia/Muscat",
+      before_assembly_offset_seconds: 180,
       transition: "start_next_when_current_ends",
       fixed_delay_seconds: 0,
       prevent_overlap: true,
@@ -897,6 +933,7 @@
     const boys = releaseForAudience("boys");
     const girls = releaseForAudience("girls");
     const drafts = state.releases.filter((release) => release.status === "draft");
+    const archived = state.releases.filter((release) => release.status === "archived");
     const activeCampaigns = state.campaigns.filter((campaign) => campaignStatus(campaign).key === "active");
 
     $("statBoysVersion").textContent = boys ? `v${boys.version_number}` : "—";
@@ -906,6 +943,7 @@
     $("statWeeklyGuidance").textContent = `${guidancePairForRelease(boys).length} + ${guidancePairForRelease(girls).length}`;
     $("statSchoolChoices").textContent = String(state.schoolProfiles.length);
     $("draftsBadge").textContent = String(drafts.length);
+    $("archivedBadge").textContent = String(archived.length);
     $("campaignsBadge").textContent = `${state.campaigns.length} حملة`;
 
     renderChannel("boys", boys);
@@ -913,6 +951,7 @@
     renderPublishedRelease("boys", boys);
     renderPublishedRelease("girls", girls);
     renderDrafts(drafts);
+    renderArchivedReleases(archived);
     renderCampaigns();
     renderSchools();
   }
@@ -949,7 +988,11 @@
         <span class="pill muted">${sequence.length} إرشادًا</span>
         <span class="pill ${rotating ? "success" : "muted"}">${rotating ? "تدوير أسبوعي" : "مقطعان ثابتان"}</span>
         <span class="pill muted">${escapeHtml(formatDate(release.published_at))}</span>
+      </div>
+      <div class="release-card-actions">
+        <button class="button danger small" type="button" data-delete-release="${escapeHtml(release.id)}">مسح الإصدار</button>
       </div>`;
+    card.querySelector("[data-delete-release]")?.addEventListener("click", () => openDeleteReleaseDialog(release.id));
   }
 
   function releaseReady(release) {
@@ -988,12 +1031,108 @@
           <span class="pill muted">${sequence.length} إرشادًا</span>
           <span class="pill ${ready ? "success" : "warn"}">${ready ? "جاهزة للنشر" : "غير مكتملة"}</span>
         </div>
-        <button class="button primary wide" type="button" data-publish-release="${escapeHtml(release.id)}" ${ready && state.migrationReady ? "" : "disabled"}>مراجعة ونشر</button>
+        <div class="release-card-actions split">
+          <button class="button primary" type="button" data-publish-release="${escapeHtml(release.id)}" ${ready && state.migrationReady ? "" : "disabled"}>مراجعة ونشر</button>
+          <button class="button danger" type="button" data-delete-release="${escapeHtml(release.id)}">مسح المسودة</button>
+        </div>
       </article>`;
     }).join("");
     $("draftsList").querySelectorAll("[data-publish-release]").forEach((button) => {
       button.addEventListener("click", () => openPublishDialog(button.dataset.publishRelease));
     });
+    $("draftsList").querySelectorAll("[data-delete-release]").forEach((button) => {
+      button.addEventListener("click", () => openDeleteReleaseDialog(button.dataset.deleteRelease));
+    });
+  }
+
+  function renderArchivedReleases(releases) {
+    const list = $("archivedReleasesList");
+    if (!releases.length) {
+      list.innerHTML = '<div class="empty-state compact">لا توجد إصدارات مؤرشفة.</div>';
+      return;
+    }
+    list.innerHTML = releases.map((release) => {
+      const assets = state.remoteAssets.filter((asset) => asset.release_id === release.id);
+      return `<article class="archived-release-card">
+        <div>
+          <span class="audience-badge ${escapeHtml(release.audience_key)}">${escapeHtml(AUDIENCE_LABELS[release.audience_key])}</span>
+          <strong>v${escapeHtml(release.version_number)} · ${escapeHtml(release.title)}</strong>
+          <small>${assets.length} ملفًا · ${escapeHtml(formatDate(release.updated_at || release.created_at))}</small>
+        </div>
+        <button class="button danger small" type="button" data-delete-release="${escapeHtml(release.id)}">مسح نهائي</button>
+      </article>`;
+    }).join("");
+    list.querySelectorAll("[data-delete-release]").forEach((button) => {
+      button.addEventListener("click", () => openDeleteReleaseDialog(button.dataset.deleteRelease));
+    });
+  }
+
+  function deleteConfirmationPhrase(release) {
+    return `حذف v${release.version_number}`;
+  }
+
+  function openDeleteReleaseDialog(releaseId) {
+    const release = state.releases.find((item) => item.id === releaseId);
+    if (!release) return;
+    state.deletingReleaseId = release.id;
+    const published = release.status === "published";
+    const assets = state.remoteAssets.filter((asset) => asset.release_id === release.id);
+    const phrase = deleteConfirmationPhrase(release);
+    $("deleteReleaseTitle").textContent = published ? "مسح الإصدار المنشور" : release.status === "draft" ? "مسح المسودة" : "مسح الإصدار المؤرشف";
+    $("deleteReleaseText").textContent = published
+      ? `سيُحذف إصدار ${AUDIENCE_LABELS[release.audience_key]} الحالي وجميع ملفاته (${assets.length}). ستبقى الأجهزة على النسخة المحفوظة محليًا حتى تتصل، ولن يصلها إصدار جديد قبل نشر بديل.`
+      : `سيُحذف الإصدار v${release.version_number} وجميع ملفاته (${assets.length}) نهائيًا.`;
+    $("deleteReleaseWarning").hidden = !published;
+    $("deleteReleasePhrase").textContent = phrase;
+    $("deleteReleaseConfirmation").value = "";
+    $("confirmDeleteReleaseBtn").disabled = true;
+    $("deleteReleaseDialog").showModal();
+  }
+
+  function closeDeleteReleaseDialog() {
+    state.deletingReleaseId = null;
+    $("deleteReleaseDialog").close();
+  }
+
+  async function deleteAudioRelease() {
+    const release = state.releases.find((item) => item.id === state.deletingReleaseId);
+    if (!release) return;
+    const phrase = deleteConfirmationPhrase(release);
+    if ($("deleteReleaseConfirmation").value.trim() !== phrase) return;
+    const button = $("confirmDeleteReleaseBtn");
+    button.disabled = true;
+    button.textContent = "جارٍ المسح…";
+    try {
+      const { data, error } = await state.client.rpc("delete_windows_audio_release", {
+        p_release_id: release.id,
+        p_confirmation: phrase,
+      });
+      if (error) throw error;
+      const storagePaths = Array.isArray(data?.storage_paths) ? data.storage_paths.filter(Boolean) : [];
+      let storageWarning = false;
+      for (let index = 0; index < storagePaths.length; index += 100) {
+        const cleanup = await state.client.storage.from(AUDIO_BUCKET).remove(storagePaths.slice(index, index + 100));
+        if (cleanup.error) storageWarning = true;
+      }
+      closeDeleteReleaseDialog();
+      showStatus(
+        storageWarning
+          ? "تم مسح الإصدار من النظام، وتعذر تنظيف بعض الملفات القديمة من التخزين."
+          : `تم مسح الإصدار v${release.version_number} وجميع بياناته بنجاح.`,
+        storageWarning ? "warn" : "success",
+        true,
+      );
+      await loadRemoteData({ silent: true });
+    } catch (error) {
+      console.error(error);
+      const needsUpgrade = /delete_windows_audio_release|PGRST202|schema cache|does not exist/i.test(errorText(error));
+      showStatus(needsUpgrade
+        ? "ميزة مسح الإصدارات تحتاج تنفيذ database/windows_audio_central_v3.sql مرة واحدة في Supabase."
+        : `تعذر مسح الإصدار: ${errorText(error)}`, "error", true);
+    } finally {
+      button.textContent = "مسح الإصدار نهائيًا";
+      button.disabled = $("deleteReleaseConfirmation").value.trim() !== phrase;
+    }
   }
 
   function openPublishDialog(releaseId) {
@@ -1339,6 +1478,14 @@
     $("confirmPublishBtn").addEventListener("click", publishRelease);
     $("cancelPublishBtn").addEventListener("click", closePublishDialog);
     $("closePublishDialog").addEventListener("click", closePublishDialog);
+    $("deleteReleaseConfirmation").addEventListener("input", () => {
+      const release = state.releases.find((item) => item.id === state.deletingReleaseId);
+      $("confirmDeleteReleaseBtn").disabled = !release
+        || $("deleteReleaseConfirmation").value.trim() !== deleteConfirmationPhrase(release);
+    });
+    $("confirmDeleteReleaseBtn").addEventListener("click", deleteAudioRelease);
+    $("cancelDeleteReleaseBtn").addEventListener("click", closeDeleteReleaseDialog);
+    $("closeDeleteReleaseDialog").addEventListener("click", closeDeleteReleaseDialog);
     $("closeAudioDock").addEventListener("click", closeAudioPreview);
     window.addEventListener("beforeunload", closeAudioPreview);
   }
