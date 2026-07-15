@@ -18,6 +18,21 @@
     after_break: "بعد انتهاء الفسحة",
     end_of_day: "في نهاية اليوم الدراسي",
   };
+  const GUIDANCE_SLOT_LABELS = {
+    after_assembly: "بعد الطابور",
+    during_break: "أثناء الفسحة",
+    during_prayer: "أثناء الصلاة",
+    end_of_day: "نهاية اليوم الدراسي",
+  };
+  const DEFAULT_GUIDANCE_SLOTS = {
+    guidance_09_waste: "during_break",
+    guidance_14_eat_breakfast: "during_break",
+    guidance_15_keep_clean: "during_break",
+    guidance_22_avoid_wastefulness: "during_break",
+    guidance_23_say_bismillah_before_eating: "during_break",
+    guidance_04_prayer_pillar_of_faith: "during_prayer",
+    guidance_17_end_of_school_day: "end_of_day",
+  };
   const REQUIRED_SYSTEM_KEYS = [
     "assembly_start",
     "break_start",
@@ -250,6 +265,28 @@
     return pieces.length > 1 ? pieces.slice(1).join("/") : pieces[0];
   }
 
+  function guidanceSlot(item) {
+    const configured = String(item?.play_slot || "").trim();
+    if (GUIDANCE_SLOT_LABELS[configured]) return configured;
+    return DEFAULT_GUIDANCE_SLOTS[item?.id] || "after_assembly";
+  }
+
+  function guidanceSequences() {
+    const result = Object.fromEntries(Object.keys(GUIDANCE_SLOT_LABELS).map((slot) => [slot, []]));
+    result.after_assembly = state.awarenessOrder.filter((assetKey) => {
+      const asset = awarenessAsset(assetKey);
+      return asset?.active && asset.playSlot === "after_assembly";
+    });
+    state.localAssets
+      .filter((asset) => asset.kind === "guidance"
+        && asset.active
+        && asset.playSlot !== "after_assembly"
+        && GUIDANCE_SLOT_LABELS[asset.playSlot])
+      .sort((first, second) => first.sortOrder - second.sortOrder)
+      .forEach((asset) => result[asset.playSlot].push(asset.assetKey));
+    return result;
+  }
+
   async function parseLocalPackage(fileList) {
     closeAudioPreview();
     state.localManifest = null;
@@ -287,11 +324,14 @@
         categoryAr: item.category_ar || "الإرشادات",
         titleAr: item.title_ar || item.id,
         filePath: String(item.file || ""),
+        playSlot: guidanceSlot(item),
         sortOrder: index,
         active: item.active !== false,
       }));
       state.localAssets = [...systemAssets, ...guidanceAssets];
-      state.awarenessOrder = guidanceAssets.filter((asset) => asset.active).map((asset) => asset.assetKey);
+      state.awarenessOrder = guidanceAssets
+        .filter((asset) => asset.active && asset.playSlot === "after_assembly")
+        .map((asset) => asset.assetKey);
 
       const missingFiles = state.localAssets.filter((asset) => !state.localFiles.has(asset.filePath));
       const availableSystemKeys = new Set(systemAssets.map((asset) => asset.assetKey));
@@ -417,8 +457,22 @@
     const shouldAdd = forceValue === undefined ? !exists : forceValue;
     if (shouldAdd && !exists) {
       asset.active = true;
+      asset.playSlot = "after_assembly";
       state.awarenessOrder.push(assetKey);
     } else if (!shouldAdd && exists) {
+      state.awarenessOrder = state.awarenessOrder.filter((key) => key !== assetKey);
+    }
+    renderAwarenessSelection();
+    renderLocalAssets();
+  }
+
+  function changeGuidanceSlot(assetKey, playSlot) {
+    const asset = awarenessAsset(assetKey);
+    if (!asset || !GUIDANCE_SLOT_LABELS[playSlot]) return;
+    asset.playSlot = playSlot;
+    if (playSlot === "after_assembly") {
+      if (asset.active && !state.awarenessOrder.includes(assetKey)) state.awarenessOrder.push(assetKey);
+    } else {
       state.awarenessOrder = state.awarenessOrder.filter((key) => key !== assetKey);
     }
     renderAwarenessSelection();
@@ -480,6 +534,11 @@
     $("localAssetsList").innerHTML = filtered.map((asset) => {
       const file = state.localFiles.get(asset.filePath);
       const selected = state.awarenessOrder.includes(asset.assetKey);
+      const routeSelect = asset.kind === "guidance" ? `<label class="asset-route">موضع التشغيل
+        <select data-guidance-slot="${escapeHtml(asset.assetKey)}">
+          ${Object.entries(GUIDANCE_SLOT_LABELS).map(([value, label]) => `<option value="${value}" ${asset.playSlot === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+        </select>
+      </label>` : "";
       return `<article class="asset-card ${selected ? "selected-for-rotation" : ""}" data-asset-key="${escapeHtml(asset.assetKey)}">
         <div class="asset-card-top">
           <span class="tag ${asset.kind === "system_event" ? "system" : ""}">${escapeHtml(asset.categoryAr)}</span>
@@ -487,10 +546,11 @@
         </div>
         <h3>${escapeHtml(asset.titleAr)}</h3>
         <p title="${escapeHtml(asset.filePath)}">${escapeHtml(asset.filePath)}</p>
+        ${routeSelect}
         <div class="asset-card-actions">
           <span class="pill muted">${formatBytes(file?.size || 0)}</span>
           <div class="asset-card-controls">
-            ${asset.kind === "guidance" ? `<button class="button secondary small rotation-toggle ${selected ? "active" : ""}" type="button" data-toggle-awareness="${escapeHtml(asset.assetKey)}">${selected ? "ضمن الدورة ✓" : "إضافة للدورة"}</button>` : ""}
+            ${asset.kind === "guidance" && asset.playSlot === "after_assembly" ? `<button class="button secondary small rotation-toggle ${selected ? "active" : ""}" type="button" data-toggle-awareness="${escapeHtml(asset.assetKey)}">${selected ? "ضمن دورة الطابور ✓" : "إضافة لدورة الطابور"}</button>` : ""}
             <button class="button secondary small" type="button" data-preview-key="${escapeHtml(asset.assetKey)}">تشغيل</button>
           </div>
         </div>
@@ -502,6 +562,9 @@
     });
     $("localAssetsList").querySelectorAll("[data-toggle-awareness]").forEach((button) => {
       button.addEventListener("click", () => toggleAwareness(button.dataset.toggleAwareness));
+    });
+    $("localAssetsList").querySelectorAll("[data-guidance-slot]").forEach((select) => {
+      select.addEventListener("change", () => changeGuidanceSlot(select.dataset.guidanceSlot, select.value));
     });
     $("localAssetsList").querySelectorAll("[data-asset-active]").forEach((input) => {
       input.addEventListener("change", () => {
@@ -605,12 +668,14 @@
 
   function preparedManifest() {
     const manifest = JSON.parse(JSON.stringify(state.localManifest));
+    const eventGuidance = guidanceSequences();
     manifest.central_config = {
       schema_version: 2,
       target_audience: selectedAudience(),
       default_profile: $("releaseDefaultProfile").value,
-      awareness_sequence: [...state.awarenessOrder],
-      awareness_rotation: state.awarenessOrder.length > 2,
+      awareness_sequence: [...eventGuidance.after_assembly],
+      awareness_rotation: eventGuidance.after_assembly.length > 2,
+      event_guidance: eventGuidance,
       clips_per_week: 2,
       week_starts_on: "sunday",
       timezone: "Asia/Muscat",
@@ -624,6 +689,7 @@
       category: asset.category,
       title_ar: asset.titleAr,
       file: asset.filePath,
+      play_slot: asset.playSlot || null,
       active: asset.active,
       sort_order: asset.sortOrder,
     }]));
@@ -719,6 +785,7 @@
         category: asset.category,
         title_ar: asset.title_ar,
         storage_path: asset.storage_path,
+        play_slot: state.localAssets.find((item) => item.assetKey === asset.asset_key)?.playSlot || null,
         active: asset.is_active,
         sort_order: asset.sort_order,
         checksum_sha256: asset.checksum_sha256,
