@@ -640,7 +640,9 @@
     if (!ensureWidget()) return;
     ensureViewer();
     state.selected = cachedSelection();
-    refreshManifest();
+    // نعطي المؤقت وبيانات المدرسة والإعلانات أولوية عند أول فتح.
+    // فحص الجداول مستقل ولا ينبغي أن ينافس تحميل الشاشة الأساسية.
+    setTimeout(refreshManifest, 2200);
     state.refreshTimer = setInterval(() => refreshManifest({ silent: true }), 5 * 60 * 1000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') refreshManifest({ silent: true });
