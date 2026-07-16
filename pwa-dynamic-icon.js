@@ -44,8 +44,8 @@
         dir: 'rtl',
         lang: 'ar',
         icons: [
-          { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-          { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any' }
         ]
       };
       const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
@@ -81,7 +81,7 @@
       const result = await db.from('schools').select('*').eq('school_slug', slug).limit(1);
       const school = result.data && result.data[0];
       if (!school) return;
-      const icon = school.app_icon_url || school.logo_url || school.school_logo_url || school.school_logo || school.logo || '';
+      const icon = school.logo_url || school.app_icon_url || school.school_logo_url || school.school_logo || school.logo || '';
       if (icon) {
         writeCachedIcon(icon);
         setIcons(icon);
@@ -89,5 +89,10 @@
     } catch (error) {}
   }
 
-  setIcons(DEFAULT_ICON);
+  setIcons(readCachedIcon() || DEFAULT_ICON);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadRemoteIcon);
+  } else {
+    loadRemoteIcon();
+  }
 })();

@@ -90,11 +90,11 @@
 
   function setDynamicManifest(data){
     if (isNeutralSchool) return;
-    const stableManifestLink = document.querySelector('link[rel="manifest"]');
-    if (stableManifestLink && stableManifestLink.href.includes('manifests/school-mr7hmic2.webmanifest')) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
-    const appIcon192 = absoluteAsset(GLOBAL_APP_ICON_192);
-    const appIcon512 = absoluteAsset(GLOBAL_APP_ICON_512);
+    const schoolIcon = getLogo(data);
+    const appIcon192 = schoolIcon || absoluteAsset(GLOBAL_APP_ICON_192);
+    const appIcon512 = schoolIcon || absoluteAsset(GLOBAL_APP_ICON_512);
+    const iconPurpose = schoolIcon ? 'any' : 'any maskable';
     const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
     const manifest = {
       id: './school-timer-' + slug,
@@ -108,8 +108,8 @@
       dir: 'rtl',
       lang: 'ar',
       icons: [
-        { src: appIcon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: appIcon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        { src: appIcon192, sizes: '192x192', type: 'image/png', purpose: iconPurpose },
+        { src: appIcon512, sizes: '512x512', type: 'image/png', purpose: iconPurpose }
       ]
     };
     try {
@@ -156,7 +156,7 @@
       }
     }
 
-    setIconLinks(absoluteAsset(GLOBAL_APP_ICON_192));
+    setIconLinks(logoUrl || absoluteAsset(GLOBAL_APP_ICON_192));
     setDynamicManifest(data);
   }
 
