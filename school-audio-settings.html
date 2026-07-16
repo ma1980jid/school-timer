@@ -1,133 +1,186 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#0f766e">
-  <title>النظام الصوتي للمدرسة | مؤقت الحصص</title>
-  <link rel="stylesheet" href="school-audio-settings.css?v=2.0.0">
-  <script defer src="supabase.min.js"></script>
-  <script defer src="supabase-config.js"></script>
-  <script defer src="school-audio-settings.js?v=2.0.0"></script>
-</head>
-<body>
-  <main class="page-shell">
-    <header class="hero">
-      <div class="hero-copy">
-        <span class="eyebrow">إعدادات برنامج Windows</span>
-        <h1>النظام الصوتي للمدرسة</h1>
-        <p>اختر آلية تشغيل الأصوات الرسمية التي جهزها المبرمج. لا يمكن رفع ملفات صوتية من هذه الصفحة.</p>
-      </div>
-      <div class="hero-actions">
-        <a id="backToDashboard" class="button light" href="dashboard-v2.html">العودة إلى لوحة المدرسة</a>
-        <button id="refreshButton" class="button glass" type="button">تحديث البيانات</button>
-      </div>
-    </header>
-
-    <div id="pageNotice" class="notice" role="status" aria-live="polite" hidden></div>
-
-    <section id="loadingView" class="loading-card" aria-live="polite">
-      <span class="spinner" aria-hidden="true"></span>
-      <div><strong>جارٍ تحميل إعدادات المدرسة…</strong><p>يتم جلب الإصدار الصوتي الرسمي والاختيار الحالي.</p></div>
-    </section>
-
-    <section id="errorView" class="error-card" hidden>
-      <span class="error-icon" aria-hidden="true">!</span>
-      <div><h2>تعذر فتح الإعدادات</h2><p id="errorMessage">تحقق من رابط المدرسة ثم أعد المحاولة.</p></div>
-      <button id="retryButton" class="button primary" type="button">إعادة المحاولة</button>
-    </section>
-
-    <div id="settingsView" hidden>
-      <section class="school-summary panel">
-        <div class="school-identity">
-          <span id="schoolStatus" class="status-chip">—</span>
-          <h2 id="schoolName">—</h2>
-          <p id="schoolSlug" dir="ltr">—</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0f766e" />
+    <title>النظام الصوتي للمدرسة | مؤقت الحصص</title>
+    <link rel="stylesheet" href="school-audio-settings.css?v=2.1.0" />
+    <script defer src="supabase.min.js"></script>
+    <script defer src="supabase-config.js"></script>
+    <script defer src="school-audio-settings.js?v=2.1.0"></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">إعدادات برنامج Windows</span>
+          <h1>النظام الصوتي للمدرسة</h1>
+          <p>
+            اختر آلية تشغيل الأصوات الرسمية التي جهزها المبرمج. لا يمكن رفع
+            ملفات صوتية من هذه الصفحة.
+          </p>
         </div>
-        <div class="summary-grid">
-          <article><span>الفئة الصوتية</span><strong id="audienceLabel">—</strong></article>
-          <article><span>الإصدار الرسمي</span><strong id="releaseLabel">—</strong></article>
-          <article><span>مصدر الاختيار</span><strong id="sourceLabel">—</strong></article>
+        <div class="hero-actions">
+          <a id="backToDashboard" class="button light" href="dashboard-v2.html"
+            >العودة إلى لوحة المدرسة</a
+          >
+          <button id="refreshButton" class="button glass" type="button">
+            تحديث البيانات
+          </button>
+        </div>
+      </header>
+
+      <div
+        id="pageNotice"
+        class="notice"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+
+      <section id="loadingView" class="loading-card" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <div>
+          <strong>جارٍ تحميل إعدادات المدرسة…</strong>
+          <p>يتم جلب الإصدار الصوتي الرسمي والاختيار الحالي.</p>
         </div>
       </section>
 
-      <section class="content-grid">
-        <div class="panel choice-panel">
+      <section id="errorView" class="error-card" hidden>
+        <span class="error-icon" aria-hidden="true">!</span>
+        <div>
+          <h2>تعذر فتح الإعدادات</h2>
+          <p id="errorMessage">تحقق من رابط المدرسة ثم أعد المحاولة.</p>
+        </div>
+        <button id="retryButton" class="button primary" type="button">
+          إعادة المحاولة
+        </button>
+      </section>
+
+      <div id="settingsView" hidden>
+        <section class="school-summary panel">
+          <div class="school-identity">
+            <span id="schoolStatus" class="status-chip">—</span>
+            <h2 id="schoolName">—</h2>
+            <p id="schoolSlug" dir="ltr">—</p>
+          </div>
+          <div class="official-summary">
+            <span class="official-icon" aria-hidden="true">♫</span>
+            <div>
+              <strong>أصوات رسمية تُحدَّث تلقائيًا</strong>
+              <p>
+                يتولى المبرمج تجهيز الأصوات المناسبة لفئة المدرسة والإرشادات
+                والمناسبات، ويحفظها برنامج Windows للعمل دون إنترنت.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel choice-panel">
           <div class="section-head">
-            <div><span class="step">الاختيار المتاح</span><h2>كيف تريد تشغيل أصوات الحصص؟</h2></div>
-            <span class="locked-badge">أصوات رسمية فقط</span>
+            <div>
+              <span class="step">اختيار مدير المدرسة</span>
+              <h2>كيف تريد تشغيل أصوات الحصص؟</h2>
+            </div>
+            <span class="locked-badge">أصوات النظام الرسمية</span>
           </div>
 
+          <p class="choice-intro">
+            اختر أحد النظامين فقط، ثم أدخل رمز إدارة المدرسة للحفظ. يصل الاختيار
+            إلى برنامج Windows عند المزامنة التالية.
+          </p>
+
           <form id="profileForm">
-            <fieldset id="profileOptions">
+            <fieldset id="profileOptions" class="profile-options">
               <legend class="sr-only">اختر النظام الصوتي</legend>
               <label class="profile-card" data-profile="end_only">
-                <input type="radio" name="profile" value="end_only">
+                <input type="radio" name="profile" value="end_only" />
                 <span class="radio-mark" aria-hidden="true"></span>
                 <span class="profile-icon" aria-hidden="true">✓</span>
                 <span class="profile-copy">
                   <strong>النهايات فقط</strong>
-                  <small>يشغّل إعلان نهاية كل حصة وفق الجدول، دون إعلان مستقل لبداية الحصة التالية.</small>
-                  <span class="sequence"><b>نهاية الأولى</b><i>ثم</i><b>نهاية الثانية</b><i>ثم</i><b>نهاية الثالثة</b></span>
+                  <small
+                    >يشغّل إعلان نهاية كل حصة وفق الجدول، دون إعلان مستقل لبداية
+                    الحصة التالية.</small
+                  >
+                  <span class="sequence"
+                    ><b>نهاية الأولى</b><i>ثم</i><b>نهاية الثانية</b><i>ثم</i
+                    ><b>نهاية الثالثة</b></span
+                  >
                 </span>
                 <span class="recommended">هادئ ومختصر</span>
               </label>
 
               <label class="profile-card" data-profile="start_and_end">
-                <input type="radio" name="profile" value="start_and_end">
+                <input type="radio" name="profile" value="start_and_end" />
                 <span class="radio-mark" aria-hidden="true"></span>
                 <span class="profile-icon dual" aria-hidden="true">↔</span>
                 <span class="profile-copy">
                   <strong>البداية والنهاية</strong>
-                  <small>بعد إعلان نهاية الحصة يبدأ إعلان بداية الحصة التالية فور انتهاء المقطع الأول، بلا فاصل زمني ثابت.</small>
-                  <span class="sequence"><b>نهاية الأولى</b><i>ثم فورًا</i><b>بداية الثانية</b><i>ثم</i><b>نهاية الثانية</b></span>
+                  <small
+                    >بعد إعلان نهاية الحصة يبدأ إعلان بداية الحصة التالية فور
+                    انتهاء المقطع الأول، دون انتظار زمني ثابت.</small
+                  >
+                  <span class="sequence"
+                    ><b>نهاية الأولى</b><i>ثم فورًا</i><b>بداية الثانية</b
+                    ><i>ثم</i><b>نهاية الثانية</b></span
+                  >
                 </span>
                 <span class="recommended accent">أكثر تفصيلًا</span>
               </label>
             </fieldset>
 
             <div class="save-box">
-              <div class="save-copy"><h3>تأكيد مدير المدرسة</h3><p>اكتب رمز إدارة المدرسة لحفظ الاختيار. لا يُرسل الرمز إلا للتحقق ولا يظهر للمبرمج.</p></div>
-              <label class="code-field">رمز الإدارة
+              <div class="save-copy">
+                <h3>تأكيد الاختيار</h3>
+                <p>
+                  أدخل رمز إدارة المدرسة. يُستخدم الرمز للتحقق فقط ولا يظهر
+                  للمبرمج.
+                </p>
+              </div>
+              <label class="code-field"
+                >رمز إدارة المدرسة
                 <div class="password-wrap">
-                  <input id="adminCode" type="password" autocomplete="current-password" inputmode="numeric" placeholder="أدخل رمز إدارة المدرسة">
-                  <button id="toggleCode" type="button" aria-label="إظهار أو إخفاء الرمز">إظهار</button>
+                  <input
+                    id="adminCode"
+                    type="password"
+                    autocomplete="current-password"
+                    inputmode="numeric"
+                    placeholder="أدخل رمز إدارة المدرسة"
+                  />
+                  <button
+                    id="toggleCode"
+                    type="button"
+                    aria-label="إظهار أو إخفاء الرمز"
+                  >
+                    إظهار
+                  </button>
                 </div>
-                <small id="sessionCodeHint" hidden>يمكنك ترك الحقل فارغًا لاستخدام الرمز المحفوظ خلال هذه الجلسة.</small>
+                <small id="sessionCodeHint" hidden
+                  >يمكنك ترك الحقل فارغًا لاستخدام الرمز المحفوظ خلال هذه
+                  الجلسة.</small
+                >
               </label>
-              <button id="saveButton" class="button primary save-button" type="submit">حفظ النظام الصوتي</button>
+              <button
+                id="saveButton"
+                class="button primary save-button"
+                type="submit"
+              >
+                حفظ الاختيار
+              </button>
             </div>
           </form>
-        </div>
+        </section>
 
-        <aside class="side-column">
-          <section class="panel guidance-panel">
-            <div class="side-head"><span class="side-icon">↻</span><div><span>إرشادات هذا الأسبوع</span><h2 id="rotationTitle">—</h2></div></div>
-            <div id="guidanceTitles" class="guidance-list"><p>يتم تحميل المقاطع…</p></div>
-            <div class="rotation-meta">
-              <div><span>بداية الأسبوع</span><strong id="weekStart">الأحد</strong></div>
-              <div><span>التغيير القادم</span><strong id="nextRotation">—</strong></div>
-            </div>
-            <p id="rotationNote" class="rotation-note">—</p>
-          </section>
-
-          <section class="panel rules-panel">
-            <div class="side-head"><span class="side-icon shield">✓</span><div><span>سياسة التشغيل</span><h2>ماذا تدير المدرسة؟</h2></div></div>
-            <ul>
-              <li><span>✓</span> تختار نظام النهايات أو البداية والنهاية.</li>
-              <li><span>✓</span> تستقبل إصدار البنين أو البنات تلقائيًا.</li>
-              <li><span>✓</span> تحصل على إرشادات الأسبوع والمناسبات المركزية.</li>
-              <li class="muted"><span>—</span> لا ترفع أو تحذف أي ملف صوتي.</li>
-            </ul>
-          </section>
-        </aside>
-      </section>
-
-      <footer class="page-footer">
-        <span>يُحفظ الاختيار في Supabase ويصل إلى برنامج Windows عند المزامنة التالية.</span>
-        <span>لا يغيّر هذا الإعداد تواقيت المدرسة أو جدول الحصص.</span>
-      </footer>
-    </div>
-  </main>
-</body>
+        <footer class="page-footer">
+          <span
+            >الأصوات وفئة المدرسة والتدوير الأسبوعي والمناسبات تُدار
+            تلقائيًا.</span
+          >
+          <span>هذا الاختيار لا يغيّر التوقيت أو جدول الحصص.</span>
+        </footer>
+      </div>
+    </main>
+  </body>
 </html>

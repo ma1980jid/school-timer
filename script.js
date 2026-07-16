@@ -708,7 +708,7 @@ function updateCards(s = getSchedule()) {
     setText("currentName", "--");
     setTimeRange("currentTime", null);
   } else {
-    setText("currentName", "لا توجد حصة");
+    setText("currentName", "فاصل بين الحصص");
     setTimeRange("currentTime", null);
   }
 

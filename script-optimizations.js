@@ -93,7 +93,7 @@
         window.setText('currentName', '--');
         window.setTimeRange('currentTime', null);
       } else {
-        window.setText('currentName', 'لا توجد حصة');
+        window.setText('currentName', 'فاصل بين الحصص');
         window.setTimeRange('currentTime', null);
       }
 
