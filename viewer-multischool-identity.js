@@ -8,6 +8,8 @@
   const cacheKey = 'school_timer_identity_' + slug;
   const isInstallPage = location.pathname.includes('install.html');
   const DEFAULT_CARD_TEXT = 'مؤقت الحصص';
+  const GLOBAL_APP_ICON_192 = 'icons/pwa-192.png?v=brand-20260716-01';
+  const GLOBAL_APP_ICON_512 = 'icons/pwa-512.png?v=brand-20260716-01';
   const SHARED_CLIENT_KEY = '__schoolTimerSupabaseClient';
   let identity = null;
   let identityLoading = false;
@@ -22,7 +24,12 @@
   }
 
   function safeText(value){ return String(value || '').trim(); }
-  function getLogo(data){ return safeText(data && (data.app_icon_url || data.logo_url)); }
+  function getLogo(data){ return safeText(data && (data.logo_url || data.app_icon_url)); }
+
+  function absoluteAsset(path){
+    try { return new URL(path, location.href).href; }
+    catch (error) { return path; }
+  }
 
   function readCache(){
     if (isNeutralSchool) return null;
@@ -86,7 +93,8 @@
     const stableManifestLink = document.querySelector('link[rel="manifest"]');
     if (stableManifestLink && stableManifestLink.href.includes('manifests/school-mr7hmic2.webmanifest')) return;
     const name = safeText(data && data.school_name) || DEFAULT_CARD_TEXT;
-    const icon = getLogo(data);
+    const appIcon192 = absoluteAsset(GLOBAL_APP_ICON_192);
+    const appIcon512 = absoluteAsset(GLOBAL_APP_ICON_512);
     const startUrl = 'index.html?school=' + encodeURIComponent(slug) + '&view=mobile&pwa=1';
     const manifest = {
       id: './school-timer-' + slug,
@@ -99,10 +107,10 @@
       theme_color: '#0f766e',
       dir: 'rtl',
       lang: 'ar',
-      icons: icon ? [
-        { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-      ] : []
+      icons: [
+        { src: appIcon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: appIcon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ]
     };
     try {
       const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
@@ -148,7 +156,7 @@
       }
     }
 
-    if (logoUrl) setIconLinks(logoUrl);
+    setIconLinks(absoluteAsset(GLOBAL_APP_ICON_192));
     setDynamicManifest(data);
   }
 

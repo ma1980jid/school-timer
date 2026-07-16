@@ -2,7 +2,7 @@
   if (window.__schoolTimerPwaDynamicIconLoaded) return;
   window.__schoolTimerPwaDynamicIconLoaded = true;
 
-  const DEFAULT_ICON = 'icons/school_logo.png';
+  const DEFAULT_ICON = 'icons/pwa-512.png?v=brand-20260716-01';
   const slug = new URLSearchParams(location.search).get('school') || window.SCHOOL_TIMER_SLUG || 'alsheikh-saif';
   const iconCacheKey = 'school_timer_app_icon_' + slug;
 
@@ -89,10 +89,5 @@
     } catch (error) {}
   }
 
-  setIcons(readCachedIcon() || DEFAULT_ICON);
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadRemoteIcon);
-  } else {
-    loadRemoteIcon();
-  }
+  setIcons(DEFAULT_ICON);
 })();
